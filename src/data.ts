@@ -9,6 +9,61 @@ export const profile = {
   github: "https://github.com/yourname",
 }
 
+export const about = {
+  // 简短个人定位
+  positioning:
+    "AI 时代的复合型产品人，擅长在「设计 — 产品 — AI 工程」之间穿针引线，用一句话定义价值：让好产品被更快、更好地造出来。",
+  // 职业优势（3 条左右）
+  advantages: [
+    {
+      title: "设计 + 产品双栖",
+      desc: "既能输出高保真交互与视觉规范，又能拆解复杂业务、撰写清晰 PRD，减少跨职能沟通损耗。",
+    },
+    {
+      title: "AI 工作流提效",
+      desc: "熟练运用 Prompt 工程与 AI 编码工具，把从设计到上线的链路压缩到极短，快速验证想法。",
+    },
+    {
+      title: "端到端交付力",
+      desc: "从 0 到 1 独立推动需求落地，覆盖洞察、设计、开发协同与上线迭代的完整闭环。",
+    },
+  ],
+  // 设计与产品理念（2-3 条，含小标题 + 描述）
+  philosophy: [
+    {
+      title: "体验是商业的复利",
+      desc: "每一处细节的打磨都会沉淀为用户信任，好的体验不是成本，而是长期回报。",
+    },
+    {
+      title: "先定义问题，再设计方案",
+      desc: "拒绝为做而做，先把「值得做什么」想清楚，再用最克制的方式解决真实问题。",
+    },
+    {
+      title: "用 AI 放大判断力",
+      desc: "AI 把执行成本降到极低，产品人的核心价值回归到判断、取舍与定义标准。",
+    },
+  ],
+  // 在校经历
+  education: [
+    {
+      school: "示例大学",
+      major: "数字媒体艺术 / 工业设计（占位）",
+      period: "2021 — 2025",
+      points: [
+        "核心课程：交互设计、用户研究、信息架构、服务设计。",
+        "担任设计社团负责人，组织多场设计工作坊与项目实践。",
+        "主导多个课程项目从概念到高保真原型的完整落地。",
+      ],
+    },
+  ],
+  // 获奖情况
+  awards: [
+    { name: "全国大学生设计大赛 一等奖（占位）", level: "国家级", year: "2024" },
+    { name: "省级互联网+创新创业大赛 银奖（占位）", level: "省级", year: "2023" },
+    { name: "校级优秀毕业设计（占位）", level: "校级", year: "2025" },
+  ],
+}
+
 export const stats = [
   { value: "12", suffix: "+", label: "交付项目", desc: "B端 / C端 / 创新设计" },
   { value: "2", suffix: "年", label: "AI 实践经验", desc: "AI 工作流与提效落地" },
@@ -109,7 +164,7 @@ export const navItems = [
   { id: "home", label: "首页" },
   { id: "experience", label: "工作经历" },
   { id: "projects", label: "项目作品" },
-  { id: "thinking", label: "产品思考" },
+  { id: "thinking", label: "ai工作流" },
   { id: "contact", label: "联系我" },
 ]
 

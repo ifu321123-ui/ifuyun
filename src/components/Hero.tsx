@@ -1,5 +1,6 @@
 import { ArrowRight, Download, Sparkles } from "lucide-react"
 import { profile, stats } from "@/data"
+import { navigate } from "@/hooks/useRoute"
 
 export default function Hero() {
   const scrollTo = (id: string) =>
@@ -36,7 +37,7 @@ export default function Hero() {
 
           <div className="mt-9 flex flex-wrap items-center gap-3">
             <button
-              onClick={() => scrollTo("projects")}
+              onClick={() => navigate("projects")}
               className="group inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground transition-transform hover:scale-[1.03]"
             >
               查看全部项目

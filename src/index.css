@@ -4,23 +4,23 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
 
-  /* 黑白灰主色调 */
-  --color-background: oklch(0.145 0 0);
-  --color-foreground: oklch(0.97 0 0);
+  /* 亮色基调：纯白 / 极浅灰 */
+  --color-background: oklch(0.985 0 0);
+  --color-foreground: oklch(0.205 0 0);
 
-  --color-surface: oklch(0.185 0 0);
-  --color-surface-foreground: oklch(0.97 0 0);
+  --color-surface: oklch(1 0 0);
+  --color-surface-foreground: oklch(0.205 0 0);
 
-  --color-muted: oklch(0.27 0 0);
-  --color-muted-foreground: oklch(0.62 0 0);
+  --color-muted: oklch(0.95 0 0);
+  --color-muted-foreground: oklch(0.5 0 0);
 
-  --color-border: oklch(1 0 0 / 8%);
-  --color-border-strong: oklch(1 0 0 / 14%);
+  --color-border: oklch(0 0 0 / 8%);
+  --color-border-strong: oklch(0 0 0 / 14%);
 
-  /* 荧光绿强调色 */
-  --color-accent: oklch(0.87 0.24 145);
-  --color-accent-foreground: oklch(0.145 0 0);
-  --color-accent-muted: oklch(0.87 0.24 145 / 12%);
+  /* 电光蓝强调色 */
+  --color-accent: oklch(0.52 0.25 264);
+  --color-accent-foreground: oklch(0.99 0 0);
+  --color-accent-muted: oklch(0.52 0.25 264 / 12%);
 
   --radius: 1rem;
 }
@@ -56,52 +56,57 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: oklch(1 0 0 / 10%);
+    background: oklch(0 0 0 / 16%);
     border-radius: 9999px;
     border: 3px solid var(--color-background);
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: oklch(1 0 0 / 18%);
+    background: var(--color-accent);
   }
 }
 
 @layer components {
-  /* 磨砂玻璃卡片 */
+  /* 亮底磨砂玻璃卡片 */
   .glass {
     background: linear-gradient(
       180deg,
-      oklch(1 0 0 / 6%) 0%,
-      oklch(1 0 0 / 2%) 100%
+      oklch(1 0 0 / 85%) 0%,
+      oklch(1 0 0 / 65%) 100%
     );
     backdrop-filter: blur(20px) saturate(140%);
     -webkit-backdrop-filter: blur(20px) saturate(140%);
     border: 1px solid var(--color-border);
     box-shadow:
-      0 1px 0 0 oklch(1 0 0 / 6%) inset,
-      0 20px 50px -20px oklch(0 0 0 / 60%);
+      0 1px 0 0 oklch(1 0 0 / 90%) inset,
+      0 18px 48px -24px oklch(0.52 0.25 264 / 18%),
+      0 8px 24px -16px oklch(0 0 0 / 8%);
   }
 
   .glass-strong {
     background: linear-gradient(
       180deg,
-      oklch(1 0 0 / 9%) 0%,
-      oklch(1 0 0 / 3%) 100%
+      oklch(1 0 0 / 95%) 0%,
+      oklch(1 0 0 / 80%) 100%
     );
     backdrop-filter: blur(28px) saturate(160%);
     -webkit-backdrop-filter: blur(28px) saturate(160%);
     border: 1px solid var(--color-border-strong);
+    box-shadow:
+      0 1px 0 0 oklch(1 0 0 / 95%) inset,
+      0 28px 70px -30px oklch(0.52 0.25 264 / 22%),
+      0 10px 30px -18px oklch(0 0 0 / 10%);
   }
 
-  /* 荧光绿发光文字 */
+  /* 电光蓝发光文字 */
   .text-glow {
-    text-shadow: 0 0 30px oklch(0.87 0.24 145 / 45%);
+    text-shadow: 0 2px 24px oklch(0.52 0.25 264 / 28%);
   }
 
   /* 网格背景纹理 */
   .grid-bg {
     background-image:
-      linear-gradient(to right, oklch(1 0 0 / 3%) 1px, transparent 1px),
-      linear-gradient(to bottom, oklch(1 0 0 / 3%) 1px, transparent 1px);
+      linear-gradient(to right, oklch(0 0 0 / 4%) 1px, transparent 1px),
+      linear-gradient(to bottom, oklch(0 0 0 / 4%) 1px, transparent 1px);
     background-size: 64px 64px;
   }
 }

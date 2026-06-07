@@ -1,0 +1,156 @@
+import {
+  Award,
+  Compass,
+  GraduationCap,
+  Lightbulb,
+  Sparkles,
+  TrendingUp,
+} from "lucide-react"
+import Section from "./Section"
+import { about } from "@/data"
+
+export default function About() {
+  return (
+    <Section
+      id="about"
+      eyebrow="关于我"
+      title="个人简介"
+      description="一份关于定位、优势、理念与成长经历的综合介绍。"
+    >
+      <div className="grid gap-4 lg:grid-cols-3">
+        {/* 个人定位 */}
+        <div className="group rounded-2xl glass-strong p-7 transition-all duration-300 hover:-translate-y-1 lg:col-span-3">
+          <div className="flex items-start gap-4">
+            <div className="inline-flex size-11 shrink-0 items-center justify-center rounded-xl bg-accent-muted text-accent transition-colors group-hover:bg-accent group-hover:text-accent-foreground">
+              <Compass className="size-5" />
+            </div>
+            <div>
+              <h3 className="text-base font-semibold">个人定位</h3>
+              <p className="mt-2 text-pretty leading-relaxed text-muted-foreground">
+                {about.positioning}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* 职业优势 */}
+        <div className="group rounded-2xl glass p-7 transition-all duration-300 hover:-translate-y-1 lg:col-span-2">
+          <div className="mb-5 flex items-center gap-3">
+            <div className="inline-flex size-11 items-center justify-center rounded-xl bg-accent-muted text-accent">
+              <TrendingUp className="size-5" />
+            </div>
+            <h3 className="text-base font-semibold">职业优势</h3>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {about.advantages.map((item) => (
+              <div
+                key={item.title}
+                className="rounded-xl border border-border p-4 transition-colors hover:border-accent/40"
+              >
+                <h4 className="text-sm font-semibold text-foreground">
+                  {item.title}
+                </h4>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {item.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 设计与产品理念 */}
+        <div className="group rounded-2xl glass p-7 transition-all duration-300 hover:-translate-y-1">
+          <div className="mb-5 flex items-center gap-3">
+            <div className="inline-flex size-11 items-center justify-center rounded-xl bg-accent-muted text-accent">
+              <Lightbulb className="size-5" />
+            </div>
+            <h3 className="text-base font-semibold">设计与产品理念</h3>
+          </div>
+          <ul className="space-y-4">
+            {about.philosophy.map((item) => (
+              <li key={item.title} className="flex gap-2.5">
+                <Sparkles className="mt-0.5 size-4 shrink-0 text-accent" />
+                <div>
+                  <h4 className="text-sm font-semibold text-foreground">
+                    {item.title}
+                  </h4>
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                    {item.desc}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* 在校经历 */}
+        <div className="group rounded-2xl glass p-7 transition-all duration-300 hover:-translate-y-1 lg:col-span-2">
+          <div className="mb-5 flex items-center gap-3">
+            <div className="inline-flex size-11 items-center justify-center rounded-xl bg-accent-muted text-accent">
+              <GraduationCap className="size-5" />
+            </div>
+            <h3 className="text-base font-semibold">在校经历</h3>
+          </div>
+          <div className="space-y-6">
+            {about.education.map((edu) => (
+              <div key={edu.school}>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <h4 className="text-sm font-semibold text-foreground">
+                      {edu.school}
+                    </h4>
+                    <p className="mt-1 text-sm text-accent">{edu.major}</p>
+                  </div>
+                  <span className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">
+                    {edu.period}
+                  </span>
+                </div>
+                <ul className="mt-4 space-y-2.5">
+                  {edu.points.map((p) => (
+                    <li
+                      key={p}
+                      className="flex gap-2.5 text-sm leading-relaxed text-muted-foreground"
+                    >
+                      <span className="mt-2 size-1.5 shrink-0 rounded-full bg-accent" />
+                      {p}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 获奖情况 */}
+        <div className="group rounded-2xl glass p-7 transition-all duration-300 hover:-translate-y-1">
+          <div className="mb-5 flex items-center gap-3">
+            <div className="inline-flex size-11 items-center justify-center rounded-xl bg-accent-muted text-accent">
+              <Award className="size-5" />
+            </div>
+            <h3 className="text-base font-semibold">获奖情况</h3>
+          </div>
+          <ul className="space-y-3">
+            {about.awards.map((award) => (
+              <li
+                key={award.name}
+                className="rounded-xl border border-border p-4 transition-colors hover:border-accent/40"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <span className="text-sm font-medium text-foreground">
+                    {award.name}
+                  </span>
+                  <span className="shrink-0 rounded-full bg-accent-muted px-2 py-0.5 text-xs font-medium text-accent">
+                    {award.level}
+                  </span>
+                </div>
+                <span className="mt-2 block text-xs text-muted-foreground">
+                  {award.year}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </Section>
+  )
+}
