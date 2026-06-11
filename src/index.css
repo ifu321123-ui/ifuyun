@@ -353,7 +353,7 @@
   }
 
   .notebook-paper--top {
-    min-height: clamp(17rem, 44vw, 21.5rem);
+    min-height: clamp(19rem, 50vw, 27rem);
     border-radius: 0.45rem;
     transform: perspective(4105px) rotateX(-5deg);
     transform-origin: 50% 100%;
