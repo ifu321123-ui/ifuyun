@@ -20,7 +20,7 @@ export function useRoute(): PageId {
   useEffect(() => {
     const onHashChange = () => {
       setPage(parseHash())
-      window.scrollTo({ top: 0 })
+      // 滚动归零由 SmoothScroll 统一处理（Lenis / 原生兜底），避免双重滚动冲突。
     }
     window.addEventListener("hashchange", onHashChange)
     return () => window.removeEventListener("hashchange", onHashChange)

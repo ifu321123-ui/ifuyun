@@ -1,5 +1,6 @@
 import { useInView } from "@/hooks/useInView"
 import { cn } from "@/lib/utils"
+import SplitText from "./SplitText"
 
 interface SectionProps {
   id: string
@@ -43,9 +44,14 @@ export default function Section({
             </div>
           )}
           {title && (
-            <h2 className="text-balance text-3xl font-semibold tracking-tight md:text-4xl">
-              {title}
-            </h2>
+            <SplitText
+              as="h2"
+              text={title}
+              by="char"
+              stagger={28}
+              duration={760}
+              className="block text-balance text-3xl font-semibold tracking-tight md:text-4xl"
+            />
           )}
           {description && (
             <p className="mt-4 text-pretty leading-relaxed text-muted-foreground">

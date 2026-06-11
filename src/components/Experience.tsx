@@ -1,4 +1,4 @@
-import { Briefcase, Check, Sparkles } from "lucide-react"
+import { Briefcase, Check, Search, Wrench, BarChart3, Sparkles } from "lucide-react"
 import Section from "./Section"
 import { experiences } from "@/data"
 
@@ -31,14 +31,46 @@ export default function Experience() {
                   {exp.period}
                 </span>
               </div>
+              <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{exp.summary}</p>
 
-              <div className="mt-6 grid gap-8 md:grid-cols-2">
+              <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                <article className="rounded-xl border border-border bg-surface/60 p-4">
+                  <h4 className="mb-2 inline-flex items-center gap-2 text-sm font-medium text-foreground">
+                    <Search className="size-4 text-accent" />
+                    问题
+                  </h4>
+                  <p className="text-sm leading-relaxed text-muted-foreground">{exp.loop.problem}</p>
+                </article>
+                <article className="rounded-xl border border-border bg-surface/60 p-4">
+                  <h4 className="mb-2 inline-flex items-center gap-2 text-sm font-medium text-foreground">
+                    <Check className="size-4 text-accent" />
+                    分析
+                  </h4>
+                  <p className="text-sm leading-relaxed text-muted-foreground">{exp.loop.analysis}</p>
+                </article>
+                <article className="rounded-xl border border-border bg-surface/60 p-4">
+                  <h4 className="mb-2 inline-flex items-center gap-2 text-sm font-medium text-foreground">
+                    <Wrench className="size-4 text-accent" />
+                    方案
+                  </h4>
+                  <p className="text-sm leading-relaxed text-muted-foreground">{exp.loop.solution}</p>
+                </article>
+                <article className="rounded-xl border border-border bg-surface/60 p-4">
+                  <h4 className="mb-2 inline-flex items-center gap-2 text-sm font-medium text-foreground">
+                    <BarChart3 className="size-4 text-accent" />
+                    结果
+                  </h4>
+                  <p className="text-sm leading-relaxed text-muted-foreground">{exp.loop.result}</p>
+                </article>
+              </div>
+
+              <div className="mt-8 grid gap-8 md:grid-cols-2">
                 <div>
                   <h4 className="mb-3 text-sm font-medium text-foreground">
                     核心工作内容
                   </h4>
                   <ul className="space-y-2.5">
-                    {exp.points.map((p) => (
+                    {[exp.loop.problem, exp.loop.analysis, exp.loop.solution].map((p) => (
                       <li
                         key={p}
                         className="flex gap-2.5 text-sm leading-relaxed text-muted-foreground"

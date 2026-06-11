@@ -30,7 +30,7 @@ const links = [
   {
     icon: Github,
     label: "GitHub",
-    value: "@yourname",
+    value: profile.github.replace(/^https?:\/\//, ""),
     href: profile.github,
   },
 ]
@@ -51,8 +51,19 @@ export default function Contact() {
             Let&apos;s Build Something Together.
           </h2>
           <p className="mt-4 max-w-lg text-pretty leading-relaxed text-muted-foreground">
-            无论是产品合作、设计交流，还是 AI 落地探讨，欢迎随时与我联系。
+            {profile.brandClosing}
           </p>
+
+          <div className="mt-4 flex flex-wrap gap-2">
+            {profile.targetJobs.map((job) => (
+              <span
+                key={job}
+                className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground"
+              >
+                {job}
+              </span>
+            ))}
+          </div>
 
           <div className="mt-10 grid gap-4 sm:grid-cols-3">
             {links.map((l) => (
@@ -75,13 +86,28 @@ export default function Contact() {
           </div>
 
           <div className="mt-8">
-            <a
-              href="#"
-              className="group inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground transition-transform hover:scale-[1.03]"
-            >
-              <Download className="size-4" />
-              一键下载个人简历
-            </a>
+            <div className="flex flex-wrap gap-3">
+              <a
+                href={profile.resumeUrl}
+                download
+                target="_blank"
+                rel="noreferrer"
+                className="group inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground transition-transform hover:scale-[1.03]"
+              >
+                <Download className="size-4" />
+                下载个人简历
+              </a>
+              <a
+                href={profile.portfolioUrl}
+                download
+                target="_blank"
+                rel="noreferrer"
+                className="group inline-flex items-center gap-2 rounded-full border border-border-strong px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
+              >
+                <Download className="size-4" />
+                下载作品集
+              </a>
+            </div>
           </div>
         </div>
       </div>

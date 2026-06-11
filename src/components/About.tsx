@@ -1,11 +1,4 @@
-import {
-  Award,
-  Compass,
-  GraduationCap,
-  Lightbulb,
-  Sparkles,
-  TrendingUp,
-} from "lucide-react"
+import { Award, Compass, GraduationCap } from "lucide-react"
 import Section from "./Section"
 import { about } from "@/data"
 
@@ -33,56 +26,6 @@ export default function About() {
           </div>
         </div>
 
-        {/* 职业优势 */}
-        <div className="group rounded-2xl glass p-7 transition-all duration-300 hover:-translate-y-1 lg:col-span-2">
-          <div className="mb-5 flex items-center gap-3">
-            <div className="inline-flex size-11 items-center justify-center rounded-xl bg-accent-muted text-accent">
-              <TrendingUp className="size-5" />
-            </div>
-            <h3 className="text-base font-semibold">职业优势</h3>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {about.advantages.map((item) => (
-              <div
-                key={item.title}
-                className="rounded-xl border border-border p-4 transition-colors hover:border-accent/40"
-              >
-                <h4 className="text-sm font-semibold text-foreground">
-                  {item.title}
-                </h4>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  {item.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* 设计与产品理念 */}
-        <div className="group rounded-2xl glass p-7 transition-all duration-300 hover:-translate-y-1">
-          <div className="mb-5 flex items-center gap-3">
-            <div className="inline-flex size-11 items-center justify-center rounded-xl bg-accent-muted text-accent">
-              <Lightbulb className="size-5" />
-            </div>
-            <h3 className="text-base font-semibold">设计与产品理念</h3>
-          </div>
-          <ul className="space-y-4">
-            {about.philosophy.map((item) => (
-              <li key={item.title} className="flex gap-2.5">
-                <Sparkles className="mt-0.5 size-4 shrink-0 text-accent" />
-                <div>
-                  <h4 className="text-sm font-semibold text-foreground">
-                    {item.title}
-                  </h4>
-                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                    {item.desc}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-
         {/* 在校经历 */}
         <div className="group rounded-2xl glass p-7 transition-all duration-300 hover:-translate-y-1 lg:col-span-2">
           <div className="mb-5 flex items-center gap-3">
@@ -105,17 +48,34 @@ export default function About() {
                     {edu.period}
                   </span>
                 </div>
-                <ul className="mt-4 space-y-2.5">
-                  {edu.points.map((p) => (
-                    <li
-                      key={p}
-                      className="flex gap-2.5 text-sm leading-relaxed text-muted-foreground"
+                <div className="mt-5 space-y-4">
+                  {edu.items.map((item) => (
+                    <div
+                      key={item.title}
+                      className="rounded-xl border border-border p-4"
                     >
-                      <span className="mt-2 size-1.5 shrink-0 rounded-full bg-accent" />
-                      {p}
-                    </li>
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <h5 className="text-sm font-semibold text-foreground">
+                          {item.title}
+                        </h5>
+                        <span className="rounded-full bg-accent-muted px-2.5 py-1 text-xs font-medium text-accent">
+                          {item.period}
+                        </span>
+                      </div>
+                      <ul className="mt-3 space-y-2.5">
+                        {item.points.map((p) => (
+                          <li
+                            key={p}
+                            className="flex gap-2.5 text-sm leading-relaxed text-muted-foreground"
+                          >
+                            <span className="mt-2 size-1.5 shrink-0 rounded-full bg-accent" />
+                            {p}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   ))}
-                </ul>
+                </div>
               </div>
             ))}
           </div>

@@ -1,99 +1,147 @@
-import { ArrowRight, Download, Sparkles } from "lucide-react"
+import { useState } from "react"
+import { ArrowRight, FileText } from "lucide-react"
 import { profile, stats } from "@/data"
 import { navigate } from "@/hooks/useRoute"
+import SplitText from "./SplitText"
+
+/** 人物抠图：替换为去背 PNG（建议黑白/灰度调），放到 public 下并改这里的路径 */
+const PORTRAIT_SRC = "/portrait.png"
+
+function Portrait() {
+  const [ok, setOk] = useState(true)
+
+  if (!ok) {
+    // 占位：未提供人物图时，保持版式层叠关系
+    return (
+      <div className="flex h-[clamp(10rem,28vw,20rem)] w-[clamp(13rem,30vw,22rem)] items-end justify-center">
+        <div className="grid h-[86%] w-full place-items-center rounded-[2rem] border border-dashed border-border-strong bg-gradient-to-b from-muted to-background text-center">
+          <span className="px-4 text-xs leading-relaxed text-muted-foreground">
+            人物抠图占位
+            <br />
+            替换 <code className="font-mono">/public/portrait.png</code>
+          </span>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <img
+      src={PORTRAIT_SRC}
+      alt={profile.name}
+      onError={() => setOk(false)}
+      className="h-[clamp(10rem,28vw,20rem)] w-auto object-contain object-bottom grayscale contrast-[1.08] mix-blend-screen"
+    />
+  )
+}
 
 export default function Hero() {
-  const scrollTo = (id: string) =>
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" })
-
   return (
     <section
       id="home"
-      className="relative overflow-hidden px-6 pt-36 pb-24 md:pt-44 md:pb-32"
+      className="relative overflow-hidden px-6 pt-10 pb-20 md:pt-14 md:pb-24"
     >
-      {/* 背景纹理与光晕 */}
-      <div className="pointer-events-none absolute inset-0 grid-bg [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]" />
-      <div className="pointer-events-none absolute -top-32 right-0 size-[480px] rounded-full bg-accent/20 blur-[140px] animate-pulse-glow" />
+      <div className="mx-auto max-w-6xl">
+        <p className="text-center text-sm font-medium text-muted-foreground animate-fade-up md:text-base">
+          Hi, 我是 {profile.name}
+        </p>
 
-      <div className="relative mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
-        {/* 左侧文字 */}
-        <div className="animate-fade-up">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border-strong px-3 py-1.5 text-xs font-medium text-muted-foreground">
-            <Sparkles className="size-3.5 text-accent" />
-            可接受合作 · 开放新机会
+        {/* 人物抠图（黑白）在标题文字上方 */}
+        <div className="relative mx-auto mt-4 flex max-w-5xl flex-col items-center">
+          <div className="relative z-20 flex justify-center animate-fade-up">
+            <Portrait />
           </div>
 
-          <h1 className="text-balance text-4xl font-semibold leading-[1.1] tracking-tight md:text-6xl">
-            <span className="text-accent text-glow">{profile.role}</span>
-          </h1>
+          <SplitText
+            as="h1"
+            text={profile.heroTitle}
+            by="char"
+            stagger={55}
+            duration={900}
+            className="relative z-10 -mt-2 block select-none whitespace-nowrap text-center text-[clamp(2.5rem,12.5vw,9rem)] font-black leading-[0.92] tracking-tighter text-foreground md:-mt-4"
+          />
 
-          <p className="mt-6 max-w-xl text-balance text-xl font-medium leading-snug text-foreground/90 md:text-2xl">
-            {profile.slogan}
-          </p>
-
-          <p className="mt-5 max-w-lg text-pretty leading-relaxed text-muted-foreground">
-            {profile.description}
-          </p>
-
-          <div className="mt-9 flex flex-wrap items-center gap-3">
-            <button
-              onClick={() => navigate("projects")}
-              className="group inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground transition-transform hover:scale-[1.03]"
-            >
-              查看全部项目
-              <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
-            </button>
-            <button
-              onClick={() => scrollTo("contact")}
-              className="inline-flex items-center gap-2 rounded-full border border-border-strong px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
-            >
-              <Download className="size-4" />
-              下载个人简历
-            </button>
-          </div>
+          <SplitText
+            as="h1"
+            text={profile.heroSubtitle}
+            by="char"
+            stagger={55}
+            delay={220}
+            duration={900}
+            className="relative z-10 -mt-[0.16em] block select-none whitespace-nowrap text-center text-[clamp(2.5rem,12.5vw,9rem)] font-black leading-[0.92] tracking-tighter text-transparent [-webkit-text-stroke:2px_var(--color-foreground)]"
+          />
         </div>
 
-        {/* 右侧：预留 3D 交互空间 */}
-        <div className="relative hidden lg:block">
-          <div className="relative aspect-square rounded-3xl glass-strong p-8">
-            <div className="absolute inset-0 grid-bg rounded-3xl opacity-40" />
-            <div className="relative flex h-full flex-col items-center justify-center gap-6 text-center">
-              <div className="relative grid size-32 place-items-center rounded-full border border-accent/30 animate-float">
-                <div className="absolute inset-0 rounded-full bg-accent/10 blur-2xl" />
-                <span className="text-5xl font-bold text-accent text-glow">AI</span>
+        <p className="mx-auto mt-8 max-w-3xl text-center text-pretty text-base leading-relaxed text-muted-foreground animate-fade-up md:text-lg">
+          {profile.slogan}
+        </p>
+        <p className="mx-auto mt-3 max-w-3xl text-center text-pretty text-sm leading-relaxed text-muted-foreground/90 animate-fade-up">
+          {profile.description}
+        </p>
+
+        <div className="relative z-30 mt-8 flex flex-wrap items-center justify-center gap-3 animate-fade-up">
+          <button
+            onClick={() => navigate("projects")}
+            className="group inline-flex items-center gap-2 rounded-lg bg-foreground px-6 py-3 text-sm font-semibold text-background transition-transform hover:scale-[1.03]"
+          >
+            查看项目作品
+            <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+          </button>
+          <a
+            href={profile.resumeUrl}
+            download
+            target="_blank"
+            rel="noreferrer"
+            className="group inline-flex items-center gap-2 rounded-lg border border-border-strong px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
+          >
+            <FileText className="size-4" />
+            下载简历
+          </a>
+        </div>
+
+        <div className="relative z-30 mx-auto mt-12 grid max-w-4xl gap-3 sm:grid-cols-3">
+          {stats.map((item) => (
+            <div key={item.label} className="rounded-2xl border border-border bg-surface/60 p-4">
+              <div className="text-2xl font-semibold text-foreground">
+                {item.value}
+                <span className="text-lg text-accent">{item.suffix}</span>
               </div>
-              <p className="text-sm text-muted-foreground">
-                3D 交互区域
-                <br />
-                <span className="text-xs opacity-60">（后续接入）</span>
-              </p>
+              <div className="mt-1 text-sm font-medium">{item.label}</div>
+              <div className="mt-1 text-xs text-muted-foreground">{item.desc}</div>
+            </div>
+          ))}
+        </div>
+
+        <div className="relative z-30 mx-auto mt-10 grid max-w-4xl gap-8 border-t border-border pt-7 sm:grid-cols-2">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+              Currently
+            </p>
+            <p className="mt-2 text-sm font-medium leading-relaxed text-foreground">
+              {profile.currentStatus}
+            </p>
+          </div>
+          <div className="sm:text-right">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+              Previously / 实习与团队
+            </p>
+            <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1.5 text-sm font-semibold text-foreground/70 sm:justify-end">
+              <span>{profile.previous[0]}</span>
+              <span className="text-border-strong">·</span>
+              <span>{profile.previous[1]}</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* 量化数据卡片 */}
-      <div className="relative mx-auto mt-20 grid max-w-6xl gap-4 sm:grid-cols-3">
-        {stats.map((s, i) => (
-          <div
-            key={s.label}
-            className="group rounded-2xl glass p-7 transition-all duration-300 hover:-translate-y-1"
-            style={{ animationDelay: `${i * 100}ms` }}
-          >
-            <div className="flex items-baseline gap-1">
-              <span className="text-5xl font-semibold tracking-tight text-foreground">
-                {s.value}
-              </span>
-              <span className="text-2xl font-semibold text-accent">
-                {s.suffix}
-              </span>
-            </div>
-            <div className="mt-3 text-sm font-medium text-foreground">
-              {s.label}
-            </div>
-            <div className="mt-1 text-sm text-muted-foreground">{s.desc}</div>
-          </div>
-        ))}
+      {/* 像素风装饰吉祥物 */}
+      <div className="pointer-events-none absolute bottom-6 right-6 hidden animate-float select-none lg:block">
+        <div
+          className="grid size-12 place-items-center rounded-lg border border-border-strong bg-muted text-2xl"
+          style={{ imageRendering: "pixelated" }}
+        >
+          🤖
+        </div>
       </div>
     </section>
   )

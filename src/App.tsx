@@ -5,7 +5,11 @@ import Skills from "./components/Skills"
 import Experience from "./components/Experience"
 import Projects from "./components/Projects"
 import Thinking from "./components/Thinking"
+import Notebook from "./components/Notebook"
 import Contact from "./components/Contact"
+import QuickActions from "./components/QuickActions"
+import IntroFlip from "./components/IntroFlip"
+import SmoothScroll from "./components/SmoothScroll"
 import { useRoute } from "./hooks/useRoute"
 
 function renderPage(page: string) {
@@ -22,6 +26,7 @@ function renderPage(page: string) {
       return (
         <>
           <Hero />
+          <Notebook />
           <About />
           <Skills />
         </>
@@ -33,11 +38,15 @@ export default function App() {
   const page = useRoute()
 
   return (
-    <div className="relative min-h-screen bg-background">
-      <Navbar />
-      <main key={page} className="min-h-screen animate-fade-up pt-20">
-        {renderPage(page)}
-      </main>
-    </div>
+    <SmoothScroll>
+      <div className="relative min-h-screen bg-background">
+        <Navbar />
+        <main key={page} className="min-h-screen animate-fade-up pt-20">
+          {renderPage(page)}
+        </main>
+        <QuickActions />
+        <IntroFlip />
+      </div>
+    </SmoothScroll>
   )
 }
