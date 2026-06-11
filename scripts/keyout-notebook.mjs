@@ -20,6 +20,10 @@ const JOBS = [
   { in: "so1wZgMvJhjB3P40EWwFAbrMls.jpg", out: "navie3.png" }, // 卷曲笔画
   { in: "5kwx3ViaHeW5I6KliMS9bsYa0U.jpg", out: "navie4.png" }, // 记事本
   { in: "klvZtuhjeLBrHRuCnpOubsPLgI.jpg", out: "navie5.png" }, // 小标记
+  // 底页三张便利贴底图
+  { in: "rhT0iPheLHJdGQAZ04lGqNb0I.jpg", out: "note-lined.png" },
+  { in: "0aKOwaR29QHg04I7MHlsi9j1g4.jpg", out: "note-grid.png" },
+  { in: "m0nSd9OmKrRp1nvRHVH89tLs0mg.jpg", out: "note-sticky.png" },
 ]
 
 const LOW = 32 // 低于此亮度 -> 完全透明

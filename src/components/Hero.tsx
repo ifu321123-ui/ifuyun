@@ -39,7 +39,7 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="relative overflow-hidden px-6 pt-10 pb-20 md:pt-14 md:pb-24"
+      className="relative overflow-hidden px-6 pt-10 pb-10 md:pt-14 md:pb-12"
     >
       <div className="mx-auto max-w-6xl">
         <p className="text-center text-sm font-medium text-muted-foreground animate-fade-up md:text-base">

@@ -5,7 +5,6 @@ import Skills from "./components/Skills"
 import Experience from "./components/Experience"
 import Projects from "./components/Projects"
 import Thinking from "./components/Thinking"
-import Notebook from "./components/Notebook"
 import Contact from "./components/Contact"
 import QuickActions from "./components/QuickActions"
 import IntroFlip from "./components/IntroFlip"
@@ -26,7 +25,6 @@ function renderPage(page: string) {
       return (
         <>
           <Hero />
-          <Notebook />
           <About />
           <Skills />
         </>
