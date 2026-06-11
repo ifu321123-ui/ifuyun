@@ -4,6 +4,14 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
   --font-hand: "Caveat", "Segoe Script", cursive;
+  --font-gochi: "Gochi Hand", "Caveat", cursive;
+  --font-averia: "Averia Serif Libre", "Songti SC", serif;
+  --font-serif: "Playfair Display", "Averia Serif Libre", "Songti SC", serif;
+
+  --notebook-red: #e35341;
+  --notebook-ribbon: #ed7164;
+  --notebook-cream: #f2e3cf;
+  --notebook-paper: #f5f0e6;
 
   /* 黑底拼贴基调（Jackie Zhang 风格）：炭黑画布 / 奶油近白字 / 砖红强调 */
   --color-background: rgb(33, 33, 33);
@@ -147,6 +155,520 @@
   .pin-card:hover {
     transform: rotate(0deg) translateY(-10px) scale(1.03);
     z-index: 30;
+  }
+
+  /* —— Jackie Zhang 手账本（Framer 上/中/下 三段结构） —— */
+  .font-gochi {
+    font-family: var(--font-gochi);
+  }
+
+  .notebook-section {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: 1.5rem max(1rem, 4vw) 3rem;
+    overflow: hidden;
+  }
+
+  .notebook-nav {
+    position: relative;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.75rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .notebook-side-strip {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: 2;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    gap: 1.25rem;
+    width: 4rem;
+    padding: 2.5rem 0;
+    opacity: 0.7;
+  }
+  .notebook-side-strip--left {
+    left: max(0.25rem, 2vw);
+  }
+  .notebook-side-strip--right {
+    right: max(0.25rem, 2vw);
+  }
+  .notebook-side-icon {
+    width: 2.1rem;
+    height: auto;
+    object-fit: contain;
+    filter: brightness(0.95) sepia(0.4) saturate(2.4) hue-rotate(-6deg);
+  }
+
+  .notebook-doodle {
+    position: absolute;
+    z-index: 3;
+    pointer-events: none;
+    filter: brightness(1.04) sepia(0.12) saturate(1.35);
+  }
+  .notebook-doodle--juice {
+    top: 2%;
+    left: max(2%, 1.5rem);
+    width: clamp(4.5rem, 9vw, 7rem);
+  }
+  .notebook-doodle--fish {
+    top: 36%;
+    left: max(1%, 0.75rem);
+    width: clamp(4rem, 8vw, 6.5rem);
+    filter: none;
+    opacity: 0.82;
+  }
+  .notebook-doodle--zilla {
+    top: 4%;
+    right: max(2%, 1.5rem);
+    width: clamp(5rem, 11vw, 8.5rem);
+  }
+  .notebook-doodle--noodle {
+    top: 40%;
+    right: max(1.5%, 1rem);
+    width: clamp(4rem, 9vw, 7rem);
+    transform: translateY(-50%);
+  }
+
+  .notebook-scene {
+    position: relative;
+    z-index: 5;
+    margin: 0 auto;
+    max-width: min(720px, 92vw);
+    perspective: 2200px;
+    perspective-origin: 50% 40%;
+  }
+
+  .notebook-book {
+    position: relative;
+    transform-style: preserve-3d;
+  }
+
+  /* 皮革封面层 */
+  .notebook-leather {
+    position: absolute;
+    inset: 0;
+    border-radius: 0.2rem;
+    background-color: #7a2824;
+    background-image: url("/notebook/leather-red.jpg");
+    background-repeat: repeat;
+    background-position: left top;
+    background-size: 900px;
+    box-shadow:
+      inset 0 0 0 1px oklch(1 0 0 / 8%),
+      0 24px 64px -18px oklch(0 0 0 / 72%);
+  }
+  .notebook-leather--edge {
+    position: absolute;
+    left: 1.65rem;
+    right: 1.15rem;
+    bottom: 0;
+    height: 1.15rem;
+    border-radius: 0 0 0.35rem 0.35rem;
+  }
+
+  /* ① Top page container — rim light */
+  .notebook-top-rim {
+    position: relative;
+    filter: drop-shadow(0 -2px 12px oklch(1 0 0 / 6%));
+  }
+
+  .notebook-top-wrap {
+    position: relative;
+    padding: 1.35rem 1.15rem 0.35rem 1.65rem;
+    transform-style: preserve-3d;
+  }
+
+  .notebook-ribbon-left {
+    position: absolute;
+    top: 0.15rem;
+    left: 0.55rem;
+    z-index: 20;
+    width: 5.5rem;
+    height: auto;
+    pointer-events: none;
+  }
+  .notebook-ribbon-right {
+    position: absolute;
+    top: 0.35rem;
+    left: 0.15rem;
+    z-index: 19;
+    width: 2.9rem;
+    height: auto;
+    pointer-events: none;
+  }
+
+  .notebook-page-stack {
+    position: absolute;
+    left: 1.65rem;
+    right: 1.15rem;
+    bottom: 0.15rem;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.18rem;
+    pointer-events: none;
+  }
+  .notebook-stack-sheet {
+    height: 0.42rem;
+    border: 1px solid oklch(0.78 0.03 84 / 55%);
+    border-top: none;
+    background: oklch(0.9 0.02 86);
+    border-radius: 0 0 0.12rem 0.12rem;
+  }
+
+  /* ✍️ Paper Page — 顶页 perspective(4105px) rotateX(-5deg) */
+  .notebook-paper {
+    position: relative;
+    z-index: 4;
+    background: var(--notebook-paper);
+    border: 1px solid oklch(0.82 0.03 84 / 45%);
+    transform-style: preserve-3d;
+    box-shadow:
+      0 -1px 0 oklch(1 0 0 / 35%) inset,
+      0 10px 28px -12px oklch(0 0 0 / 28%);
+  }
+
+  .notebook-paper--top {
+    min-height: clamp(17rem, 44vw, 21.5rem);
+    transform: perspective(4105px) rotateX(-5deg);
+    transform-origin: 50% 100%;
+  }
+
+  .notebook-paper-vfx {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .notebook-paper-gradient {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      oklch(1 0 0 / 10%) 0%,
+      oklch(0 0 0 / 0%) 38%,
+      oklch(0 0 0 / 5%) 100%
+    );
+  }
+  .notebook-paper-grid {
+    position: absolute;
+    inset: 0;
+    opacity: 0.42;
+    mix-blend-mode: multiply;
+    background-image: url("/notebook/paper-grid.png");
+    background-repeat: repeat;
+    background-position: center top;
+    background-size: 41.5px;
+    mask-image: linear-gradient(180deg, #000 0%, #000 55%, transparent 85%);
+  }
+  .notebook-paper-vfx--plain .notebook-paper-grid {
+    display: none;
+  }
+
+  .notebook-top-inner {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    gap: 0.5rem;
+    align-items: center;
+    min-height: inherit;
+    padding: clamp(1.35rem, 3.2vw, 2rem) clamp(1rem, 2.5vw, 1.75rem)
+      clamp(1.25rem, 3vw, 1.75rem);
+  }
+
+  .notebook-intro {
+    color: var(--notebook-red);
+  }
+  .notebook-name {
+    font-size: clamp(1.65rem, 3.8vw, 2.15rem);
+    line-height: 1;
+    letter-spacing: 0.01em;
+  }
+  .notebook-role {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.02em;
+    margin-top: 0.45rem;
+    max-width: 11rem;
+  }
+  .notebook-role-char {
+    font-family: var(--font-averia);
+    font-size: clamp(0.95rem, 2vw, 1.15rem);
+    line-height: 1;
+    text-align: center;
+  }
+
+  .notebook-headline-block {
+    margin-top: clamp(0.85rem, 2.2vw, 1.35rem);
+  }
+  .notebook-headline-main,
+  .notebook-headline-feel {
+    font-family: var(--font-serif);
+    font-size: clamp(1.45rem, 3.4vw, 2rem);
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+  .notebook-headline-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.2em;
+    margin-top: 0.08em;
+  }
+  .notebook-headline-emphasis {
+    font-size: clamp(1.65rem, 4vw, 2.35rem);
+    line-height: 0.95;
+    letter-spacing: -0.01em;
+  }
+
+  .notebook-location {
+    margin-top: clamp(0.85rem, 2vw, 1.2rem);
+    font-family: var(--font-averia);
+    font-size: clamp(0.78rem, 1.5vw, 0.95rem);
+    font-weight: 300;
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+
+  .notebook-hero-wrap {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: clamp(11rem, 28vw, 16rem);
+  }
+  .notebook-slice-decor {
+    position: absolute;
+    top: -0.35rem;
+    left: 8%;
+    z-index: 2;
+    width: clamp(3.5rem, 9vw, 5.5rem);
+    height: auto;
+    pointer-events: none;
+  }
+  .notebook-slice-decor--bottom {
+    top: auto;
+    bottom: 1.5rem;
+    left: 0.5rem;
+    width: clamp(3rem, 8vw, 4.5rem);
+    opacity: 0.9;
+  }
+  .notebook-hero-img {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 20rem);
+    height: auto;
+    object-fit: contain;
+  }
+
+  /* 书脊 */
+  .notebook-binder {
+    position: relative;
+    z-index: 6;
+    height: 0.55rem;
+    margin: -0.1rem 1.65rem 0 1.15rem;
+    background: linear-gradient(
+      180deg,
+      oklch(0.32 0.08 28) 0%,
+      oklch(0.42 0.12 28) 45%,
+      oklch(0.35 0.1 28) 100%
+    );
+    box-shadow:
+      0 2px 6px oklch(0 0 0 / 35%),
+      inset 0 1px 0 oklch(1 0 0 / 12%);
+  }
+
+  /* ③ Bottom Page — 外层 3D，内层 Paper + Leather 并列 */
+  .notebook-bottom-outer {
+    position: relative;
+    padding: 0.2rem 1.15rem 1.35rem 1.65rem;
+    transform: perspective(3310px) rotateX(-1.11deg);
+    transform-origin: 50% 0%;
+    transform-style: preserve-3d;
+  }
+
+  .notebook-paper--bottom {
+    min-height: clamp(19rem, 50vw, 27rem);
+    padding: clamp(1.15rem, 2.8vw, 1.65rem) clamp(1rem, 2.5vw, 1.75rem)
+      clamp(2.25rem, 5vw, 3.25rem);
+    box-shadow:
+      0 14px 36px -14px oklch(0 0 0 / 38%),
+      0 1px 0 oklch(1 0 0 / 30%) inset;
+  }
+
+  .notebook-beliefs-title {
+    position: relative;
+    z-index: 2;
+    font-family: var(--font-serif);
+    font-size: clamp(0.95rem, 1.8vw, 1.1rem);
+    font-weight: 600;
+    color: var(--notebook-red);
+    letter-spacing: -0.01em;
+  }
+
+  .notebook-notes {
+    position: relative;
+    z-index: 3;
+    margin: clamp(1.35rem, 3.5vw, 2rem) auto 0;
+    width: min(100%, 30rem);
+    min-height: clamp(11rem, 30vw, 15.5rem);
+  }
+
+  .notebook-note {
+    position: absolute;
+    width: clamp(8.5rem, 26vw, 12.5rem);
+  }
+  .notebook-note-paper {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .notebook-note-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.2rem 0.9rem;
+    text-align: center;
+    font-size: clamp(0.82rem, 1.9vw, 1rem);
+    line-height: 1.35;
+    color: oklch(0.22 0.02 60);
+  }
+  .notebook-note--lined {
+    top: 0;
+    left: 2%;
+    transform: rotate(-5deg);
+    z-index: 2;
+  }
+  .notebook-note--lined .notebook-note-text {
+    padding-top: 1.65rem;
+    font-size: clamp(0.9rem, 2.1vw, 1.08rem);
+  }
+  .notebook-note--grid {
+    top: -0.35rem;
+    right: 0;
+    transform: rotate(4deg);
+    z-index: 3;
+  }
+  .notebook-note--grid .notebook-note-text {
+    padding-top: 1.35rem;
+    font-size: clamp(0.74rem, 1.7vw, 0.88rem);
+    letter-spacing: -0.02em;
+  }
+  .notebook-note--sticky {
+    bottom: 0.15rem;
+    left: 50%;
+    transform: translateX(-50%) rotate(-2deg);
+    z-index: 4;
+    width: clamp(9.5rem, 28vw, 13rem);
+  }
+  .notebook-note--sticky .notebook-note-text {
+    padding-top: 1.45rem;
+    font-size: clamp(0.88rem, 2vw, 1.02rem);
+  }
+
+  .notebook-corner {
+    position: absolute;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .notebook-corner--plant {
+    bottom: 0.35rem;
+    left: 0;
+    width: clamp(5.5rem, 17vw, 9.5rem);
+  }
+  .notebook-corner--stump {
+    bottom: 0;
+    right: 0;
+    width: clamp(6.5rem, 20vw, 11.5rem);
+  }
+  /* 进场动画 */
+  @keyframes notebook-rise {
+    from {
+      opacity: 0;
+      transform: translateY(48px) rotateX(10deg) scale(0.97);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) rotateX(0deg) scale(1);
+    }
+  }
+  .notebook-in .notebook-book {
+    animation: notebook-rise 1s var(--ease-out-expo) both;
+  }
+
+  @media (max-width: 640px) {
+    .notebook-scene {
+      max-width: 96vw;
+    }
+    .notebook-top-wrap,
+    .notebook-bottom-outer {
+      padding-left: 1.15rem;
+      padding-right: 0.85rem;
+    }
+    .notebook-page-stack {
+      left: 1.15rem;
+      right: 0.85rem;
+    }
+    .notebook-binder {
+      margin-inline: 1.15rem 0.85rem;
+    }
+    .notebook-top-inner {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+    .notebook-role {
+      justify-content: center;
+      max-width: none;
+    }
+    .notebook-headline-row {
+      justify-content: center;
+    }
+    .notebook-hero-wrap {
+      order: -1;
+      min-height: 12rem;
+    }
+    .notebook-hero-img {
+      width: min(88%, 15rem);
+    }
+    .notebook-paper--top {
+      transform: perspective(2800px) rotateX(-3deg);
+    }
+    .notebook-bottom-outer {
+      transform: perspective(2800px) rotateX(-0.8deg);
+    }
+    .notebook-notes {
+      min-height: 19rem;
+    }
+    .notebook-note--lined {
+      left: 50%;
+      transform: translateX(-74%) rotate(-5deg);
+    }
+    .notebook-note--grid {
+      right: auto;
+      left: 50%;
+      transform: translateX(-26%) rotate(4deg);
+    }
+    .notebook-doodle--juice,
+    .notebook-doodle--noodle,
+    .notebook-doodle--zilla {
+      opacity: 0.5;
+    }
   }
 }
 

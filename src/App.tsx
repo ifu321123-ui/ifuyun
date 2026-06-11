@@ -9,6 +9,7 @@ import Contact from "./components/Contact"
 import QuickActions from "./components/QuickActions"
 import IntroFlip from "./components/IntroFlip"
 import SmoothScroll from "./components/SmoothScroll"
+import { cn } from "./lib/utils"
 import { useRoute } from "./hooks/useRoute"
 
 function renderPage(page: string) {
@@ -34,16 +35,20 @@ function renderPage(page: string) {
 
 export default function App() {
   const page = useRoute()
+  const isNotebookHome = page === "home"
 
   return (
     <SmoothScroll>
       <div className="relative min-h-screen bg-background">
-        <Navbar />
-        <main key={page} className="min-h-screen animate-fade-up pt-20">
+        {!isNotebookHome && <Navbar />}
+        <main
+          key={page}
+          className={cn("min-h-screen animate-fade-up", !isNotebookHome && "pt-20")}
+        >
           {renderPage(page)}
         </main>
-        <QuickActions />
-        <IntroFlip />
+        {!isNotebookHome && <QuickActions />}
+        {!isNotebookHome && <IntroFlip />}
       </div>
     </SmoothScroll>
   )

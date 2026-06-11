@@ -69,6 +69,42 @@ export const about = {
   ],
 }
 
+export const notebookNav = [
+  { id: "about" as const, label: "about" },
+  { id: "work" as const, label: "Work" },
+  { id: "connect" as const, label: "Connect" },
+]
+
+export const notebook = {
+  nameScript: "JACKIE",
+  role: "Product Designer",
+  headlineMain: "Software should",
+  headlineFeel: "feel",
+  rotatingEmphasis: ["natural", "honest"],
+  location: "Cape Town • GMT +2:00",
+  beliefsTitle: "3 things I strongly believe in",
+  beliefs: [
+    {
+      text: "tirelessly pursue clarity.",
+      paper: "/notebook/note-lined.png",
+      font: "hand" as const,
+      className: "notebook-note--lined",
+    },
+    {
+      text: "Software should empower.",
+      paper: "/notebook/note-grid.png",
+      font: "mono" as const,
+      className: "notebook-note--grid",
+    },
+    {
+      text: "Design for moments",
+      paper: "/notebook/note-sticky.png",
+      font: "serif" as const,
+      className: "notebook-note--sticky",
+    },
+  ],
+}
+
 export const stats = [
   { value: "12", suffix: "+", label: "项目交付", desc: "B 端 / 创新体验 / 数字叙事" },
   { value: "2", suffix: "年", label: "AI 实践经验", desc: "工作流编排与提效落地" },
