@@ -234,7 +234,7 @@ export default function Notebook() {
             <div className="notebook-top-wrap">
               <RibbonLeft />
               <RibbonRight />
-              <div className="notebook-leather" aria-hidden />
+              <div className="notebook-leather notebook-leather--top" aria-hidden />
 
               <div className="notebook-page-stack" aria-hidden>
                 <div className="notebook-stack-sheet" />
@@ -291,6 +291,7 @@ export default function Notebook() {
 
           {/* —— ③ Bottom Page — perspective(3310px) rotateX(-1.11deg) —— */}
           <div className="notebook-bottom-outer">
+            <div className="notebook-leather notebook-leather--bottom" aria-hidden />
             <div className="notebook-paper notebook-paper--bottom">
               <div className="notebook-paper-vfx notebook-paper-vfx--plain" aria-hidden>
                 <div className="notebook-paper-gradient" />
@@ -308,8 +309,6 @@ export default function Notebook() {
               <img src="/notebook/plant.png" alt="" className="notebook-corner notebook-corner--plant" />
               <img src="/notebook/stump.png" alt="" className="notebook-corner notebook-corner--stump" />
             </div>
-
-            <div className="notebook-leather notebook-leather--edge" aria-hidden />
           </div>
         </div>
       </div>

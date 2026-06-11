@@ -255,27 +255,39 @@
     transform-style: preserve-3d;
   }
 
-  /* 皮革封面层 */
+  /* 皮革封面层 —— 红色皮革：用米色皮革纹理 × 红底 multiply 上色，保留压花颗粒 */
   .notebook-leather {
     position: absolute;
     inset: 0;
-    border-radius: 0.2rem;
-    background-color: #7a2824;
-    background-image: url("/notebook/leather-red.jpg");
-    background-repeat: repeat;
-    background-position: left top;
-    background-size: 900px;
+    border-radius: 0.9rem;
+    background-color: #d94b3a;
+    background-image:
+      linear-gradient(
+        145deg,
+        oklch(1 0 0 / 16%) 0%,
+        oklch(1 0 0 / 0%) 30%,
+        oklch(0 0 0 / 0%) 70%,
+        oklch(0 0 0 / 18%) 100%
+      ),
+      url("/notebook/leather-red.jpg");
+    background-repeat: no-repeat, repeat;
+    background-position: center, left top;
+    background-size: cover, 900px;
+    background-blend-mode: overlay, multiply;
     box-shadow:
-      inset 0 0 0 1px oklch(1 0 0 / 8%),
+      inset 0 0 0 1px oklch(1 0 0 / 14%),
+      inset 0 1px 0 oklch(1 0 0 / 22%),
+      inset 0 -2px 8px oklch(0 0 0 / 28%),
       0 24px 64px -18px oklch(0 0 0 / 72%);
   }
-  .notebook-leather--edge {
-    position: absolute;
-    left: 1.65rem;
-    right: 1.15rem;
-    bottom: 0;
-    height: 1.15rem;
-    border-radius: 0 0 0.35rem 0.35rem;
+  /* 上盖皮革：四角全圆角 */
+  .notebook-leather--top {
+    border-radius: 0.9rem;
+  }
+  /* 下页皮革背板：四角全圆角 */
+  .notebook-leather--bottom {
+    inset: 0;
+    border-radius: 0.9rem;
   }
 
   /* ① Top page container — rim light */
@@ -342,6 +354,7 @@
 
   .notebook-paper--top {
     min-height: clamp(17rem, 44vw, 21.5rem);
+    border-radius: 0.45rem;
     transform: perspective(4105px) rotateX(-5deg);
     transform-origin: 50% 100%;
   }
@@ -350,6 +363,7 @@
     position: absolute;
     inset: 0;
     overflow: hidden;
+    border-radius: inherit;
     pointer-events: none;
   }
   .notebook-paper-gradient {
@@ -503,6 +517,7 @@
 
   .notebook-paper--bottom {
     min-height: clamp(19rem, 50vw, 27rem);
+    border-radius: 0.45rem;
     padding: clamp(1.15rem, 2.8vw, 1.65rem) clamp(1rem, 2.5vw, 1.75rem)
       clamp(2.25rem, 5vw, 3.25rem);
     box-shadow:
