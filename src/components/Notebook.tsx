@@ -174,7 +174,11 @@ export default function Notebook() {
     if (id === "about") {
       document.getElementById("about")?.scrollIntoView({ behavior: "smooth" })
     } else if (id === "work") {
+      navigate("experience")
+    } else if (id === "project") {
       navigate("projects")
+    } else if (id === "thinking") {
+      navigate("thinking")
     } else {
       navigate("contact")
     }
@@ -196,27 +200,29 @@ export default function Notebook() {
       ))}
 
       <nav className="notebook-nav">
-        {NAV_DOODLES.about.map((d) => (
-          <HoverDoodle key={d.src} src={d.src} show={hover === "about"} {...d} />
-        ))}
-        {NAV_DOODLES.work.map((d) => (
-          <HoverDoodle key={d.src} src={d.src} show={hover === "work"} {...d} />
-        ))}
-
         <Smiley />
         {notebookNav.map((item) => (
-          <button
-            key={item.id}
-            onMouseEnter={() => {
-              if (item.id === "about") setHover("about")
-              else if (item.id === "work") setHover("work")
-            }}
-            onMouseLeave={() => setHover(null)}
-            onClick={() => onNavClick(item.id)}
-            className="font-gochi text-[22px] text-[#f2e3cf] transition-opacity hover:opacity-70"
-          >
-            {item.label}
-          </button>
+          <span key={item.id} className="relative inline-flex">
+            {item.id === "about" &&
+              NAV_DOODLES.about.map((d) => (
+                <HoverDoodle key={d.src} show={hover === "about"} {...d} />
+              ))}
+            {item.id === "work" &&
+              NAV_DOODLES.work.map((d) => (
+                <HoverDoodle key={d.src} show={hover === "work"} {...d} />
+              ))}
+            <button
+              onMouseEnter={() => {
+                if (item.id === "about") setHover("about")
+                else if (item.id === "work") setHover("work")
+              }}
+              onMouseLeave={() => setHover(null)}
+              onClick={() => onNavClick(item.id)}
+              className="font-gochi text-[22px] text-[#f2e3cf] transition-opacity hover:opacity-70"
+            >
+              {item.label}
+            </button>
+          </span>
         ))}
       </nav>
 

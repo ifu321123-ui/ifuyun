@@ -72,6 +72,8 @@ export const about = {
 export const notebookNav = [
   { id: "about" as const, label: "about" },
   { id: "work" as const, label: "Work" },
+  { id: "project" as const, label: "Project" },
+  { id: "thinking" as const, label: "Thinking" },
   { id: "connect" as const, label: "Connect" },
 ]
 
