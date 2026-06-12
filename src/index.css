@@ -163,15 +163,18 @@
   }
 
   .notebook-section {
+    /* 实测原站 jackiezhang.co.za @ 1440×900：宽约 64.7vw，顶距 ~28vh，单页约 3:2 */
+    --nb-width: min(64.7vw, 980px);
+    --nb-page-ratio: 3 / 2;
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     width: 100%;
     min-height: 100vh;
     min-height: 100dvh;
-    padding: 1.5rem max(1rem, 4vw) 3rem;
+    padding: clamp(1.25rem, 20vh, 8rem) max(1rem, 4vw) 2rem;
     overflow: hidden;
   }
 
@@ -182,7 +185,7 @@
     align-items: center;
     justify-content: center;
     gap: 1.75rem;
-    margin-bottom: 2.5rem;
+    margin-bottom: clamp(1.5rem, 8vh, 4rem);
   }
 
   .notebook-side-strip {
@@ -244,8 +247,9 @@
   .notebook-scene {
     position: relative;
     z-index: 5;
+    width: var(--nb-width);
+    max-width: 100%;
     margin: 0 auto;
-    max-width: min(720px, 92vw);
     perspective: 2200px;
     perspective-origin: 50% 40%;
   }
@@ -353,7 +357,8 @@
   }
 
   .notebook-paper--top {
-    min-height: clamp(19rem, 50vw, 27rem);
+    aspect-ratio: var(--nb-page-ratio);
+    min-height: 0;
     border-radius: 0.45rem;
     transform: perspective(4105px) rotateX(-5deg);
     transform-origin: 50% 100%;
@@ -516,7 +521,8 @@
   }
 
   .notebook-paper--bottom {
-    min-height: clamp(19rem, 50vw, 27rem);
+    aspect-ratio: var(--nb-page-ratio);
+    min-height: 0;
     border-radius: 0.45rem;
     padding: clamp(1.15rem, 2.8vw, 1.65rem) clamp(1rem, 2.5vw, 1.75rem)
       clamp(2.25rem, 5vw, 3.25rem);
@@ -628,8 +634,10 @@
   }
 
   @media (max-width: 640px) {
-    .notebook-scene {
-      max-width: 96vw;
+    .notebook-section {
+      --nb-width: min(92vw, 980px);
+      --nb-page-ratio: 4 / 3;
+      padding-top: clamp(1rem, 10vh, 3rem);
     }
     .notebook-top-wrap,
     .notebook-bottom-outer {
