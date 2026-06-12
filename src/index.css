@@ -4,9 +4,9 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
   --font-hand: "Caveat", "Segoe Script", cursive;
-  --font-gochi: "Gochi Hand", "Caveat", cursive;
-  --font-averia: "Averia Serif Libre", "Songti SC", serif;
-  --font-serif: "Playfair Display", "Averia Serif Libre", "Songti SC", serif;
+  --font-gochi: "Gochi Hand", "Caveat", "ZCOOL KuaiLe", cursive;
+  --font-averia: "Averia Serif Libre", "Noto Serif SC", "Songti SC", serif;
+  --font-serif: "Playfair Display", "Averia Serif Libre", "Noto Serif SC", "Songti SC", serif;
 
   --notebook-red: #e35341;
   --notebook-ribbon: #ed7164;
@@ -710,15 +710,24 @@
     transform: rotate(-6deg);
     z-index: 2;
     --nb-note-lift: 0.85;
+    /* 让子元素能用 cqw 单位按便签宽度定位，从而对齐 PNG 上的蓝线 */
+    container-type: inline-size;
   }
   .notebook-note--lined:hover {
     transform: rotate(-6deg) translateY(-4px);
     --nb-note-lift: 1.35;
   }
+  /* 文字落在蓝线上：行高 = 蓝线间距（≈15.5% 纸高），首行压到第一条蓝线，
+     左缩进避开红色装订线，限定书写列宽让 6 字按 3/3 换行各坐一条线 */
   .notebook-note--lined .notebook-note-text {
-    align-items: center;
-    padding: 1.4rem 22% 1.4rem 28%;
-    font-size: clamp(1.3rem, 3.2vw, 1.8rem);
+    display: block;
+    align-items: initial;
+    justify-content: initial;
+    padding: 29cqw 47cqw 0 19cqw;
+    font-size: 11cqw;
+    line-height: 11.7cqw;
+    letter-spacing: 0.04em;
+    text-align: left;
   }
   .notebook-note--grid {
     top: -0.75rem;
@@ -729,8 +738,8 @@
   }
   .notebook-note--grid .notebook-note-text {
     align-items: flex-start;
-    padding: 16% 40% 1rem 14%;
-    font-size: clamp(1.1rem, 2.7vw, 1.5rem);
+    padding: 15% 20% 1rem 14%;
+    font-size: clamp(1.35rem, 3.3vw, 1.85rem);
     letter-spacing: -0.02em;
   }
   .notebook-note--sticky {
@@ -742,8 +751,8 @@
   }
   .notebook-note--sticky .notebook-note-text {
     align-items: center;
-    padding: 2rem 30% 2rem 14%;
-    font-size: clamp(1.1rem, 2.7vw, 1.5rem);
+    padding: 2rem 16% 2rem 14%;
+    font-size: clamp(1.6rem, 4vw, 2.25rem);
   }
 
   .notebook-corner {

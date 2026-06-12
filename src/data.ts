@@ -78,28 +78,28 @@ export const notebookNav = [
 ]
 
 export const notebook = {
-  nameScript: "JACKIE",
+  nameScript: "IFU.YUN",
   role: "Product Designer",
-  headlineMain: "Software should",
-  headlineFeel: "feel",
-  rotatingEmphasis: ["natural", "honest"],
-  location: "Cape Town • GMT +2:00",
+  headlineMain: "软件应当",
+  headlineFeel: "让人觉得",
+  rotatingEmphasis: ["可靠", "真诚", "简单", "自然", "有趣"],
+  location: "China • GMT +8:00",
   beliefsTitle: "3 things I strongly believe in",
   beliefs: [
     {
-      text: "tirelessly pursue clarity.",
+      text: "坚持不懈追求清晰",
       paper: "/notebook/note-lined.png",
       font: "hand" as const,
       className: "notebook-note--lined",
     },
     {
-      text: "Software should empower.",
+      text: "软件应当赋能于人",
       paper: "/notebook/note-grid.png",
-      font: "mono" as const,
+      font: "sans" as const,
       className: "notebook-note--grid",
     },
     {
-      text: "Design for moments",
+      text: "为每个瞬间而设计",
       paper: "/notebook/note-sticky.png",
       font: "serif" as const,
       className: "notebook-note--sticky",

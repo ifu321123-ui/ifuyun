@@ -115,8 +115,8 @@ function BeliefNote({
   const fontClass =
     font === "hand"
       ? "font-gochi"
-      : font === "mono"
-        ? "font-mono"
+      : font === "sans"
+        ? "font-sans"
         : "font-serif italic"
 
   return (
