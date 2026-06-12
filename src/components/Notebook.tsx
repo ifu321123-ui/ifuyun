@@ -243,13 +243,13 @@ export default function Notebook() {
               <RibbonRight />
               <div className="notebook-leather notebook-leather--top" aria-hidden />
 
-              <div className="notebook-page-stack" aria-hidden>
-                <div className="notebook-stack-sheet" />
-                <div className="notebook-stack-sheet" />
+              {/* —— ② 第二层：和顶页一样大的、静止不动的完整纸张 —— */}
+              <div className="notebook-under-sheet" aria-hidden>
+                <div className="notebook-paper-vfx" aria-hidden>
+                  <div className="notebook-paper-gradient" />
+                  <div className="notebook-paper-grid" />
+                </div>
               </div>
-
-              {/* 被按压时从顶沿露出的下一页纸边 */}
-              <div className="notebook-top-edge" aria-hidden />
 
               {/* ✍️ Paper Page — perspective(4105px) rotateX(-5deg) */}
               <div

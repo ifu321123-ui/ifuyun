@@ -375,28 +375,40 @@
     pointer-events: none;
   }
 
-  .notebook-page-stack {
+  /* ② 第二层：和顶页同尺寸、静止不动的完整纸张
+     —— 顶页绕底边后倒时，从其顶沿后方露出这张完整纸 —— */
+  .notebook-under-sheet {
     position: absolute;
-    left: 1.65rem;
-    right: 1.15rem;
-    bottom: 0.15rem;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 0.18rem;
+    top: 1.35rem; /* = top-wrap 上 padding */
+    left: 1.65rem; /* = top-wrap 左 padding */
+    right: 1.15rem; /* = top-wrap 右 padding */
+    aspect-ratio: var(--nb-page-ratio);
+    z-index: 2; /* 顶页(z=4)之下、皮革之上 */
+    background: var(--notebook-paper);
+    border: 1px solid oklch(0.82 0.03 84 / 45%);
+    border-radius: var(--nb-paper-radius) var(--nb-paper-radius)
+      var(--nb-spine-radius) var(--nb-spine-radius);
+    /* 略微下移，平时在底沿透出一条窄纸边，像压在下面的第二页 */
+    transform: translateY(0.32rem);
+    box-shadow:
+      inset 0 1px 0 oklch(1 0 0 / 30%),
+      inset 0 -14px 22px -16px oklch(0 0 0 / 20%),
+      0 6px 14px -10px oklch(0 0 0 / 30%);
     pointer-events: none;
   }
-  .notebook-stack-sheet {
-    height: 0.34rem;
-    border: 1px solid oklch(0.72 0.03 84 / 60%);
-    border-top: none;
+  /* 第二层纸面略压暗一点点，强化「在下面」的层次 */
+  .notebook-under-sheet::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
     background: linear-gradient(
       180deg,
-      oklch(0.92 0.02 86) 0%,
-      oklch(0.83 0.03 84) 100%
+      oklch(0 0 0 / 6%) 0%,
+      oklch(0 0 0 / 0%) 24%,
+      oklch(0 0 0 / 0%) 100%
     );
-    border-radius: 0 0 0.12rem 0.12rem;
-    box-shadow: 0 1px 2px oklch(0 0 0 / 22%);
+    pointer-events: none;
   }
 
   /* ✍️ Paper Page — 顶页 perspective(4105px) rotateX(-5deg) */
@@ -433,36 +445,7 @@
   }
 
   /* —— 顶页「按压」交互：hover 时顶页绕底边再倒一点（下沉），
-     顶沿露出一条下一页纸边，顶沿内阴影加深 —— */
-  /* 露出的下一页纸边：平时藏在顶页后面，按压时上探一点点 */
-  .notebook-top-edge {
-    position: absolute;
-    top: 1.3rem; /* 与纸面顶沿对齐（受 top-wrap 上 padding 影响，可微调） */
-    left: 2.05rem;
-    right: 1.55rem;
-    height: 0.62rem;
-    z-index: 3; /* 纸面(z=4)之下、皮革之上 */
-    border-radius: 0.4rem 0.4rem 0 0;
-    background: linear-gradient(
-      180deg,
-      oklch(0.93 0.02 86) 0%,
-      oklch(0.86 0.03 84) 100%
-    );
-    box-shadow: 0 -1px 2px oklch(0 0 0 / 25%);
-    opacity: 0;
-    transform: translateY(0.3rem) scaleX(0.99);
-    transition:
-      opacity 0.4s var(--ease-out-expo),
-      transform 0.5s var(--ease-out-expo);
-    pointer-events: none;
-  }
-
-  .notebook-top-wrap.is-pressed .notebook-top-edge {
-    opacity: 1;
-    /* 上探到纸面顶沿之上，露出一条下一页的边；越负露得越多 */
-    transform: translateY(-0.72rem) scaleX(1);
-  }
-
+     从顶沿后方露出第二层完整纸张，顶沿内阴影加深 —— */
   .notebook-top-wrap.is-pressed .notebook-paper--top {
     /* 基准 -5deg → -8deg：再往后倒 3deg（下沉幅度，按需 2~5deg） */
     transform: perspective(4105px) rotateX(-8deg) translateY(2px);
@@ -804,7 +787,7 @@
       padding-left: 1.15rem;
       padding-right: 0.85rem;
     }
-    .notebook-page-stack {
+    .notebook-under-sheet {
       left: 1.15rem;
       right: 0.85rem;
     }
