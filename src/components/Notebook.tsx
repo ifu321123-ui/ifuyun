@@ -96,7 +96,7 @@ function SideStrip({ side }: { side: "left" | "right" }) {
   const items = [...SIDE_DOODLES, ...SIDE_DOODLES, ...SIDE_DOODLES]
   return (
     <div
-      className={`notebook-side-strip notebook-side-strip--${side} hidden xl:flex`}
+      className={`notebook-side-strip notebook-side-strip--${side} hidden lg:flex`}
       aria-hidden
     >
       {items.map((src, i) => (
@@ -132,6 +132,7 @@ export default function Notebook() {
   const [inView, setInView] = useState(false)
   const [hover, setHover] = useState<"about" | "work" | null>(null)
   const [wordIdx, setWordIdx] = useState(0)
+  const [topPress, setTopPress] = useState(false)
 
   useEffect(() => {
     const el = sectionRef.current
@@ -231,7 +232,7 @@ export default function Notebook() {
         >
           {/* —— ① Top page container (rim light) —— */}
           <div className="notebook-top-rim">
-            <div className="notebook-top-wrap">
+            <div className={`notebook-top-wrap ${topPress ? "is-pressed" : ""}`}>
               <RibbonLeft />
               <RibbonRight />
               <div className="notebook-leather notebook-leather--top" aria-hidden />
@@ -241,8 +242,15 @@ export default function Notebook() {
                 <div className="notebook-stack-sheet" />
               </div>
 
+              {/* 被按压时从顶沿露出的下一页纸边 */}
+              <div className="notebook-top-edge" aria-hidden />
+
               {/* ✍️ Paper Page — perspective(4105px) rotateX(-5deg) */}
-              <div className="notebook-paper notebook-paper--top">
+              <div
+                className="notebook-paper notebook-paper--top"
+                onMouseEnter={() => setTopPress(true)}
+                onMouseLeave={() => setTopPress(false)}
+              >
                 <div className="notebook-paper-vfx" aria-hidden>
                   <div className="notebook-paper-gradient" />
                   <div className="notebook-paper-grid" />

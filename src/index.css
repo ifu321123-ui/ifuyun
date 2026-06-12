@@ -166,6 +166,12 @@
     /* 实测原站 jackiezhang.co.za @ 1440×900：宽约 64.7vw，顶距 ~28vh，单页约 3:2 */
     --nb-width: min(64.7vw, 980px);
     --nb-page-ratio: 3 / 2;
+    /* 圆角体系：外圈树皮圆角 + 红边到纸张的间距 → 纸张圆角同心推导 */
+    --nb-radius: 3.4rem;
+    --nb-shell-gap: 1.2rem;
+    --nb-paper-radius: calc(var(--nb-radius) - var(--nb-shell-gap));
+    /* 书脊侧圆角（上下两页拼接处，应基本平直，只留极小圆角） */
+    --nb-spine-radius: 0.5rem;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -195,11 +201,11 @@
     z-index: 2;
     flex-direction: column;
     align-items: center;
-    justify-content: space-evenly;
-    gap: 1.25rem;
-    width: 4rem;
-    padding: 2.5rem 0;
-    opacity: 0.7;
+    justify-content: space-between;
+    gap: 0.55rem;
+    width: 3.6rem;
+    padding: 1.25rem 0;
+    opacity: 0.85;
   }
   .notebook-side-strip--left {
     left: max(0.25rem, 2vw);
@@ -208,10 +214,11 @@
     right: max(0.25rem, 2vw);
   }
   .notebook-side-icon {
-    width: 2.1rem;
+    width: 2.4rem;
     height: auto;
     object-fit: contain;
-    filter: brightness(0.95) sepia(0.4) saturate(2.4) hue-rotate(-6deg);
+    filter: brightness(0.95) sepia(0.4) saturate(2.4) hue-rotate(-6deg)
+      drop-shadow(0 1px 2px oklch(0 0 0 / 45%));
   }
 
   .notebook-doodle {
@@ -254,8 +261,29 @@
     perspective-origin: 50% 40%;
   }
 
+  /* 书本背后的暖色光晕 —— 让本子像被打光，浮在黑底空气中 */
+  .notebook-scene::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 46%;
+    width: 124%;
+    height: 122%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(
+      50% 50% at 50% 50%,
+      oklch(0.55 0.07 40 / 20%) 0%,
+      oklch(0.4 0.05 30 / 8%) 42%,
+      oklch(0 0 0 / 0%) 72%
+    );
+    filter: blur(10px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
   .notebook-book {
     position: relative;
+    z-index: 1;
     transform-style: preserve-3d;
   }
 
@@ -263,7 +291,7 @@
   .notebook-leather {
     position: absolute;
     inset: 0;
-    border-radius: 0.9rem;
+    border-radius: var(--nb-radius);
     background-color: #d94b3a;
     background-image:
       linear-gradient(
@@ -279,19 +307,29 @@
     background-size: cover, 900px;
     background-blend-mode: overlay, multiply;
     box-shadow:
-      inset 0 0 0 1px oklch(1 0 0 / 14%),
-      inset 0 1px 0 oklch(1 0 0 / 22%),
-      inset 0 -2px 8px oklch(0 0 0 / 28%),
-      0 24px 64px -18px oklch(0 0 0 / 72%);
+      /* 顶部 rim light + 整圈细高光 */
+      inset 0 1px 0 oklch(1 0 0 / 34%),
+      inset 0 0 0 1px oklch(1 0 0 / 12%),
+      /* 皮革左右压痕（向内的暗边，强化厚度） */
+      inset 7px 0 16px -10px oklch(0 0 0 / 45%),
+      inset -7px 0 16px -10px oklch(0 0 0 / 45%),
+      /* 底部受光面阴影 */
+      inset 0 -3px 14px oklch(0 0 0 / 38%),
+      /* 贴合接触阴影 → 中景 → 远景环境光，营造悬浮空气感 */
+      0 4px 10px -4px oklch(0 0 0 / 55%),
+      0 22px 52px -20px oklch(0 0 0 / 70%),
+      0 64px 120px -44px oklch(0 0 0 / 82%);
   }
-  /* 上盖皮革：四角全圆角 */
+  /* 上盖皮革：仅顶部两角大圆角，靠书脊（底部）两角收小 */
   .notebook-leather--top {
-    border-radius: 0.9rem;
+    border-radius: var(--nb-radius) var(--nb-radius) var(--nb-spine-radius)
+      var(--nb-spine-radius);
   }
-  /* 下页皮革背板：四角全圆角 */
+  /* 下页皮革背板：仅底部两角大圆角，靠书脊（顶部）两角收小 */
   .notebook-leather--bottom {
     inset: 0;
-    border-radius: 0.9rem;
+    border-radius: var(--nb-spine-radius) var(--nb-spine-radius)
+      var(--nb-radius) var(--nb-radius);
   }
 
   /* ① Top page container — rim light */
@@ -337,11 +375,16 @@
     pointer-events: none;
   }
   .notebook-stack-sheet {
-    height: 0.42rem;
-    border: 1px solid oklch(0.78 0.03 84 / 55%);
+    height: 0.34rem;
+    border: 1px solid oklch(0.72 0.03 84 / 60%);
     border-top: none;
-    background: oklch(0.9 0.02 86);
+    background: linear-gradient(
+      180deg,
+      oklch(0.92 0.02 86) 0%,
+      oklch(0.83 0.03 84) 100%
+    );
     border-radius: 0 0 0.12rem 0.12rem;
+    box-shadow: 0 1px 2px oklch(0 0 0 / 22%);
   }
 
   /* ✍️ Paper Page — 顶页 perspective(4105px) rotateX(-5deg) */
@@ -359,9 +402,64 @@
   .notebook-paper--top {
     aspect-ratio: var(--nb-page-ratio);
     min-height: 0;
-    border-radius: 0.45rem;
+    border-radius: var(--nb-paper-radius) var(--nb-paper-radius)
+      var(--nb-spine-radius) var(--nb-spine-radius);
     transform: perspective(4105px) rotateX(-5deg);
     transform-origin: 50% 100%;
+    box-shadow:
+      /* 纸面顶沿细高光（页边受光） */
+      inset 0 1px 0 oklch(1 0 0 / 50%),
+      /* 皮革封面盖沿压在纸面上的柔和暗影（关键层次感） */
+      inset 0 13px 18px -13px oklch(0 0 0 / 34%),
+      /* 靠书脊（下沿）的装订柔和暗影 */
+      inset 0 -16px 24px -16px oklch(0 0 0 / 22%),
+      /* 纸页整体落在封面上的柔和投影 */
+      0 12px 24px -14px oklch(0 0 0 / 36%);
+    transition:
+      transform 0.5s var(--ease-out-expo),
+      box-shadow 0.5s var(--ease-out-expo);
+  }
+
+  /* —— 顶页「按压」交互：hover 时顶页绕底边再倒一点（下沉），
+     顶沿露出一条下一页纸边，顶沿内阴影加深 —— */
+  /* 露出的下一页纸边：平时藏在顶页后面，按压时上探一点点 */
+  .notebook-top-edge {
+    position: absolute;
+    top: 1.3rem; /* 与纸面顶沿对齐（受 top-wrap 上 padding 影响，可微调） */
+    left: 2.05rem;
+    right: 1.55rem;
+    height: 0.62rem;
+    z-index: 3; /* 纸面(z=4)之下、皮革之上 */
+    border-radius: 0.4rem 0.4rem 0 0;
+    background: linear-gradient(
+      180deg,
+      oklch(0.93 0.02 86) 0%,
+      oklch(0.86 0.03 84) 100%
+    );
+    box-shadow: 0 -1px 2px oklch(0 0 0 / 25%);
+    opacity: 0;
+    transform: translateY(0.3rem) scaleX(0.99);
+    transition:
+      opacity 0.4s var(--ease-out-expo),
+      transform 0.5s var(--ease-out-expo);
+    pointer-events: none;
+  }
+
+  .notebook-top-wrap.is-pressed .notebook-top-edge {
+    opacity: 1;
+    /* 上探到纸面顶沿之上，露出一条下一页的边；越负露得越多 */
+    transform: translateY(-0.72rem) scaleX(1);
+  }
+
+  .notebook-top-wrap.is-pressed .notebook-paper--top {
+    /* 基准 -5deg → -8deg：再往后倒 3deg（下沉幅度，按需 2~5deg） */
+    transform: perspective(4105px) rotateX(-8deg) translateY(2px);
+    box-shadow:
+      inset 0 1px 0 oklch(1 0 0 / 50%),
+      /* 顶沿接触阴影加深（被压的暗部） */
+      inset 0 22px 26px -14px oklch(0 0 0 / 50%),
+      inset 0 -16px 24px -16px oklch(0 0 0 / 22%),
+      0 16px 30px -14px oklch(0 0 0 / 42%);
   }
 
   .notebook-paper-vfx {
@@ -384,13 +482,13 @@
   .notebook-paper-grid {
     position: absolute;
     inset: 0;
-    opacity: 0.42;
+    opacity: 0.3;
     mix-blend-mode: multiply;
     background-image: url("/notebook/paper-grid.png");
     background-repeat: repeat;
     background-position: center top;
     background-size: 41.5px;
-    mask-image: linear-gradient(180deg, #000 0%, #000 55%, transparent 85%);
+    mask-image: linear-gradient(180deg, #000 0%, #000 48%, transparent 80%);
   }
   .notebook-paper-vfx--plain .notebook-paper-grid {
     display: none;
@@ -400,16 +498,26 @@
     position: relative;
     z-index: 2;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
-    gap: 0.5rem;
-    align-items: center;
+    grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.2fr);
+    gap: 0.25rem;
+    align-items: stretch;
+    height: 100%;
     min-height: inherit;
-    padding: clamp(1.35rem, 3.2vw, 2rem) clamp(1rem, 2.5vw, 1.75rem)
-      clamp(1.25rem, 3vw, 1.75rem);
+    padding: clamp(1.5rem, 3.6vw, 2.4rem) clamp(0.9rem, 2.2vw, 1.5rem) 0
+      clamp(1.1rem, 2.8vw, 1.85rem);
+  }
+
+  .notebook-intro {
+    align-self: start;
+  }
+  .notebook-hero-wrap {
+    align-self: stretch;
   }
 
   .notebook-intro {
     color: var(--notebook-red);
+    transform: translateY(clamp(2rem, 6vw, 4rem)) scale(1.18);
+    transform-origin: left top;
   }
   .notebook-name {
     font-size: clamp(1.65rem, 3.8vw, 2.15rem);
@@ -419,15 +527,16 @@
   .notebook-role {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.02em;
-    margin-top: 0.45rem;
-    max-width: 11rem;
+    gap: 0.01em;
+    margin-top: 0.5rem;
+    max-width: 13rem;
   }
   .notebook-role-char {
-    font-family: var(--font-averia);
-    font-size: clamp(0.95rem, 2vw, 1.15rem);
+    font-family: var(--font-mono);
+    font-size: clamp(0.95rem, 2vw, 1.2rem);
     line-height: 1;
     text-align: center;
+    white-space: pre;
   }
 
   .notebook-headline-block {
@@ -466,16 +575,16 @@
   .notebook-hero-wrap {
     position: relative;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: clamp(11rem, 28vw, 16rem);
+    justify-content: flex-end;
+    align-items: flex-end;
+    min-height: clamp(13rem, 34vw, 20rem);
   }
   .notebook-slice-decor {
     position: absolute;
     top: -0.35rem;
-    left: 8%;
+    left: 2%;
     z-index: 2;
-    width: clamp(3.5rem, 9vw, 5.5rem);
+    width: clamp(3rem, 7.5vw, 4.6rem);
     height: auto;
     pointer-events: none;
   }
@@ -489,26 +598,32 @@
   .notebook-hero-img {
     position: relative;
     z-index: 1;
-    width: min(100%, 20rem);
+    width: 600px;
+    max-width: none;
     height: auto;
     object-fit: contain;
+    transform: translate(3%, -7px);
   }
 
   /* 书脊 */
   .notebook-binder {
     position: relative;
     z-index: 6;
-    height: 0.55rem;
+    height: 0.6rem;
     margin: -0.1rem 1.65rem 0 1.15rem;
     background: linear-gradient(
       180deg,
-      oklch(0.32 0.08 28) 0%,
-      oklch(0.42 0.12 28) 45%,
-      oklch(0.35 0.1 28) 100%
+      oklch(0.3 0.08 28) 0%,
+      oklch(0.44 0.13 28) 48%,
+      oklch(0.33 0.1 28) 100%
     );
     box-shadow:
-      0 2px 6px oklch(0 0 0 / 35%),
-      inset 0 1px 0 oklch(1 0 0 / 12%);
+      /* 书脊上下投到两页上的装订暗影 */
+      0 -10px 16px -8px oklch(0 0 0 / 45%),
+      0 10px 16px -8px oklch(0 0 0 / 45%),
+      /* 书脊自身的高光与压痕 */
+      inset 0 1px 0 oklch(1 0 0 / 16%),
+      inset 0 -1px 0 oklch(0 0 0 / 30%);
   }
 
   /* ③ Bottom Page — 外层 3D，内层 Paper + Leather 并列 */
@@ -523,12 +638,19 @@
   .notebook-paper--bottom {
     aspect-ratio: var(--nb-page-ratio);
     min-height: 0;
-    border-radius: 0.45rem;
+    border-radius: var(--nb-spine-radius) var(--nb-spine-radius)
+      var(--nb-paper-radius) var(--nb-paper-radius);
     padding: clamp(1.15rem, 2.8vw, 1.65rem) clamp(1rem, 2.5vw, 1.75rem)
       clamp(2.25rem, 5vw, 3.25rem);
     box-shadow:
-      0 14px 36px -14px oklch(0 0 0 / 38%),
-      0 1px 0 oklch(1 0 0 / 30%) inset;
+      /* 纸面顶沿细高光 */
+      inset 0 1px 0 oklch(1 0 0 / 44%),
+      /* 靠书脊（上沿）的装订柔和暗影 */
+      inset 0 16px 24px -16px oklch(0 0 0 / 24%),
+      /* 底部贴皮革封面边的柔和暗影（关键层次感） */
+      inset 0 -13px 18px -13px oklch(0 0 0 / 28%),
+      /* 纸页整体落在封面上的柔和投影 */
+      0 14px 28px -16px oklch(0 0 0 / 40%);
   }
 
   .notebook-beliefs-title {
@@ -544,14 +666,14 @@
   .notebook-notes {
     position: relative;
     z-index: 3;
-    margin: clamp(1.35rem, 3.5vw, 2rem) auto 0;
-    width: min(100%, 30rem);
-    min-height: clamp(11rem, 30vw, 15.5rem);
+    margin: clamp(3.1rem, 6.2vw, 4.45rem) auto 0;
+    width: min(100%, 44rem);
+    min-height: clamp(16rem, 44vw, 22rem);
   }
 
   .notebook-note {
     position: absolute;
-    width: clamp(8.5rem, 26vw, 12.5rem);
+    width: clamp(11rem, 33vw, 18rem);
   }
   .notebook-note-paper {
     display: block;
@@ -563,44 +685,48 @@
     inset: 0;
     display: flex;
     align-items: center;
-    justify-content: center;
-    padding: 1.2rem 0.9rem;
-    text-align: center;
-    font-size: clamp(0.82rem, 1.9vw, 1rem);
-    line-height: 1.35;
+    justify-content: flex-start;
+    padding: 1.6rem 1.2rem;
+    text-align: left;
+    font-size: clamp(1rem, 2.5vw, 1.35rem);
+    line-height: 1.3;
     color: oklch(0.22 0.02 60);
   }
   .notebook-note--lined {
-    top: 0;
-    left: 2%;
-    transform: rotate(-5deg);
+    top: 0.5rem;
+    left: 0;
+    transform: rotate(-6deg);
     z-index: 2;
   }
   .notebook-note--lined .notebook-note-text {
-    padding-top: 1.65rem;
-    font-size: clamp(0.9rem, 2.1vw, 1.08rem);
+    align-items: center;
+    padding: 1.4rem 22% 1.4rem 28%;
+    font-size: clamp(1.3rem, 3.2vw, 1.8rem);
   }
   .notebook-note--grid {
-    top: -0.35rem;
+    top: -0.75rem;
     right: 0;
-    transform: rotate(4deg);
+    transform: rotate(5deg);
     z-index: 3;
+    width: clamp(12rem, 37vw, 20rem);
   }
   .notebook-note--grid .notebook-note-text {
-    padding-top: 1.35rem;
-    font-size: clamp(0.74rem, 1.7vw, 0.88rem);
+    align-items: flex-start;
+    padding: 16% 40% 1rem 14%;
+    font-size: clamp(1.1rem, 2.7vw, 1.5rem);
     letter-spacing: -0.02em;
   }
   .notebook-note--sticky {
-    bottom: 0.15rem;
-    left: 50%;
-    transform: translateX(-50%) rotate(-2deg);
+    bottom: -0.5rem;
+    left: 49%;
+    transform: translateX(-50%) rotate(-1.5deg);
     z-index: 4;
-    width: clamp(9.5rem, 28vw, 13rem);
+    width: clamp(11.5rem, 34vw, 18rem);
   }
   .notebook-note--sticky .notebook-note-text {
-    padding-top: 1.45rem;
-    font-size: clamp(0.88rem, 2vw, 1.02rem);
+    align-items: center;
+    padding: 2rem 30% 2rem 14%;
+    font-size: clamp(1.1rem, 2.7vw, 1.5rem);
   }
 
   .notebook-corner {
@@ -655,6 +781,12 @@
       grid-template-columns: 1fr;
       text-align: center;
     }
+    .notebook-intro {
+      position: static;
+      top: auto;
+      left: auto;
+      transform: none;
+    }
     .notebook-role {
       justify-content: center;
       max-width: none;
@@ -676,7 +808,7 @@
       transform: perspective(2800px) rotateX(-0.8deg);
     }
     .notebook-notes {
-      min-height: 19rem;
+      min-height: 24rem;
     }
     .notebook-note--lined {
       left: 50%;
