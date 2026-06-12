@@ -1,6 +1,6 @@
-import { Award, Compass, GraduationCap } from "lucide-react"
+import { Award, Briefcase, Compass, FolderKanban, GraduationCap } from "lucide-react"
 import Section from "./Section"
-import { about } from "@/data"
+import { about, briefProjects, experiences } from "@/data"
 
 export default function About() {
   return (
@@ -27,7 +27,7 @@ export default function About() {
         </div>
 
         {/* 在校经历 */}
-        <div className="group rounded-2xl glass p-7 transition-all duration-300 hover:-translate-y-1 lg:col-span-2">
+        <div className="group rounded-2xl glass p-7 transition-all duration-300 hover:-translate-y-1 lg:col-span-3">
           <div className="mb-5 flex items-center gap-3">
             <div className="inline-flex size-11 items-center justify-center rounded-xl bg-accent-muted text-accent">
               <GraduationCap className="size-5" />
@@ -81,15 +81,78 @@ export default function About() {
           </div>
         </div>
 
+        {/* 实习经历 */}
+        <div className="group rounded-2xl glass p-7 transition-all duration-300 hover:-translate-y-1 lg:col-span-3">
+          <div className="mb-5 flex items-center gap-3">
+            <div className="inline-flex size-11 items-center justify-center rounded-xl bg-accent-muted text-accent">
+              <Briefcase className="size-5" />
+            </div>
+            <h3 className="text-base font-semibold">实习经历</h3>
+          </div>
+          <div className="space-y-5">
+            {experiences.map((exp) => (
+              <div key={exp.company} className="rounded-xl border border-border p-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h4 className="text-sm font-semibold text-foreground">
+                      {exp.company}
+                    </h4>
+                    <span className="rounded-full bg-accent-muted px-2.5 py-1 text-xs font-medium text-accent">
+                      {exp.role}
+                    </span>
+                  </div>
+                  <span className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">
+                    {exp.period}
+                  </span>
+                </div>
+                {exp.project && (
+                  <p className="mt-2 text-sm font-medium text-accent">{exp.project}</p>
+                )}
+                <p className="mt-2 text-pretty text-sm leading-relaxed text-muted-foreground">
+                  {exp.summary}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 项目经历 */}
+        <div className="group rounded-2xl glass p-7 transition-all duration-300 hover:-translate-y-1 lg:col-span-3">
+          <div className="mb-5 flex items-center gap-3">
+            <div className="inline-flex size-11 items-center justify-center rounded-xl bg-accent-muted text-accent">
+              <FolderKanban className="size-5" />
+            </div>
+            <h3 className="text-base font-semibold">项目经历</h3>
+          </div>
+          <ul className="grid gap-3 sm:grid-cols-3">
+            {briefProjects.map((project) => (
+              <li
+                key={project.title}
+                className="rounded-xl border border-border p-4 transition-colors hover:border-accent/40"
+              >
+                <h4 className="text-sm font-semibold text-foreground">
+                  {project.title}
+                </h4>
+                <span className="mt-2 inline-block rounded-full bg-accent-muted px-2.5 py-1 text-xs font-medium text-accent">
+                  {project.type}
+                </span>
+                <span className="mt-2 block text-xs text-muted-foreground">
+                  {project.period}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
         {/* 获奖情况 */}
-        <div className="group rounded-2xl glass p-7 transition-all duration-300 hover:-translate-y-1">
+        <div className="group rounded-2xl glass p-7 transition-all duration-300 hover:-translate-y-1 lg:col-span-3">
           <div className="mb-5 flex items-center gap-3">
             <div className="inline-flex size-11 items-center justify-center rounded-xl bg-accent-muted text-accent">
               <Award className="size-5" />
             </div>
             <h3 className="text-base font-semibold">获奖情况</h3>
           </div>
-          <ul className="space-y-3">
+          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {about.awards.map((award) => (
               <li
                 key={award.name}

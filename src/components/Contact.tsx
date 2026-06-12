@@ -1,4 +1,4 @@
-import { Mail, MessageCircle, Download, ArrowUpRight } from "lucide-react"
+import { Mail, Phone, Download, ArrowUpRight } from "lucide-react"
 import { profile } from "@/data"
 
 function Github({ className }: { className?: string }) {
@@ -22,10 +22,10 @@ const links = [
     href: `mailto:${profile.email}`,
   },
   {
-    icon: MessageCircle,
-    label: "微信",
-    value: profile.wechat,
-    href: "#",
+    icon: Phone,
+    label: "电话",
+    value: profile.phone,
+    href: `tel:${profile.phone}`,
   },
   {
     icon: Github,
