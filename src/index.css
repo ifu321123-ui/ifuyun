@@ -180,8 +180,19 @@
     width: 100%;
     min-height: 100vh;
     min-height: 100dvh;
-    padding: clamp(1.25rem, 20vh, 8rem) max(1rem, 4vw) 2rem;
+    /* 底部留足空间，让皮革封面的大柔和投影在被 overflow 裁切前完全溶回背景，
+       否则投影会在区块底缘被硬切出一条突兀的横线 */
+    padding: clamp(1.25rem, 20vh, 8rem) max(1rem, 4vw) clamp(7rem, 15vh, 11rem);
     overflow: hidden;
+    /* 笔记本所在区域做柔和提亮，向四周溶回纯背景色，
+       让皮革投影落在渐变上而非平色上，衔接更自然 */
+    background:
+      radial-gradient(
+        135% 100% at 50% 38%,
+        oklch(0.31 0.006 35) 0%,
+        oklch(0.26 0.004 35) 42%,
+        var(--color-background) 78%
+      );
   }
 
   .notebook-nav {
@@ -315,10 +326,10 @@
       inset -7px 0 16px -10px oklch(0 0 0 / 45%),
       /* 底部受光面阴影 */
       inset 0 -3px 14px oklch(0 0 0 / 38%),
-      /* 贴合接触阴影 → 中景 → 远景环境光，营造悬浮空气感 */
-      0 4px 10px -4px oklch(0 0 0 / 55%),
-      0 22px 52px -20px oklch(0 0 0 / 70%),
-      0 64px 120px -44px oklch(0 0 0 / 82%);
+      /* 贴合接触阴影 → 中景 → 远景环境光，逐层加大羽化让边缘溶入背景 */
+      0 6px 16px -8px oklch(0 0 0 / 50%),
+      0 28px 64px -28px oklch(0 0 0 / 62%),
+      0 90px 160px -70px oklch(0 0 0 / 78%);
   }
   /* 上盖皮革：仅顶部两角大圆角，靠书脊（底部）两角收小 */
   .notebook-leather--top {
@@ -647,10 +658,16 @@
       inset 0 1px 0 oklch(1 0 0 / 44%),
       /* 靠书脊（上沿）的装订柔和暗影 */
       inset 0 16px 24px -16px oklch(0 0 0 / 24%),
-      /* 底部贴皮革封面边的柔和暗影（关键层次感） */
-      inset 0 -13px 18px -13px oklch(0 0 0 / 28%),
-      /* 纸页整体落在封面上的柔和投影 */
-      0 14px 28px -16px oklch(0 0 0 / 40%);
+      /* 底部贴皮革封面边的柔和暗影（纸边内卷的暗部） */
+      inset 0 -16px 22px -14px oklch(0 0 0 / 34%),
+      /* —— 纸页落在红色皮革封面上的三段层次阴影 ——
+         ① 紧贴撕边的接触阴影（窄、深，定义纸/皮的分界，加实） */
+      0 2px 2px 0 oklch(0 0 0 / 58%),
+      0 4px 6px -1px oklch(0 0 0 / 52%),
+      /* ② 中景投影（纸张抬起的高度感） */
+      0 14px 24px -8px oklch(0 0 0 / 50%),
+      /* ③ 远景环境阴影（柔、散，让纸悬浮在皮革之上） */
+      0 32px 52px -22px oklch(0 0 0 / 54%);
   }
 
   .notebook-beliefs-title {
@@ -674,11 +691,22 @@
   .notebook-note {
     position: absolute;
     width: clamp(11rem, 33vw, 18rem);
+    /* 便签上浮的高度（驱动接触阴影 + 环境阴影的强弱），越靠上层越高 */
+    --nb-note-lift: 1;
+    transition: transform 0.45s var(--ease-out-expo);
   }
   .notebook-note-paper {
     display: block;
     width: 100%;
     height: auto;
+    /* 纸张落在内页上的层次：① 贴近的接触阴影（紧、深、沿撕边）
+       ② 扩散的环境阴影（柔、浅、偏下，营造悬浮高度）
+       drop-shadow 跟随 PNG alpha，毛边/撕口都会投影 */
+    filter:
+      drop-shadow(0 calc(1px * var(--nb-note-lift)) calc(1.5px * var(--nb-note-lift))
+        oklch(0.18 0.02 60 / 24%))
+      drop-shadow(0 calc(7px * var(--nb-note-lift)) calc(13px * var(--nb-note-lift))
+        oklch(0.16 0.02 60 / 20%));
   }
   .notebook-note-text {
     position: absolute;
@@ -697,6 +725,11 @@
     left: 0;
     transform: rotate(-6deg);
     z-index: 2;
+    --nb-note-lift: 0.85;
+  }
+  .notebook-note--lined:hover {
+    transform: rotate(-6deg) translateY(-4px);
+    --nb-note-lift: 1.35;
   }
   .notebook-note--lined .notebook-note-text {
     align-items: center;
@@ -736,12 +769,12 @@
   }
   .notebook-corner--plant {
     bottom: 0.35rem;
-    left: 0;
+    right: 0;
     width: clamp(5.5rem, 17vw, 9.5rem);
   }
   .notebook-corner--stump {
     bottom: 0;
-    right: 0;
+    left: 0;
     width: clamp(6.5rem, 20vw, 11.5rem);
   }
   /* 进场动画 */
