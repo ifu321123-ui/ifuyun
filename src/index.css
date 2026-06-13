@@ -1801,7 +1801,7 @@
   }
 
   .gunze-movie-slider {
-    width: min(100vw, 1180px);
+    width: 100vw;
     margin: 0 auto;
   }
 
@@ -1811,10 +1811,11 @@
   }
 
   .gunze-movie-card {
+    --card-w: clamp(11rem, 21vw, 20rem);
     position: absolute;
     top: 50%;
     left: 50%;
-    width: clamp(13rem, 28vw, 25rem);
+    width: var(--card-w);
     aspect-ratio: 9 / 16;
     padding: 0;
     overflow: hidden;
@@ -1825,9 +1826,9 @@
     cursor: pointer;
     transform:
       translate(-50%, -50%)
-      translateX(calc(var(--offset-x, 0) * 1px))
-      rotate(var(--offset-rot, 0deg))
-      scale(var(--offset-scale, 1));
+      translateX(calc(var(--offset-x, 0) * var(--card-w)))
+      translateY(calc(var(--offset-y, 0) * var(--card-w)))
+      rotate(var(--offset-rot, 0deg));
     transition:
       transform 0.45s var(--ease-out-expo),
       opacity 0.45s var(--ease-out-expo);
@@ -1840,38 +1841,42 @@
   }
 
   .gunze-movie-card.is-offset--2 {
-    --offset-x: -430;
+    --offset-x: -2.441;
+    --offset-y: 0.438;
     --offset-rot: -10deg;
-    --offset-scale: 0.74;
-    opacity: 0.46;
+    opacity: 1;
+    z-index: 1;
   }
 
   .gunze-movie-card.is-offset--1 {
-    --offset-x: -245;
-    --offset-rot: -6deg;
-    --offset-scale: 0.86;
-    opacity: 0.75;
+    --offset-x: -1.256;
+    --offset-y: 0.035;
+    --offset-rot: -5deg;
+    opacity: 1;
+    z-index: 2;
   }
 
   .gunze-movie-card.is-offset-0 {
     --offset-x: 0;
+    --offset-y: 0;
     --offset-rot: 0deg;
-    --offset-scale: 1;
     z-index: 3;
   }
 
   .gunze-movie-card.is-offset-1 {
-    --offset-x: 245;
-    --offset-rot: 6deg;
-    --offset-scale: 0.86;
-    opacity: 0.75;
+    --offset-x: 1.256;
+    --offset-y: 0.035;
+    --offset-rot: 5deg;
+    opacity: 1;
+    z-index: 2;
   }
 
   .gunze-movie-card.is-offset-2 {
-    --offset-x: 430;
+    --offset-x: 2.441;
+    --offset-y: 0.438;
     --offset-rot: 10deg;
-    --offset-scale: 0.74;
-    opacity: 0.46;
+    opacity: 1;
+    z-index: 1;
   }
 
   .gunze-movie-play {
@@ -1885,6 +1890,53 @@
 
   .gunze-movie-play svg {
     width: 3.5rem;
+  }
+
+  .gunze-movie-caption {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 2.6rem 1rem 1.1rem;
+    background: linear-gradient(to top, rgb(0 0 0 / 66%), rgb(0 0 0 / 0%));
+    color: #fff;
+    font-size: clamp(0.95rem, 1.4vw, 1.2rem);
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .gunze-movie-more {
+    display: flex;
+    justify-content: center;
+    margin-top: clamp(1.6rem, 3vw, 2.6rem);
+  }
+
+  .gunze-more-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.2rem 0.2rem 0.4rem;
+    border: 0;
+    border-bottom: 0.2rem solid currentColor;
+    background: transparent;
+    color: var(--gunze-blue);
+    font-size: clamp(1.05rem, 1.8vw, 1.4rem);
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: gap 0.3s var(--ease-out-expo), opacity 0.3s var(--ease-out-expo);
+  }
+
+  .gunze-more-link:hover {
+    gap: 1.1rem;
+    opacity: 0.75;
+  }
+
+  .gunze-more-link svg {
+    width: 1.4rem;
+    height: auto;
   }
 
   .gunze-movie-controller {
@@ -2078,6 +2130,21 @@
     background: #000;
   }
 
+  .gunze-modal__body--image {
+    width: auto;
+    aspect-ratio: auto;
+    max-width: min(92vw, 720px);
+  }
+
+  .gunze-modal__body--image img {
+    display: block;
+    width: auto;
+    max-width: min(92vw, 720px);
+    max-height: 88vh;
+    border-radius: 1rem;
+    box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 55%);
+  }
+
   .gunze-modal__close {
     position: absolute;
     top: -1rem;
@@ -2256,8 +2323,8 @@
     padding: 0.85rem 1.05rem;
     border: 3px solid var(--gunze-ink);
     border-radius: 999px;
-    background: #f8d43d;
-    color: var(--gunze-ink);
+    background: var(--gunze-blue);
+    color: #fff;
     text-align: left;
     box-shadow: 0 0.35rem 0 var(--gunze-ink);
     cursor: pointer;
@@ -2269,9 +2336,10 @@
 
   .profile-switcher__tab[data-active="true"] {
     background: #fff;
+    color: var(--gunze-ink);
     box-shadow:
       0 0.35rem 0 var(--gunze-ink),
-      0 0 0 5px rgb(255 255 255 / 88%);
+      0 0 0 5px rgb(23 0 255 / 22%);
     transform: translateX(0.65rem);
   }
 
@@ -2290,10 +2358,15 @@
     height: 2.25rem;
     border-radius: 50%;
     background: var(--gunze-ink);
-    color: #fff;
+    color: var(--gunze-yellow);
     font-family: "JetBrains Mono", monospace;
     font-size: 0.78rem;
     font-weight: 900;
+  }
+
+  .profile-switcher__tab[data-active="true"] .profile-switcher__tab-index {
+    background: var(--gunze-blue);
+    color: #fff;
   }
 
   .profile-switcher__tab-label,
@@ -2325,10 +2398,10 @@
     border: 4px solid var(--gunze-ink);
     border-radius: 2rem;
     background:
-      linear-gradient(90deg, #fff7bc 1.15rem, transparent 1.15rem) 0 0 / 2.3rem 2.3rem,
-      linear-gradient(#fff7bc 1.15rem, transparent 1.15rem) 0 0 / 2.3rem 2.3rem,
+      linear-gradient(90deg, rgb(23 0 255 / 9%) 1.15rem, transparent 1.15rem) 0 0 / 2.3rem 2.3rem,
+      linear-gradient(rgb(23 0 255 / 9%) 1.15rem, transparent 1.15rem) 0 0 / 2.3rem 2.3rem,
       #fff;
-    box-shadow: 0.8rem 0.8rem 0 rgb(11 7 19 / 55%);
+    box-shadow: 0.8rem 0.8rem 0 rgb(23 0 255 / 45%);
     animation: profile-panel-in 0.36s var(--ease-out-expo);
   }
 
@@ -2489,11 +2562,13 @@
     }
 
     .gunze-movie-card.is-offset--1 {
-      --offset-x: -175;
+      --offset-x: -1.08;
+      --offset-y: 0.03;
     }
 
     .gunze-movie-card.is-offset-1 {
-      --offset-x: 175;
+      --offset-x: 1.08;
+      --offset-y: 0.03;
     }
 
     .gunze-webcm__grid,
@@ -2529,7 +2604,7 @@
     .profile-switcher__panel {
       min-height: auto;
       max-height: none;
-      box-shadow: 0.45rem 0.45rem 0 rgb(11 7 19 / 55%);
+      box-shadow: 0.45rem 0.45rem 0 rgb(23 0 255 / 45%);
     }
 
     .gunze-title-group {
@@ -2579,12 +2654,18 @@
       height: 31rem;
     }
 
+    .gunze-movie-card {
+      --card-w: clamp(13rem, 62vw, 20rem);
+    }
+
     .gunze-movie-card.is-offset--1 {
-      --offset-x: -115;
+      --offset-x: -0.92;
+      --offset-y: 0.03;
     }
 
     .gunze-movie-card.is-offset-1 {
-      --offset-x: 115;
+      --offset-x: 0.92;
+      --offset-y: 0.03;
     }
 
     .gunze-progress {

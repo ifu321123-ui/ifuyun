@@ -2,10 +2,11 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { useLenis } from "lenis/react"
+import { navigate } from "@/hooks/useRoute"
 import ProfileSwitcher from "./ProfileSwitcher"
 
 const ASSET = "/gunze/"
-const MOVIE_TOTAL = 16
+const MOVIE_TOTAL = 5
 
 function clamp(v: number, min: number, max: number) {
   return Math.min(max, Math.max(min, v))
@@ -30,8 +31,10 @@ const GAP_RATIO = 0.05
 
 const REVEAL_END = 0.46
 // 圆点放大段：从自然尺寸一路长到盖满视口，区间拉长让放大更从容
+// 区间放宽到 0.46→0.72（约占整段滚动 26%），让小圆点用更长的滚动距离慢慢长大，
+// 避免「一闪而过」铺满全屏的突兀感
 const FLOOD_START = 0.46
-const FLOOD_END = 0.6
+const FLOOD_END = 0.72
 // 盖满后再留一点余量，保证大圆边缘完全滚出视口、不露出弧线缺口
 const FLOOD_MARGIN = 1.12
 // 文字与圆点放大同步起步：圆点还小时（FLOOD_START 附近）标题与正文就开始淡入上浮，
@@ -46,28 +49,13 @@ const MESSAGE_TITLE = "Message"
 
 gsap.registerPlugin(ScrollTrigger)
 
-const movieSlides = Array.from({ length: MOVIE_TOTAL }, (_, index) => {
-  const n = index + 1
-  return {
-    id: `movie${String(n).padStart(2, "0")}`,
-    image: n <= 12 ? `movie-main${String(n).padStart(2, "0")}.jpg` : "movie-comingsoon.jpg",
-    youtube:
-      [
-        "NjUicrVbPMk",
-        "Thlk14RTGt4",
-        "m45fz2bPrJg",
-        "SevGvarMK3s",
-        "wrxHanrWW9c",
-        "zYwMByE5q_k",
-        "jDyhiEiLN40",
-        "hXitcTdwcTs",
-        "P97K2JSEpLQ",
-        "gN6tTNm6amg",
-        "ZpBe4LizZPE",
-        "EV5nOu4yCEA",
-      ][index] ?? null,
-  }
-})
+const movieSlides = [
+  { id: "work01", image: "/works/work01.png", title: "一地人间" },
+  { id: "work02", image: "/works/work02.png", title: "食援" },
+  { id: "work03", image: "/works/work03.png", title: "蜀香" },
+  { id: "work04", image: "/works/work04.png", title: "崖上的希望" },
+  { id: "work05", image: "/works/work05.png", title: "武者" },
+]
 
 function Eyes({ className = "" }: { className?: string }) {
   return (
@@ -114,49 +102,29 @@ function MovieSection() {
     })
   }, [current])
 
-  const activeMovie = modal ? movieSlides.find((item) => item.id === modal) : null
+  const activeWork = modal ? movieSlides.find((item) => item.id === modal) : null
 
   return (
     <section className="gunze-movie" id="movie">
       <hgroup className="gunze-title-group">
-        <h2 className="gunze-section-title">Movie</h2>
-        <p className="gunze-title-jp">130周年纪念视频</p>
+        <h2 className="gunze-section-title">作品概览</h2>
+        <p className="gunze-title-jp">部分设计作品</p>
       </hgroup>
 
       <div className="gunze-movie-slider" aria-label="130周年纪念视频列表">
         <div className="gunze-movie-track">
           {visible.map((slide) => {
             const isActive = slide.offset === 0
-            const canOpen = Boolean(slide.youtube)
-            const body = (
-              <>
-                <img src={`${ASSET}${slide.image}`} alt="" />
-                {canOpen && (
-                  <span className="gunze-movie-play">
-                    <svg viewBox="0 0 43 50">
-                      <use href="#gunze-play" />
-                    </svg>
-                  </span>
-                )}
-              </>
-            )
-
-            return canOpen ? (
+            return (
               <button
                 key={`${slide.id}-${slide.offset}`}
                 type="button"
                 className={`gunze-movie-card is-offset-${slide.offset} ${isActive ? "is-active" : ""}`}
                 onClick={() => setModal(slide.id)}
               >
-                {body}
+                <img src={slide.image} alt={slide.title} />
+                <span className="gunze-movie-caption">{slide.title}</span>
               </button>
-            ) : (
-              <div
-                key={`${slide.id}-${slide.offset}`}
-                className={`gunze-movie-card is-offset-${slide.offset} ${isActive ? "is-active" : ""}`}
-              >
-                {body}
-              </div>
             )
           })}
         </div>
@@ -192,20 +160,20 @@ function MovieSection() {
         </div>
       </div>
 
-      {modal && (
+      <div className="gunze-movie-more">
+        <button type="button" className="gunze-more-link" onClick={() => navigate("projects")}>
+          查看更多
+          <svg viewBox="0 0 27 26">
+            <use href="#gunze-arrow" />
+          </svg>
+        </button>
+      </div>
+
+      {modal && activeWork && (
         <div className="gunze-modal" role="dialog" aria-modal="true">
           <button type="button" className="gunze-modal__bg" aria-label="关闭弹窗" onClick={() => setModal(null)} />
-          <div className={`gunze-modal__body ${activeMovie ? "is-vertical" : ""}`}>
-            <iframe
-              src={`https://www.youtube.com/embed/${
-                activeMovie?.youtube ??
-                (modal === "webcm02" ? "NJPwkBNe9U8" : "LYVMJH47z84")
-              }`}
-              title="YouTube video player"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              referrerPolicy="strict-origin-when-cross-origin"
-              allowFullScreen
-            />
+          <div className="gunze-modal__body gunze-modal__body--image">
+            <img src={activeWork.image} alt={activeWork.title} />
             <button type="button" className="gunze-modal__close" aria-label="关闭弹窗" onClick={() => setModal(null)}>
               <svg viewBox="0 0 75 75">
                 <use href="#gunze-close" />
@@ -296,8 +264,8 @@ export default function GunzeTransition() {
 
     const easeBack = gsap.parseEase("back.out(1.7)")
     const easeFade = gsap.parseEase("power2.out")
-    // 放大先慢后快：早期圆点像问号的「点」缓缓变大，临近铺底时加速吞满全屏
-    const easeFlood = gsap.parseEase("power2.in")
+    // 放大更匀速：早期圆点像问号的「点」缓缓变大，收尾不再急剧加速，减弱「一闪铺满」的突兀感
+    const easeFlood = gsap.parseEase("power1.in")
 
     const stagger = (
       els: HTMLElement[],
