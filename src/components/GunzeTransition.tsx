@@ -27,10 +27,16 @@ const TIP_Y_RATIO = 0.998
 const TIP_X_RATIO = 0.492
 const GAP_RATIO = 0.05
 
-const REVEAL_END = 0.56
-const FLOOD_END = 0.86
-const MSG_START = 0.62
-const MSG_END = 0.88
+const REVEAL_END = 0.46
+// 圆点放大段：从自然尺寸一路长到盖满视口，区间拉长让放大更从容
+const FLOOD_START = 0.46
+const FLOOD_END = 0.66
+// 盖满后再留一点余量，保证大圆边缘完全滚出视口、不露出弧线缺口
+const FLOOD_MARGIN = 1.12
+const MSG_START = 0.64
+const MSG_END = 0.94
+
+const MESSAGE_TITLE = "Message"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -279,6 +285,30 @@ export default function GunzeTransition() {
     if (!stage) return
 
     const root = document.documentElement
+    const letters = Array.from(stage.querySelectorAll<HTMLElement>(".gunze-letter"))
+    const paragraphs = Array.from(stage.querySelectorAll<HTMLElement>(".gunze-msg-p"))
+
+    const easeBack = gsap.parseEase("back.out(1.7)")
+    const easeFade = gsap.parseEase("power2.out")
+    // 放大先慢后快：早期圆点像问号的「点」缓缓变大，临近铺底时加速吞满全屏
+    const easeFlood = gsap.parseEase("power2.in")
+
+    const stagger = (
+      els: HTMLElement[],
+      reveal: number,
+      win: number,
+      base: number,
+      gap: number,
+      shift: number,
+      ease?: (value: number) => number,
+    ) => {
+      els.forEach((el, i) => {
+        const local = clamp((reveal - base - i * gap) / win, 0, 1)
+        const moved = ease ? ease(local) : local
+        el.style.opacity = local.toFixed(3)
+        el.style.transform = `translate3d(0, ${((1 - moved) * shift).toFixed(2)}px, 0)`
+      })
+    }
 
     const apply = (progress: number) => {
       const p = clamp(progress, 0, 1)
@@ -302,25 +332,38 @@ export default function GunzeTransition() {
         : lerp(qYatCenter, qYend, map(p, REVEAL_END, 1, 0, 1))
       const dotCenterY = p <= REVEAL_END ? qY + offsetToTail : centerY
 
-      const flood = map(p, REVEAL_END, FLOOD_END, 0, 1)
+      // 单个圆点持续放大铺底：动态算出「短轴直径 ≥ 视口对角线」所需的倍数，
+      // 这样它自身就能盖满整屏，无需再叠一层矩形淡入来补色
       const diag = Math.hypot(vw, vh)
-      const maxScale = (diag * 1.7) / dotW
+      const coverScale = (diag / dotH) * FLOOD_MARGIN
+      const flood = easeFlood(map(p, FLOOD_START, FLOOD_END, 0, 1))
+      const dotScale = 1 + flood * (coverScale - 1)
+      // 圆已经完全盖住视口后，才把同色实底瞬切到位垫在圆背后（消除亚像素缝隙），
+      // 在此之前保持透明，让放大过程纯粹由「圆的边缘弧线」推进
+      const covered = dotScale * dotH >= diag
 
       if (dot) {
         dot.style.width = `${dotW.toFixed(1)}px`
         dot.style.height = `${dotH.toFixed(1)}px`
       }
 
+      const msg = map(p, MSG_START, MSG_END, 0, 1)
+      stagger(letters, msg, 0.3, 0, 0.05, 70, easeBack)
+      stagger(paragraphs, msg, 0.3, 0.2, 0.1, 36, easeFade)
+
       root.style.setProperty("--gunze-q-height", `${hookH.toFixed(1)}px`)
       root.style.setProperty("--gunze-q-y", `${qY.toFixed(2)}px`)
-      root.style.setProperty("--gunze-body-opacity", (1 - map(p, REVEAL_END, 0.8, 0, 0.85)).toFixed(4))
-      root.style.setProperty("--gunze-dot-left", `${tailX.toFixed(2)}px`)
+      root.style.setProperty("--gunze-body-opacity", (1 - map(p, REVEAL_END, FLOOD_END, 0, 1)).toFixed(4))
+      // 放大阶段把圆心收到视口正中，确保盖满时四角无残留
+      const dotLeft = p <= REVEAL_END ? tailX : centerX
+      root.style.setProperty("--gunze-dot-left", `${dotLeft.toFixed(2)}px`)
       root.style.setProperty("--gunze-dot-top", `${dotCenterY.toFixed(2)}px`)
-      root.style.setProperty("--gunze-dot-scale", (1 + flood * (maxScale - 1)).toFixed(4))
-      root.style.setProperty("--gunze-message-alpha", map(p, MSG_START, MSG_END, 0, 1).toFixed(4))
+      root.style.setProperty("--gunze-dot-scale", dotScale.toFixed(4))
+      root.style.setProperty("--gunze-flood-alpha", covered ? "1" : "0")
+      root.style.setProperty("--gunze-message-alpha", map(p, MSG_START, MSG_START + 0.03, 0, 1).toFixed(4))
       root.style.setProperty("--gunze-message-y", `${map(p, MSG_START, 1, 58, -75).toFixed(2)}vh`)
-      root.style.setProperty("--gunze-mv-alpha", (1 - map(p, 0.08, 0.56, 0, 1)).toFixed(4))
-      root.style.setProperty("--gunze-mv-y", `${map(p, 0, 0.56, 0, -120).toFixed(2)}px`)
+      root.style.setProperty("--gunze-mv-alpha", (1 - map(p, 0.08, REVEAL_END, 0, 1)).toFixed(4))
+      root.style.setProperty("--gunze-mv-y", `${map(p, 0, REVEAL_END, 0, -120).toFixed(2)}px`)
     }
 
     const state = { progress: 0 }
@@ -355,6 +398,7 @@ export default function GunzeTransition() {
         "--gunze-dot-left",
         "--gunze-dot-top",
         "--gunze-dot-scale",
+        "--gunze-flood-alpha",
         "--gunze-message-alpha",
         "--gunze-message-y",
         "--gunze-mv-alpha",
@@ -384,19 +428,26 @@ export default function GunzeTransition() {
           </div>
 
           <div className="gunze-message-bg" aria-hidden>
+            <div className="gunze-message-fill" />
             <div ref={dotRef} className="gunze-message-dot" />
           </div>
 
           <div className="gunze-message-preview">
             <div className="gunze-message-inner gunze-message-preview__inner">
-              <h2 className="gunze-section-title">Message</h2>
+              <h2 className="gunze-section-title gunze-message-title" aria-label={MESSAGE_TITLE}>
+                {MESSAGE_TITLE.split("").map((char, index) => (
+                  <span key={index} className="gunze-letter" style={{ "--ls-index": index } as React.CSSProperties} aria-hidden>
+                    {char}
+                  </span>
+                ))}
+              </h2>
               <div className="gunze-message-text">
-                <p>
+                <p className="gunze-msg-p">
                   它的发音是“郡士”。
                   <br />
                   事实上，他们将在2026年庆祝成立130周年。
                 </p>
-                <p>
+                <p className="gunze-msg-p">
                   从纱线到内衣、
                   <br />
                   塑料和医疗用品，
@@ -405,14 +456,14 @@ export default function GunzeTransition() {
                   <br />
                   提供各种“舒适”体验。
                 </p>
-                <p>
+                <p className="gunze-msg-p">
                   即使成立130年后，
                   <br />
                   这家公司仍然充满未知，
                   <br />
                   并且正在认真地尝试改变未来。
                 </p>
-                <p>
+                <p className="gunze-msg-p">
                   不仅仅是名字难以辨认，
                   <br />
                   更在于它所代表的未来可能性。
@@ -421,7 +472,7 @@ export default function GunzeTransition() {
                   <br />
                   一种目前世上尚不存在的“舒适感”。
                 </p>
-                <p>
+                <p className="gunze-msg-p">
                   无法辨认，GUNZE。
                   <br />
                   这是我们对未来的宣言，

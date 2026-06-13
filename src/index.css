@@ -1190,163 +1190,6 @@
 
 @layer components {
   :root {
-    --gunze-blue: #1800ff;
-    --gunze-bg: #f3f3f6;
-    --gunze-body-opacity: 1;
-    --gunze-q-height: 120vh;
-    --gunze-q-y: 0px;
-    --gunze-dot-scale: 1;
-    --gunze-dot-left: 50vw;
-    --gunze-dot-top: 130vh;
-    --gunze-message-alpha: 0;
-    --gunze-message-y: 80px;
-  }
-
-  .gunze-stage {
-    position: relative;
-    height: 460vh;
-    background: var(--gunze-bg);
-  }
-
-  .gunze-scene {
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    height: 100dvh;
-    overflow: hidden;
-    background: var(--gunze-bg);
-  }
-
-  .gunze-hud {
-    position: absolute;
-    top: 22px;
-    left: 24px;
-    right: 24px;
-    z-index: 20;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    pointer-events: none;
-    color: #101010;
-  }
-  .gunze-logo {
-    font-size: 28px;
-    font-weight: 800;
-    color: #1b69d2;
-    opacity: 0.95;
-  }
-  .gunze-copy {
-    font-weight: 800;
-    text-shadow: 0 1px 0 rgb(255 240 0 / 80%);
-  }
-  .gunze-menu {
-    display: grid;
-    width: 72px;
-    height: 72px;
-    place-items: center;
-    border-radius: 14px;
-    background: var(--gunze-blue);
-    color: #fff;
-    font-size: 14px;
-  }
-
-  .gunze-question-layer {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    pointer-events: none;
-    opacity: var(--gunze-body-opacity);
-  }
-  /* 巨型「？」：比视窗高，靠 --gunze-q-y 随滚动整体上移，从上到下显形 */
-  .gunze-question-body {
-    position: absolute;
-    left: 50%;
-    top: 0;
-    width: auto;
-    height: var(--gunze-q-height);
-    transform: translate(-50%, var(--gunze-q-y));
-    transform-origin: 50% 0;
-    filter: drop-shadow(0 10px 22px rgb(0 0 0 / 12%));
-    will-change: transform;
-  }
-
-  .gunze-message-bg {
-    position: absolute;
-    inset: 0;
-    z-index: 3;
-    pointer-events: none;
-  }
-  .gunze-message-dot {
-    position: absolute;
-    left: var(--gunze-dot-left);
-    top: var(--gunze-dot-top);
-    width: 146px;
-    height: 103px;
-    border-radius: 50%;
-    background-color: var(--gunze-blue);
-    transform: translate(-50%, -50%) scale(var(--gunze-dot-scale));
-    transform-origin: 50% 50%;
-    will-change: transform;
-  }
-
-  .gunze-message-preview {
-    position: absolute;
-    inset: 0;
-    z-index: 9;
-    background: var(--gunze-blue);
-    color: #fff;
-    padding-top: 120px;
-    opacity: var(--gunze-message-alpha);
-    transform: translateY(var(--gunze-message-y));
-  }
-  .gunze-message-inner {
-    width: min(92vw, 860px);
-    margin: 0 auto;
-  }
-  .gunze-message-title {
-    margin: 0;
-    color: #f7f7f7;
-    font-size: clamp(56px, 10vw, 136px);
-    line-height: 0.9;
-    letter-spacing: 0.02em;
-  }
-  .gunze-message-text {
-    margin-top: 28px;
-    max-width: 17em;
-    font-size: clamp(20px, 2.2vw, 34px);
-    line-height: 1.68;
-  }
-  .gunze-message-preview::after {
-    content: "";
-    position: absolute;
-    left: -10%;
-    right: -10%;
-    bottom: -176px;
-    height: 310px;
-    background: var(--gunze-bg);
-    border-radius: 50% 50% 0 0;
-  }
-
-  .gunze-message-block {
-    position: relative;
-    background: var(--gunze-blue);
-    color: #fff;
-    padding: 120px 20px 220px;
-  }
-  .gunze-message-block::after {
-    content: "";
-    position: absolute;
-    left: -8%;
-    right: -8%;
-    bottom: -156px;
-    height: 284px;
-    border-radius: 50% 50% 0 0;
-    background: var(--gunze-bg);
-  }
-}
-
-@layer components {
-  :root {
     --gunze-blue: #1700ff;
     --gunze-bg: #f7f7f1;
     --gunze-ink: #0b0713;
@@ -1357,6 +1200,7 @@
     --gunze-dot-scale: 1;
     --gunze-dot-left: 50vw;
     --gunze-dot-top: 130vh;
+    --gunze-flood-alpha: 0;
     --gunze-message-alpha: 0;
     --gunze-message-y: 80px;
     --gunze-mv-alpha: 1;
@@ -1691,6 +1535,14 @@
     pointer-events: none;
   }
 
+  .gunze-message-fill {
+    position: absolute;
+    inset: 0;
+    background: var(--gunze-blue);
+    opacity: var(--gunze-flood-alpha);
+    will-change: opacity;
+  }
+
   .gunze-message-dot {
     position: absolute;
     left: var(--gunze-dot-left);
@@ -1855,6 +1707,17 @@
 
   .gunze-message-text p {
     margin: 0 0 2.2em;
+  }
+
+  .gunze-message-title .gunze-letter {
+    display: inline-block;
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+
+  .gunze-msg-p {
+    opacity: 0;
+    will-change: transform, opacity;
   }
 
   .gunze-movie,
