@@ -34,7 +34,9 @@ const FLOOD_END = 0.66
 // 盖满后再留一点余量，保证大圆边缘完全滚出视口、不露出弧线缺口
 const FLOOD_MARGIN = 1.12
 const MSG_START = 0.64
-const MSG_END = 0.94
+const MSG_END = 0.9
+// 退场段：大圆整体上移，露出「圆底」弧线，下方衔接米色 MOVIE 区块
+const EXIT_START = 0.9
 
 const MESSAGE_TITLE = "Message"
 
@@ -330,7 +332,6 @@ export default function GunzeTransition() {
       const qY = p <= REVEAL_END
         ? lerp(qY0, qYatCenter, map(p, 0, REVEAL_END, 0, 1))
         : lerp(qYatCenter, qYend, map(p, REVEAL_END, 1, 0, 1))
-      const dotCenterY = p <= REVEAL_END ? qY + offsetToTail : centerY
 
       // 单个圆点持续放大铺底：动态算出「短轴直径 ≥ 视口对角线」所需的倍数，
       // 这样它自身就能盖满整屏，无需再叠一层矩形淡入来补色
@@ -341,6 +342,13 @@ export default function GunzeTransition() {
       // 圆已经完全盖住视口后，才把同色实底瞬切到位垫在圆背后（消除亚像素缝隙），
       // 在此之前保持透明，让放大过程纯粹由「圆的边缘弧线」推进
       const covered = dotScale * dotH >= diag
+
+      // 退场段：把大圆整体向上推，让它的「圆底」从视口外升入画面再滑出顶部，
+      // 露出下方米色场景底色，形成与原站一致的下凸弧形交界（而非矩形直切）
+      const exit = easeFade(map(p, EXIT_START, 1, 0, 1))
+      const dotRadius = (dotH * dotScale) / 2
+      const exitRise = exit * (centerY + dotRadius + vh * 0.12)
+      const dotCenterY = p <= REVEAL_END ? qY + offsetToTail : centerY - exitRise
 
       if (dot) {
         dot.style.width = `${dotW.toFixed(1)}px`
@@ -359,8 +367,14 @@ export default function GunzeTransition() {
       root.style.setProperty("--gunze-dot-left", `${dotLeft.toFixed(2)}px`)
       root.style.setProperty("--gunze-dot-top", `${dotCenterY.toFixed(2)}px`)
       root.style.setProperty("--gunze-dot-scale", dotScale.toFixed(4))
-      root.style.setProperty("--gunze-flood-alpha", covered ? "1" : "0")
-      root.style.setProperty("--gunze-message-alpha", map(p, MSG_START, MSG_START + 0.03, 0, 1).toFixed(4))
+      // 退场一开始就撤掉整屏矩形实底，避免它的直边底盖住圆底弧线，改由大圆独自顶住上半屏
+      root.style.setProperty("--gunze-flood-alpha", covered && exit <= 0 ? "1" : "0")
+      // 文案在退场弧线成形前就快速淡出，避免白字残留在已露出的米色区域上
+      const msgFade = 1 - map(p, EXIT_START - 0.02, EXIT_START + 0.02, 0, 1)
+      root.style.setProperty(
+        "--gunze-message-alpha",
+        (map(p, MSG_START, MSG_START + 0.03, 0, 1) * msgFade).toFixed(4),
+      )
       root.style.setProperty("--gunze-message-y", `${map(p, MSG_START, 1, 58, -75).toFixed(2)}vh`)
       root.style.setProperty("--gunze-mv-alpha", (1 - map(p, 0.08, REVEAL_END, 0, 1)).toFixed(4))
       root.style.setProperty("--gunze-mv-y", `${map(p, 0, REVEAL_END, 0, -120).toFixed(2)}px`)
