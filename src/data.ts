@@ -13,7 +13,7 @@ export const profile = {
   wechat: "13198317509",
   github: "https://github.com/ifu321123-ui",
   resumeUrl: "/resume.pdf",
-  portfolioUrl: "/resume.pdf",
+  portfolioUrl: "/portfolio.pdf",
   currentStatus: "成都锦城学院 · 数字媒体技术（产品设计 / UI 方向）",
   previous: ["成都四方伟业（UI 实习生）", "码绘技术工作室 UI 组负责人"],
   brandClosing:
@@ -76,6 +76,25 @@ export const about = {
     { name: "第十九届大学生创新创业大赛 金奖", level: "省级", year: "2025" },
     { name: "ican 大学生创新创业大赛 四川赛区三等奖", level: "省级", year: "2025" },
   ],
+}
+
+export const heroIntro = {
+  nameCjk: "付云椒",
+  nameLatin: "FU YUNJIAO",
+  version: "v2026",
+  sideText: "DESIGNING WITH AI, THINKING WITH PRODUCT",
+  breadcrumb: ["PRODUCT", "UX", "AI · 2026"],
+  displayLines: ["FUYUN", "PRODUCT", "OS"],
+  subtitle: "AI 产品设计 & 用户体验",
+  caption: "PRODUCT STRATEGY · UX DESIGN · AI WORKFLOW",
+  scroll: { en: "SCROLL TO BOOT", cn: "向下进入系统" },
+  status: [
+    { label: "SYSTEM ONLINE", tone: "online" as const },
+    { label: "OPEN TO WORK", tone: "online" as const },
+    { label: "AI NATIVE ACTIVE", tone: "accent" as const },
+    { label: "UPDATED 2026", tone: "warn" as const },
+  ],
+  signature: "© 2026 · FU YUNJIAO · PRODUCT OS · v2026.06",
 }
 
 export const notebookNav = [

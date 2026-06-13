@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GUNZE Transition Minimal Demo</title>
+    <style>
+      :root {
+        --blue: #1800ff;
+        --bg: #f3f3f6;
+        --p: 0;
+        --body-opacity: 1;
+        --q-height: 120vh;
+        --q-y: 0px;
+        --dot-scale: 1;
+        --dot-left: 50vw;
+        --dot-top: 130vh;
+        --message-alpha: 0;
+        --message-y: 80px;
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: #111;
+        font-family: "Segoe UI", Arial, sans-serif;
+        overflow-x: hidden;
+      }
+
+      .scroll-stage {
+        height: 460vh;
+        position: relative;
+      }
+
+      .scene {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        height: 100dvh;
+        overflow: hidden;
+        background: var(--bg);
+      }
+
+      .hud {
+        position: absolute;
+        top: 22px;
+        left: 24px;
+        right: 24px;
+        z-index: 20;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        pointer-events: none;
+      }
+      .logo { color: #1b69d2; font-weight: 800; font-size: 28px; opacity: 0.95; }
+      .copy { font-weight: 800; text-shadow: 0 1px 0 rgba(255, 240, 0, 0.8); }
+      .menu {
+        width: 72px; height: 72px; border-radius: 14px;
+        background: var(--blue); color: #fff;
+        display: grid; place-items: center; font-size: 14px;
+      }
+
+      .question-layer {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        pointer-events: none;
+        opacity: var(--body-opacity);
+      }
+      /* 巨型「？」：比视窗高很多，靠 --q-y 随滚动整体上移，从上到下显形 */
+      .question-body {
+        position: absolute;
+        left: 50%;
+        top: 0;
+        width: auto;
+        height: var(--q-height);
+        transform: translate(-50%, var(--q-y));
+        transform-origin: 50% 0;
+        filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.12));
+        will-change: transform;
+      }
+
+      .p-top__messageBg {
+        position: absolute;
+        inset: 0;
+        z-index: 3;
+        pointer-events: none;
+      }
+      .p-top__messageBgBody {
+        width: 146px;
+        height: 103px;
+        border-radius: 50%;
+        background-color: var(--blue);
+        position: absolute;
+        left: var(--dot-left);
+        top: var(--dot-top);
+        transform-origin: 50% 50%;
+        transform: translate(-50%, -50%) scale(var(--dot-scale));
+        will-change: transform;
+      }
+
+      .message-preview {
+        position: absolute;
+        inset: 0;
+        z-index: 9;
+        background: var(--blue);
+        color: #fff;
+        padding-top: 120px;
+        opacity: var(--message-alpha);
+        transform: translateY(var(--message-y));
+      }
+      .message-inner,
+      .message-block .inner {
+        width: min(92vw, 860px);
+        margin: 0 auto;
+      }
+      .message-title,
+      .message-block h2 {
+        margin: 0;
+        font-size: clamp(56px, 10vw, 136px);
+        line-height: 0.9;
+        color: #f7f7f7;
+        letter-spacing: 0.02em;
+      }
+      .message-text,
+      .message-block p {
+        margin-top: 28px;
+        font-size: clamp(20px, 2.2vw, 34px);
+        line-height: 1.68;
+        max-width: 17em;
+      }
+      .message-preview::after {
+        content: "";
+        position: absolute;
+        left: -10%; right: -10%; bottom: -176px;
+        height: 310px;
+        background: var(--bg);
+        border-radius: 50% 50% 0 0;
+      }
+
+      .message-block {
+        background: var(--blue);
+        color: #fff;
+        padding: 120px 20px 220px;
+        position: relative;
+      }
+      .message-block::after {
+        content: "";
+        position: absolute;
+        left: -8%; right: -8%; bottom: -156px;
+        height: 284px;
+        background: var(--bg);
+        border-radius: 50% 50% 0 0;
+      }
+
+      .spacer { height: 40vh; }
+    </style>
+  </head>
+  <body>
+    <section class="scroll-stage" id="stage">
+      <div class="scene">
+        <div class="hud">
+          <div class="logo">130th</div>
+          <div class="copy">Yomenai, GUNZE.</div>
+          <div class="menu">菜单</div>
+        </div>
+
+        <div class="question-layer">
+          <img
+            src="/gunze-question-body.svg"
+            class="question-body js-preloadimg"
+            alt=""
+            width="1440"
+            height="1316"
+          />
+        </div>
+
+        <div class="p-top__messageBg js-messagebg">
+          <div class="p-top__messageBgBody js-messagebg__body"></div>
+        </div>
+
+        <div class="message-preview">
+          <div class="message-inner">
+            <h1 class="message-title">MESSAGE</h1>
+            <div class="message-text">
+              它的发音是“郡士”。<br />
+              事实上，他们将在2026年庆祝成立130周年。<br /><br />
+              从纱线到内衣、塑料和医疗用品，<br />
+              我们不断拓展挑战，提供各种“舒适”体验。
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="message-block">
+      <div class="inner">
+        <h2>MESSAGE</h2>
+        <p>
+          它的发音是“郡士”。<br />
+          事实上，他们将在2026年庆祝成立130周年。<br /><br />
+          从纱线到内衣、塑料和医疗用品，<br />
+          我们不断拓展挑战，提供各种“舒适”体验。<br /><br />
+          即使成立130年后，这家公司仍然充满未知，<br />
+          并且正在认真地尝试改变未来。
+        </p>
+      </div>
+    </section>
+    <div class="spacer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+    <script>
+      const stage = document.getElementById("stage");
+      const root = document.documentElement;
+      const dotBody = document.querySelector(".p-top__messageBgBody");
+
+      // —— 几何参数（参照官网「？」字形）——
+      const SVG_RATIO = 1440 / 1316; // 钩子 SVG 的宽高比
+      const HOOK_VH = 1.25; // 钩子高度 = 视窗高度的倍数（>1 → 一屏装不下，需滚动显形）
+      const DOT_WIDTH_RATIO = 0.175; // 圆点宽 ≈ 钩子宽的 17.5%
+      const DOT_ASPECT = 1.424; // 圆点宽高比
+      const TIP_Y_RATIO = 0.998; // 钩子笔尖在字形约 99.8% 高处（底部）
+      const TIP_X_RATIO = 0.492; // 笔尖在字形约 49.2% 宽处（近中线）
+      const GAP_RATIO = 0.05; // 笔尖与圆点之间的缝隙 ≈ 字形高的 5%
+
+      // —— 时间轴（滚动进度 p ∈ [0,1] 的关键节点）——
+      const REVEAL_END = 0.56; // 0→此：巨型「？」上移显形，圆点骑着钩子升到视窗中心
+      const FLOOD_END = 0.86; // REVEAL_END→此：圆点锁定中心并放大吞屏
+      const MSG_START = 0.62;
+      const MSG_END = 0.88;
+
+      function clamp(v, min, max) {
+        return Math.min(max, Math.max(min, v));
+      }
+      function map(p, inMin, inMax, outMin, outMax) {
+        const t = clamp((p - inMin) / (inMax - inMin), 0, 1);
+        return outMin + (outMax - outMin) * t;
+      }
+      function lerp(a, b, t) {
+        return a + (b - a) * t;
+      }
+
+      function apply(progress) {
+        const p = clamp(progress, 0, 1);
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const centerX = vw * 0.5;
+        const centerY = vh * 0.5;
+
+        // 钩子尺寸（比视窗高），及圆点尺寸（按钩子宽推导）
+        const hookH = vh * HOOK_VH;
+        const hookW = hookH * SVG_RATIO;
+        const dotW = hookW * DOT_WIDTH_RATIO;
+        const dotH = dotW / DOT_ASPECT;
+
+        // 钩子顶部(top:0)到「圆点中心」的固定竖直距离
+        const offsetToTail = hookH * TIP_Y_RATIO + hookH * GAP_RATIO + dotH / 2;
+        const tailX = centerX + hookW * (TIP_X_RATIO - 0.5);
+
+        // 钩子整体平移 --q-y 的三个关键位置：
+        const qY0 = 0; // 起点：钩子顶贴视窗顶 → 上半部分填满屏幕
+        const qYatCenter = centerY - offsetToTail; // 圆点恰好到视窗中心时钩子的位置
+        const qYend = -(hookH + vh * 0.35); // 终点：钩子完全移出视窗顶部
+
+        let qY;
+        let dotCenterY;
+        if (p <= REVEAL_END) {
+          // 阶段 1：显形。钩子上移，圆点骑着笔尖一起升到中心。
+          const rp = map(p, 0, REVEAL_END, 0, 1);
+          qY = lerp(qY0, qYatCenter, rp);
+          dotCenterY = qY + offsetToTail; // rp=1 时正好 = centerY
+        } else {
+          // 阶段 2：钩子继续上移飞出，圆点锁死在中心。
+          const ep = map(p, REVEAL_END, 1, 0, 1);
+          qY = lerp(qYatCenter, qYend, ep);
+          dotCenterY = centerY;
+        }
+
+        // 圆点放大吞屏：到达中心后才开始，放大到足以铺满视窗对角线
+        const flood = map(p, REVEAL_END, FLOOD_END, 0, 1);
+        const diag = Math.hypot(vw, vh);
+        const maxScale = (diag * 1.6) / dotW;
+        const dotScale = 1 + flood * (maxScale - 1);
+
+        // 钩子在吞屏阶段淡出（此时它本就已飞出屏幕，淡出兜底）
+        const bodyOpacity = 1 - map(p, REVEAL_END, 0.8, 0, 0.85);
+
+        const messageAlpha = map(p, MSG_START, MSG_END, 0, 1);
+        const messageY = map(p, MSG_START, MSG_END, 80, 0);
+
+        if (dotBody) {
+          dotBody.style.width = `${dotW.toFixed(1)}px`;
+          dotBody.style.height = `${dotH.toFixed(1)}px`;
+        }
+
+        root.style.setProperty("--p", p.toFixed(4));
+        root.style.setProperty("--q-height", `${hookH.toFixed(1)}px`);
+        root.style.setProperty("--q-y", `${qY.toFixed(2)}px`);
+        root.style.setProperty("--body-opacity", bodyOpacity.toFixed(4));
+        root.style.setProperty("--dot-left", `${tailX.toFixed(2)}px`);
+        root.style.setProperty("--dot-top", `${dotCenterY.toFixed(2)}px`);
+        root.style.setProperty("--dot-scale", dotScale.toFixed(4));
+        root.style.setProperty("--message-alpha", messageAlpha.toFixed(4));
+        root.style.setProperty("--message-y", `${messageY.toFixed(2)}px`);
+      }
+
+      gsap.registerPlugin(ScrollTrigger);
+
+      const state = { progress: 0 };
+      gsap.to(state, {
+        progress: 1,
+        ease: "none",
+        onUpdate: () => apply(state.progress),
+        scrollTrigger: {
+          trigger: stage,
+          start: "top top",
+          end: "bottom bottom",
+          scrub: 0.85,
+          invalidateOnRefresh: true,
+          onRefresh: (self) => apply(self.progress),
+        },
+      });
+
+      apply(0);
+    </script>
+  </body>
+</html>
