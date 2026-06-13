@@ -1217,7 +1217,9 @@
   .gunze-stage,
   .gunze-message-block,
   .gunze-movie,
-  .gunze-ceo {
+  .gunze-ceo,
+  .business-intro,
+  .profile-switcher {
     font-family:
       "Arial Rounded MT Bold",
       "Arial Black",
@@ -1226,10 +1228,61 @@
       sans-serif;
   }
 
+  .business-intro {
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    padding: clamp(4rem, 9vw, 8rem) 0 clamp(4rem, 8vw, 7rem);
+    background: var(--gunze-bg);
+    color: var(--gunze-blue);
+  }
+
+  .business-intro__inner {
+    width: min(92vw, 1200px);
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .business-intro__lead {
+    margin: 0;
+    color: var(--gunze-ink);
+    font-size: clamp(1.4rem, 3.2vw, 2.6rem);
+    font-weight: 950;
+    letter-spacing: -0.04em;
+  }
+
+  .business-intro__lead-soft {
+    font-weight: 500;
+    color: rgb(11 7 19 / 78%);
+  }
+
+  .business-intro__word {
+    margin: clamp(0.4rem, 1.4vw, 1.2rem) 0 0;
+    color: var(--gunze-blue);
+    font-size: clamp(3.4rem, 14.5vw, 14rem);
+    font-weight: 950;
+    line-height: 0.86;
+    letter-spacing: -0.03em;
+  }
+
+  .business-intro__text {
+    margin: clamp(1.5rem, 4vw, 3rem) auto 0;
+    max-width: min(86vw, 720px);
+    color: var(--gunze-blue);
+    font-size: clamp(0.9rem, 1.5vw, 1.15rem);
+    font-weight: 900;
+    line-height: 1.9;
+    letter-spacing: -0.02em;
+  }
+
+  .business-intro__text p {
+    margin: 0;
+  }
+
   .gunze-stage {
     position: relative;
     z-index: 1;
-    height: 470vh;
+    height: 215vh;
     background:
       radial-gradient(circle at 50% 48%, rgb(255 255 255 / 80%), transparent 36%),
       var(--gunze-bg);
@@ -2151,6 +2204,222 @@
     box-shadow: 0 1rem 2rem rgb(23 0 255 / 22%);
   }
 
+  .profile-switcher {
+    position: relative;
+    z-index: 2;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: grid;
+    place-items: center;
+    padding: clamp(4rem, 8vw, 7rem) clamp(1.25rem, 5vw, 5rem);
+    overflow: hidden;
+    background: var(--gunze-bg);
+    color: var(--gunze-ink);
+  }
+
+  .profile-switcher::before {
+    content: "";
+    position: absolute;
+    inset: -20%;
+    background-image:
+      linear-gradient(90deg, rgb(11 7 19 / 6%) 1px, transparent 1px),
+      linear-gradient(rgb(11 7 19 / 6%) 1px, transparent 1px);
+    background-size: 4.4rem 4.4rem;
+    mask-image: radial-gradient(circle at 50% 45%, #000, transparent 70%);
+    pointer-events: none;
+  }
+
+  .profile-switcher__shell {
+    position: relative;
+    width: min(1120px, 100%);
+  }
+
+  .profile-switcher__grid {
+    display: grid;
+    grid-template-columns: minmax(13rem, 18rem) minmax(0, 1fr);
+    gap: clamp(1.25rem, 3vw, 2.5rem);
+    align-items: start;
+  }
+
+  .profile-switcher__menu {
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .profile-switcher__tab {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 0.9rem;
+    width: 100%;
+    min-height: 4.35rem;
+    padding: 0.85rem 1.05rem;
+    border: 3px solid var(--gunze-ink);
+    border-radius: 999px;
+    background: #f8d43d;
+    color: var(--gunze-ink);
+    text-align: left;
+    box-shadow: 0 0.35rem 0 var(--gunze-ink);
+    cursor: pointer;
+    transition:
+      transform 0.24s var(--ease-out-expo),
+      background 0.24s var(--ease-out-expo),
+      box-shadow 0.24s var(--ease-out-expo);
+  }
+
+  .profile-switcher__tab[data-active="true"] {
+    background: #fff;
+    box-shadow:
+      0 0.35rem 0 var(--gunze-ink),
+      0 0 0 5px rgb(255 255 255 / 88%);
+    transform: translateX(0.65rem);
+  }
+
+  .profile-switcher__tab:hover {
+    transform: translateX(0.45rem);
+  }
+
+  .profile-switcher__tab[data-active="true"]:hover {
+    transform: translateX(0.65rem);
+  }
+
+  .profile-switcher__tab-index {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    background: var(--gunze-ink);
+    color: #fff;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.78rem;
+    font-weight: 900;
+  }
+
+  .profile-switcher__tab-label,
+  .profile-switcher__tab-eyebrow {
+    display: block;
+  }
+
+  .profile-switcher__tab-label {
+    font-size: 1rem;
+    font-weight: 950;
+    line-height: 1.1;
+  }
+
+  .profile-switcher__tab-eyebrow {
+    margin-top: 0.25rem;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    opacity: 0.62;
+    text-transform: uppercase;
+  }
+
+  .profile-switcher__panel {
+    min-height: min(34rem, 72vh);
+    max-height: 72vh;
+    padding: clamp(1rem, 2vw, 1.5rem);
+    overflow-y: auto;
+    border: 4px solid var(--gunze-ink);
+    border-radius: 2rem;
+    background:
+      linear-gradient(90deg, #fff7bc 1.15rem, transparent 1.15rem) 0 0 / 2.3rem 2.3rem,
+      linear-gradient(#fff7bc 1.15rem, transparent 1.15rem) 0 0 / 2.3rem 2.3rem,
+      #fff;
+    box-shadow: 0.8rem 0.8rem 0 rgb(11 7 19 / 55%);
+    animation: profile-panel-in 0.36s var(--ease-out-expo);
+  }
+
+  .profile-switcher__panel-head {
+    position: sticky;
+    top: -1.5rem;
+    z-index: 2;
+    margin: calc(clamp(1rem, 2vw, 1.5rem) * -1) calc(clamp(1rem, 2vw, 1.5rem) * -1) 1rem;
+    padding: 1.15rem clamp(1rem, 2vw, 1.5rem);
+    border-bottom: 4px solid var(--gunze-ink);
+    background: #fff;
+    color: var(--gunze-ink);
+  }
+
+  .profile-switcher__panel-head span {
+    display: block;
+    color: var(--gunze-blue);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .profile-switcher__panel-head h3 {
+    margin: 0.3rem 0 0;
+    font-size: clamp(1.7rem, 3.5vw, 3rem);
+    font-weight: 950;
+    line-height: 1;
+    letter-spacing: -0.08em;
+  }
+
+  .profile-switcher__cards {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .profile-card {
+    display: grid;
+    gap: 0.75rem;
+    padding: clamp(1.1rem, 2vw, 1.45rem);
+    border: 3px solid var(--gunze-ink);
+    border-radius: 1.35rem;
+    background: rgb(255 255 255 / 96%);
+    color: var(--gunze-ink);
+    box-shadow: 0.35rem 0.35rem 0 rgb(11 7 19 / 18%);
+  }
+
+  .profile-card h4 {
+    margin: 0;
+    font-size: clamp(1.05rem, 2vw, 1.35rem);
+    font-weight: 950;
+    line-height: 1.22;
+    letter-spacing: -0.04em;
+  }
+
+  .profile-card__meta {
+    margin: 0.35rem 0 0;
+    color: rgb(11 7 19 / 62%);
+    font-size: 0.82rem;
+    font-weight: 800;
+    line-height: 1.45;
+  }
+
+  .profile-card__text {
+    margin: 0;
+    color: rgb(11 7 19 / 76%);
+    font-size: 0.95rem;
+    font-weight: 750;
+    line-height: 1.65;
+  }
+
+  .profile-card__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .profile-card__tags li {
+    padding: 0.45rem 0.7rem;
+    border: 2px solid rgb(11 7 19 / 18%);
+    border-radius: 999px;
+    background: #f7f7f1;
+    color: rgb(11 7 19 / 72%);
+    font-size: 0.74rem;
+    font-weight: 850;
+  }
+
   @keyframes gunze-marquee {
     from {
       transform: translateX(0);
@@ -2188,6 +2457,17 @@
     }
   }
 
+  @keyframes profile-panel-in {
+    from {
+      opacity: 0;
+      transform: translateY(1rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   @media (max-width: 900px) {
     .gunze-mv-character {
       opacity: 0.55;
@@ -2217,8 +2497,39 @@
     }
 
     .gunze-webcm__grid,
-    .gunze-ceo__main {
+    .gunze-ceo__main,
+    .profile-switcher__grid {
       grid-template-columns: 1fr;
+    }
+
+    .profile-switcher {
+      padding-block: 4rem;
+    }
+
+    .profile-switcher__menu {
+      display: flex;
+      gap: 0.8rem;
+      margin-inline: -1.25rem;
+      padding: 0.25rem 1.25rem 0.8rem;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+    }
+
+    .profile-switcher__tab {
+      min-width: 12.5rem;
+      scroll-snap-align: start;
+    }
+
+    .profile-switcher__tab[data-active="true"],
+    .profile-switcher__tab:hover,
+    .profile-switcher__tab[data-active="true"]:hover {
+      transform: translateY(-0.25rem);
+    }
+
+    .profile-switcher__panel {
+      min-height: auto;
+      max-height: none;
+      box-shadow: 0.45rem 0.45rem 0 rgb(11 7 19 / 55%);
     }
 
     .gunze-title-group {

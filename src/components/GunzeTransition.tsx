@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { useLenis } from "lenis/react"
+import ProfileSwitcher from "./ProfileSwitcher"
 
 const ASSET = "/gunze/"
 const MOVIE_TOTAL = 16
@@ -30,13 +31,16 @@ const GAP_RATIO = 0.05
 const REVEAL_END = 0.46
 // 圆点放大段：从自然尺寸一路长到盖满视口，区间拉长让放大更从容
 const FLOOD_START = 0.46
-const FLOOD_END = 0.66
+const FLOOD_END = 0.6
 // 盖满后再留一点余量，保证大圆边缘完全滚出视口、不露出弧线缺口
 const FLOOD_MARGIN = 1.12
-const MSG_START = 0.64
-const MSG_END = 0.9
+// 文字与圆点放大同步起步：圆点还小时（FLOOD_START 附近）标题与正文就开始淡入上浮，
+// 与原站「小圆点阶段文案已浮现」的节奏一致，而非等圆几乎铺满才出现
+const MSG_START = 0.46
+const MSG_END = 0.8
 // 退场段：大圆整体上移，露出「圆底」弧线，下方衔接米色 MOVIE 区块
-const EXIT_START = 0.9
+// 退场提前，避免缩短区块间距后滚动到下一屏时蓝底与文案仍残留
+const EXIT_START = 0.86
 
 const MESSAGE_TITLE = "Message"
 
@@ -357,7 +361,8 @@ export default function GunzeTransition() {
 
       const msg = map(p, MSG_START, MSG_END, 0, 1)
       stagger(letters, msg, 0.3, 0, 0.05, 70, easeBack)
-      stagger(paragraphs, msg, 0.3, 0.2, 0.1, 36, easeFade)
+      // 段落整体提前、间隔收紧，确保第 4 段在退场前就能完全显现
+      stagger(paragraphs, msg, 0.3, 0.08, 0.05, 36, easeFade)
 
       root.style.setProperty("--gunze-q-height", `${hookH.toFixed(1)}px`)
       root.style.setProperty("--gunze-q-y", `${qY.toFixed(2)}px`)
@@ -375,7 +380,8 @@ export default function GunzeTransition() {
         "--gunze-message-alpha",
         (map(p, MSG_START, MSG_START + 0.03, 0, 1) * msgFade).toFixed(4),
       )
-      root.style.setProperty("--gunze-message-y", `${map(p, MSG_START, 1, 58, -75).toFixed(2)}vh`)
+      // 行程加大：让最后一段在停留窗口内升到视口中部，而非卡在底边后就淡出
+      root.style.setProperty("--gunze-message-y", `${map(p, MSG_START, 1, 58, -110).toFixed(2)}vh`)
       root.style.setProperty("--gunze-mv-alpha", (1 - map(p, 0.08, REVEAL_END, 0, 1)).toFixed(4))
       root.style.setProperty("--gunze-mv-y", `${map(p, 0, REVEAL_END, 0, -120).toFixed(2)}px`)
     }
@@ -389,7 +395,7 @@ export default function GunzeTransition() {
         trigger: stage,
         start: "top top",
         end: "bottom bottom",
-        scrub: 0.85,
+        scrub: 0.4,
         invalidateOnRefresh: true,
         onRefresh: (self) => apply(self.progress),
       },
@@ -457,47 +463,41 @@ export default function GunzeTransition() {
               </h2>
               <div className="gunze-message-text">
                 <p className="gunze-msg-p">
-                  它的发音是“郡士”。
+                  我的故事始于设计。
                   <br />
-                  事实上，他们将在2026年庆祝成立130周年。
+                  最开始，
+                  <br />
+                  我只是喜欢好看的界面。
                 </p>
                 <p className="gunze-msg-p">
-                  从纱线到内衣、
+                  后来，
                   <br />
-                  塑料和医疗用品，
+                  我开始关注用户为什么点击，
                   <br />
-                  我们不断拓展挑战，
+                  为什么停留，
                   <br />
-                  提供各种“舒适”体验。
+                  为什么离开。
                 </p>
                 <p className="gunze-msg-p">
-                  即使成立130年后，
+                  于是我走向产品。
                   <br />
-                  这家公司仍然充满未知，
+                  从关注像素，
                   <br />
-                  并且正在认真地尝试改变未来。
+                  到关注问题本身。
                 </p>
                 <p className="gunze-msg-p">
-                  不仅仅是名字难以辨认，
+                  而现在，
                   <br />
-                  更在于它所代表的未来可能性。
+                  我正在学习如何用AI，
                   <br />
-                  它创造着尚未显现的价值，
-                  <br />
-                  一种目前世上尚不存在的“舒适感”。
-                </p>
-                <p className="gunze-msg-p">
-                  无法辨认，GUNZE。
-                  <br />
-                  这是我们对未来的宣言，
-                  <br />
-                  我们将迎接未来130年的挑战。
+                  创造真正有价值的产品。
                 </p>
               </div>
             </div>
           </div>
         </div>
       </section>
+      <ProfileSwitcher />
       <MovieSection />
       <CeoSection />
     </>
