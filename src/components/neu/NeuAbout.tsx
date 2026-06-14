@@ -1,23 +1,36 @@
 import { usePinProgress } from "./useNeuScroll"
 
+const clamp01 = (n: number) => Math.max(0, Math.min(1, n))
+// 放大行程：在钉住进度推进到此比例时，卡片恰好放大到满幅（图五临界值）。
+// 之后钉住随即释放，进入「整段向上滚出 → 露出 Neu.Inc」的自然滚动。
+const SCALE_END = 0.92
+
 /**
  * About（蓝色卡片）—— 复刻 neu-ad.jp 的「钉住缩放」转场。
  *
  * 外层 section 高于视口，内部 sticky 满屏舞台钉住卡片：
- *   1) 进入阶段：卡片从「窄卡片」(scale 0.8、圆角大) 随滚动放大到满幅；
- *      期间白色幕布 + 缠绕大图作为背景（呼应原站卡片浮于 KV 之上）。
- *   2) 放大到位后：卡片维持满幅（钉在固定位置）。
- *   3) 继续滚动：整段滚出视窗，露出后续蓝色内容（Neu.Inc 像素区）。
+ *   1) 放大阶段（progress 0 → SCALE_END）：白色 KV 幕布铺满，蓝色卡片以
+ *      底边为锚点从视口下方「升起 + 放大」——下沉量随滚动归零、scale 0.9→1、
+ *      圆角 44→0，与放大同步向上移动（即用户描述的「放大和位置移动同时进行」）。
+ *      期间白色幕布在末段淡出，模拟卡片浮于白色 KV 之上、最终铺满。
+ *   2) 临界点（图五）：卡片放大到满幅、钉在固定位置，尺寸不再变化。
+ *   3) 之后（progress → 1，钉住释放）：尺寸锁定，整段随滚动继续向上移出视窗，
+ *      自然露出下方的 Neu.Inc 像素区（图六、图七），衔接下一段视觉。
  */
 export default function NeuAbout() {
   const { ref, progress } = usePinProgress<HTMLDivElement>()
 
-  // 放大主要发生在前 72% 行程；之后维持满幅，再随 section 滚走。
-  const grow = Math.min(1, progress / 0.72)
-  const scale = 0.8 + 0.2 * grow
-  const radius = 60 - 36 * grow
-  // 白色幕布（含缠绕大图）随放大淡出，让满幅时背景与卡片同为纯蓝、无缝衔接下一段。
-  const veil = 1 - Math.min(1, progress / 0.6)
+  const grow = clamp01(progress / SCALE_END)
+  // easeOutCubic：起步快、收尾稳，放大手感更接近原站。
+  const eased = 1 - Math.pow(1 - grow, 3)
+
+  // 放大与上移同步：底边锚点 + 下沉量随进度归零。
+  // 起始把卡片压到视口下方露出白色 KV，但保留标题在下方可见（图二）。
+  const drop = (1 - eased) * 34 // vh
+  const scale = 0.9 + 0.1 * eased
+  const radius = 44 * (1 - eased)
+  // 白色幕布（含缠绕大图）在放大末段淡出，让临界点后成为纯蓝连续滚动。
+  const veil = 1 - clamp01((grow - 0.62) / 0.38)
 
   return (
     <section ref={ref} className="neu-about" id="neu-about" data-neu-section="about" data-neu-dark>
@@ -27,7 +40,7 @@ export default function NeuAbout() {
         </div>
         <div
           className="neu-about__card"
-          style={{ transform: `scale(${scale})`, borderRadius: `${radius}px` }}
+          style={{ transform: `translateY(${drop}vh) scale(${scale})`, borderRadius: `${radius}px` }}
         >
           <div className="neu-wrap neu-about__inner">
             <span className="neu-eyebrow">( About Neu )</span>
