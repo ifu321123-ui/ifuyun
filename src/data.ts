@@ -98,11 +98,11 @@ export const heroIntro = {
 }
 
 export const notebookNav = [
-  { id: "about" as const, label: "about" },
-  { id: "work" as const, label: "Work" },
-  { id: "project" as const, label: "Project" },
-  { id: "thinking" as const, label: "Thinking" },
-  { id: "connect" as const, label: "Connect" },
+  { id: "about" as const, label: "关于" },
+  { id: "work" as const, label: "工作" },
+  { id: "project" as const, label: "项目" },
+  { id: "thinking" as const, label: "思考" },
+  { id: "connect" as const, label: "联系" },
 ]
 
 export const notebook = {

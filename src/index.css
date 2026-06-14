@@ -184,15 +184,17 @@
        否则投影会在区块底缘被硬切出一条突兀的横线 */
     padding: clamp(1.25rem, 20vh, 8rem) max(1rem, 4vw) clamp(7rem, 15vh, 11rem);
     overflow: hidden;
-    /* 笔记本所在区域做柔和提亮，向四周溶回纯背景色，
-       让皮革投影落在渐变上而非平色上，衔接更自然 */
+    /* 笔记本所在区域做柔和提亮：暖色光晕铺在「纯背景实底」之上，
+       且在到达区块顶边前就淡出为透明，保证本区块顶边颜色 = 上一区块（From CEO）的
+       纯背景色 rgb(33,33,33)，两段衔接处不再出现明暗/冷暖断层 */
     background:
       radial-gradient(
-        135% 100% at 50% 38%,
-        oklch(0.31 0.006 35) 0%,
-        oklch(0.26 0.004 35) 42%,
-        var(--color-background) 78%
-      );
+        130% 75% at 50% 44%,
+        oklch(0.315 0.007 35) 0%,
+        oklch(0.275 0.004 35) 28%,
+        transparent 54%
+      ),
+      var(--color-background);
   }
 
   .notebook-nav {
@@ -873,44 +875,16 @@
     padding: clamp(3.5rem, 9vh, 7rem) max(1.25rem, 6vw) clamp(4rem, 10vh, 6rem);
     overflow: hidden;
     isolation: isolate;
-    background:
-      radial-gradient(
-        120% 90% at 16% 38%,
-        oklch(0.27 0.02 285 / 55%) 0%,
-        oklch(0.21 0.01 285 / 0%) 60%
-      ),
-      radial-gradient(
-        100% 80% at 92% 18%,
-        oklch(0.3 0.06 28 / 22%) 0%,
-        oklch(0.21 0.01 30 / 0%) 55%
-      ),
-      var(--color-background);
+    color: var(--notebook-cream);
+    background: var(--color-background);
   }
 
   .hi-grid-bg {
-    position: absolute;
-    inset: 0;
-    z-index: -2;
-    background-image:
-      linear-gradient(to right, oklch(1 0 0 / 4%) 1px, transparent 1px),
-      linear-gradient(to bottom, oklch(1 0 0 / 4%) 1px, transparent 1px);
-    background-size: 58px 58px;
-    mask-image: radial-gradient(120% 100% at 30% 40%, #000 0%, transparent 78%);
+    display: none;
   }
 
   .hi-scanline {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    background: repeating-linear-gradient(
-      180deg,
-      oklch(1 0 0 / 2.4%) 0px,
-      oklch(1 0 0 / 2.4%) 1px,
-      transparent 1px,
-      transparent 4px
-    );
-    opacity: 0.4;
+    display: none;
   }
 
   .hi-side {
@@ -922,8 +896,8 @@
     font-family: var(--font-mono);
     font-size: 0.62rem;
     letter-spacing: 0.42em;
-    color: var(--color-muted-foreground);
-    opacity: 0.6;
+    color: rgb(242 227 207 / 60%);
+    opacity: 0.7;
     user-select: none;
   }
 
@@ -946,21 +920,21 @@
     font-weight: 700;
     line-height: 1;
     letter-spacing: 0.04em;
-    color: var(--color-foreground);
+    color: var(--notebook-cream);
   }
   .hi-name-latin {
     font-family: var(--font-mono);
     font-size: clamp(0.78rem, 1.5vw, 1rem);
     letter-spacing: 0.5em;
-    color: var(--color-muted-foreground);
+    color: rgb(242 227 207 / 60%);
     text-transform: uppercase;
   }
   .hi-version {
     font-family: var(--font-mono);
     font-size: 0.72rem;
     letter-spacing: 0.2em;
-    color: var(--color-accent);
-    border: 1px solid oklch(0.63 0.18 28 / 40%);
+    color: var(--gunze-blue);
+    border: 1px solid rgb(23 0 255 / 45%);
     border-radius: 999px;
     padding: 0.12rem 0.55rem;
     align-self: center;
@@ -975,11 +949,11 @@
     font-family: var(--font-mono);
     font-size: clamp(0.72rem, 1.4vw, 0.9rem);
     letter-spacing: 0.28em;
-    color: var(--color-muted-foreground);
+    color: rgb(242 227 207 / 60%);
     text-transform: uppercase;
   }
   .hi-arrow {
-    color: var(--color-accent);
+    color: var(--gunze-blue);
     letter-spacing: 0.05em;
   }
   .hi-crumb {
@@ -988,7 +962,7 @@
     gap: 0.45rem;
   }
   .hi-slash {
-    color: oklch(1 0 0 / 28%);
+    color: rgb(242 227 207 / 30%);
   }
 
   .hi-display {
@@ -1004,23 +978,23 @@
     font-size: clamp(2.9rem, 11vw, 7.4rem);
     line-height: 0.86;
     letter-spacing: -0.03em;
-    color: var(--color-foreground);
+    color: var(--notebook-cream);
     transform: skewX(-7deg);
     transform-origin: left;
-    text-shadow: 0 6px 40px oklch(0 0 0 / 55%);
+    text-shadow: 0 6px 40px rgb(0 0 0 / 45%);
   }
   .hi-display-line--mark {
     align-self: flex-start;
     padding: 0 0.28em 0.06em;
     margin-left: -0.04em;
-    color: var(--color-accent-foreground);
+    color: #fff;
     background: linear-gradient(
       120deg,
-      oklch(0.55 0.2 285) 0%,
-      oklch(0.6 0.21 300) 55%,
-      oklch(0.63 0.18 28) 100%
+      var(--gunze-blue) 0%,
+      oklch(0.5 0.24 280) 55%,
+      oklch(0.55 0.22 300) 100%
     );
-    box-shadow: 0 10px 38px -10px oklch(0.55 0.2 290 / 60%);
+    box-shadow: 0 10px 38px -10px rgb(23 0 255 / 45%);
   }
 
   .hi-subtitle {
@@ -1029,14 +1003,14 @@
     font-size: clamp(1.1rem, 2.6vw, 1.7rem);
     font-weight: 600;
     letter-spacing: 0.01em;
-    color: var(--color-foreground);
+    color: var(--notebook-cream);
   }
   .hi-caption {
     margin-top: 0.5rem;
     font-family: var(--font-mono);
     font-size: clamp(0.7rem, 1.4vw, 0.85rem);
     letter-spacing: 0.32em;
-    color: var(--color-muted-foreground);
+    color: rgb(242 227 207 / 60%);
     text-transform: uppercase;
   }
 
@@ -1048,14 +1022,14 @@
     font-family: var(--font-mono);
     font-size: 0.74rem;
     letter-spacing: 0.26em;
-    color: var(--color-muted-foreground);
+    color: rgb(242 227 207 / 60%);
     text-transform: uppercase;
   }
   .hi-scroll-cn {
     letter-spacing: 0.1em;
   }
   .hi-scroll-chev {
-    color: var(--color-accent);
+    color: var(--gunze-blue);
     animation: float 2.6s ease-in-out infinite;
   }
 
@@ -1074,7 +1048,7 @@
     font-family: var(--font-mono);
     font-size: 0.66rem;
     letter-spacing: 0.22em;
-    color: var(--color-muted-foreground);
+    color: rgb(242 227 207 / 60%);
     text-transform: uppercase;
   }
   .hi-status-left {
@@ -1201,6 +1175,7 @@
     --gunze-dot-left: 50vw;
     --gunze-dot-top: 130vh;
     --gunze-flood-alpha: 0;
+    --gunze-scene-dark-alpha: 0;
     --gunze-message-alpha: 0;
     --gunze-message-y: 80px;
     --gunze-mv-alpha: 1;
@@ -1233,8 +1208,8 @@
     z-index: 1;
     overflow: hidden;
     padding: clamp(4rem, 9vw, 8rem) 0 clamp(4rem, 8vw, 7rem);
-    background: var(--gunze-bg);
-    color: var(--gunze-blue);
+    background: var(--color-background);
+    color: var(--notebook-cream);
   }
 
   .business-intro__inner {
@@ -1245,7 +1220,7 @@
 
   .business-intro__lead {
     margin: 0;
-    color: var(--gunze-ink);
+    color: var(--notebook-cream);
     font-size: clamp(1.4rem, 3.2vw, 2.6rem);
     font-weight: 950;
     letter-spacing: -0.04em;
@@ -1253,7 +1228,7 @@
 
   .business-intro__lead-soft {
     font-weight: 500;
-    color: rgb(11 7 19 / 78%);
+    color: rgb(242 227 207 / 75%);
   }
 
   .business-intro__word {
@@ -1268,7 +1243,7 @@
   .business-intro__text {
     margin: clamp(1.5rem, 4vw, 3rem) auto 0;
     max-width: min(86vw, 720px);
-    color: var(--gunze-blue);
+    color: rgb(242 227 207 / 82%);
     font-size: clamp(0.9rem, 1.5vw, 1.15rem);
     font-weight: 900;
     line-height: 1.9;
@@ -1283,9 +1258,7 @@
     position: relative;
     z-index: 1;
     height: 215vh;
-    background:
-      radial-gradient(circle at 50% 48%, rgb(255 255 255 / 80%), transparent 36%),
-      var(--gunze-bg);
+    background: var(--color-background);
   }
 
   .gunze-scene {
@@ -1294,29 +1267,19 @@
     height: 100vh;
     height: 100dvh;
     overflow: hidden;
-    color: var(--gunze-ink);
-    background:
-      radial-gradient(circle at 15% 20%, rgb(23 0 255 / 8%), transparent 16%),
-      linear-gradient(135deg, rgb(255 255 255 / 58%) 0 25%, transparent 25% 100%),
-      var(--gunze-bg);
+    color: var(--notebook-cream);
+    background: var(--color-background);
   }
 
-  .gunze-scene::before {
+  .gunze-scene::after {
     content: "";
     position: absolute;
-    inset: -40%;
-    z-index: 0;
-    background-image:
-      radial-gradient(rgb(0 0 0 / 18%) 0.75px, transparent 0.75px),
-      radial-gradient(rgb(23 0 255 / 12%) 0.65px, transparent 0.65px);
-    background-position:
-      0 0,
-      3px 4px;
-    background-size:
-      7px 7px,
-      9px 9px;
-    opacity: 0.18;
+    inset: 0;
+    z-index: 13;
+    background: var(--color-background);
+    opacity: var(--gunze-scene-dark-alpha);
     pointer-events: none;
+    will-change: opacity;
   }
 
   .gunze-hud {
@@ -1778,8 +1741,8 @@
     position: relative;
     z-index: 1;
     overflow: hidden;
-    background: var(--gunze-bg);
-    color: var(--gunze-blue);
+    background: var(--color-background);
+    color: var(--notebook-cream);
   }
 
   .gunze-movie {
@@ -1794,7 +1757,7 @@
 
   .gunze-title-jp {
     margin-top: 1rem;
-    color: var(--gunze-blue);
+    color: var(--notebook-cream);
     font-size: clamp(1.3rem, 2.6vw, 2.4rem);
     font-weight: 950;
     letter-spacing: -0.06em;
@@ -1921,7 +1884,7 @@
     border: 0;
     border-bottom: 0.2rem solid currentColor;
     background: transparent;
-    color: var(--gunze-blue);
+    color: var(--notebook-cream);
     font-size: clamp(1.05rem, 1.8vw, 1.4rem);
     font-weight: 900;
     letter-spacing: 0.04em;
@@ -1954,8 +1917,8 @@
     place-items: center;
     border: 0.25rem solid currentColor;
     border-radius: 50%;
-    background: var(--gunze-bg);
-    color: var(--gunze-blue);
+    background: var(--color-background);
+    color: var(--notebook-cream);
     cursor: pointer;
   }
 
@@ -1974,7 +1937,7 @@
     align-items: center;
     gap: 1rem;
     min-width: min(70vw, 26rem);
-    color: var(--gunze-blue);
+    color: var(--notebook-cream);
     font-size: 2rem;
     font-weight: 950;
   }
@@ -1985,13 +1948,13 @@
     height: 0.45rem;
     overflow: hidden;
     border-radius: 999px;
-    background: rgb(23 0 255 / 20%);
+    background: rgb(242 227 207 / 20%);
   }
 
   .gunze-progress__bar div {
     width: 100%;
     height: 100%;
-    background: var(--gunze-blue);
+    background: var(--notebook-cream);
     transform-origin: left center;
     transition: transform 0.35s var(--ease-out-expo);
   }
@@ -2219,7 +2182,7 @@
 
   .gunze-ceo figcaption {
     margin-top: 1rem;
-    color: var(--gunze-blue);
+    color: var(--notebook-cream);
     font-size: clamp(0.9rem, 1.5vw, 1.2rem);
     font-weight: 950;
     line-height: 1.45;
@@ -2234,7 +2197,7 @@
 
   .gunze-ceo__catch {
     margin: 0 0 1.4rem;
-    color: var(--gunze-blue);
+    color: var(--notebook-cream);
     font-size: clamp(1.6rem, 4vw, 3rem);
     font-weight: 950;
     line-height: 1;
@@ -2242,7 +2205,7 @@
   }
 
   .gunze-ceo__copy p:not(.gunze-ceo__catch) {
-    color: var(--gunze-ink);
+    color: var(--notebook-cream);
     font-size: clamp(1rem, 1.55vw, 1.2rem);
     font-weight: 900;
     line-height: 2;
@@ -2280,20 +2243,8 @@
     place-items: center;
     padding: clamp(4rem, 8vw, 7rem) clamp(1.25rem, 5vw, 5rem);
     overflow: hidden;
-    background: var(--gunze-bg);
+    background: var(--color-background);
     color: var(--gunze-ink);
-  }
-
-  .profile-switcher::before {
-    content: "";
-    position: absolute;
-    inset: -20%;
-    background-image:
-      linear-gradient(90deg, rgb(11 7 19 / 6%) 1px, transparent 1px),
-      linear-gradient(rgb(11 7 19 / 6%) 1px, transparent 1px);
-    background-size: 4.4rem 4.4rem;
-    mask-image: radial-gradient(circle at 50% 45%, #000, transparent 70%);
-    pointer-events: none;
   }
 
   .profile-switcher__shell {

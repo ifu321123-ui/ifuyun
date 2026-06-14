@@ -41,7 +41,7 @@ const FLOOD_MARGIN = 1.12
 // 与原站「小圆点阶段文案已浮现」的节奏一致，而非等圆几乎铺满才出现
 const MSG_START = 0.46
 const MSG_END = 0.8
-// 退场段：大圆整体上移，露出「圆底」弧线，下方衔接米色 MOVIE 区块
+// 退场段：大圆整体上移，露出「圆底」弧线，下方衔接深色简介区块
 // 退场提前，避免缩短区块间距后滚动到下一屏时蓝底与文案仍残留
 const EXIT_START = 0.86
 
@@ -211,9 +211,9 @@ function CeoSection() {
         <div className="gunze-ceo__main">
           <figure className="gunze-ceo__photo">
             <div className="gunze-ceo__photo-main">
-              <img className="is-default" src={`${ASSET}ceo-img.jpg`} alt="" />
+              <img className="is-default" src={`${ASSET}ceo-img-2.png`} alt="" />
               <div className="is-hover">
-                <img src={`${ASSET}ceo-img-mouseon.jpg`} alt="" />
+                <img src={`${ASSET}ceo-img-hover-2.png`} alt="" />
                 <Eyes className="gunze-eyes--ceo" />
               </div>
             </div>
@@ -235,12 +235,12 @@ function CeoSection() {
               <br />
               敬请期待接下来的发展。
             </p>
-            <a href="https://www.gunze.co.jp/recruit/media/article013/" target="_blank" rel="noreferrer" className="gunze-btn">
+            <button type="button" className="gunze-btn">
               首席执行官面试
               <svg viewBox="0 0 27 26">
                 <use href="#gunze-arrow" />
               </svg>
-            </a>
+            </button>
           </div>
         </div>
       </div>
@@ -316,7 +316,7 @@ export default function GunzeTransition() {
       const covered = dotScale * dotH >= diag
 
       // 退场段：把大圆整体向上推，让它的「圆底」从视口外升入画面再滑出顶部，
-      // 露出下方米色场景底色，形成与原站一致的下凸弧形交界（而非矩形直切）
+      // 露出下方深色场景底色，形成下凸弧形交界（而非矩形直切）
       const exit = easeFade(map(p, EXIT_START, 1, 0, 1))
       const dotRadius = (dotH * dotScale) / 2
       const exitRise = exit * (centerY + dotRadius + vh * 0.12)
@@ -342,7 +342,8 @@ export default function GunzeTransition() {
       root.style.setProperty("--gunze-dot-scale", dotScale.toFixed(4))
       // 退场一开始就撤掉整屏矩形实底，避免它的直边底盖住圆底弧线，改由大圆独自顶住上半屏
       root.style.setProperty("--gunze-flood-alpha", covered && exit <= 0 ? "1" : "0")
-      // 文案在退场弧线成形前就快速淡出，避免白字残留在已露出的米色区域上
+      root.style.setProperty("--gunze-scene-dark-alpha", map(p, EXIT_START - 0.04, EXIT_START + 0.08, 0, 1).toFixed(4))
+      // 文案在退场弧线成形前就快速淡出，避免白字残留在已露出的深色交界上
       const msgFade = 1 - map(p, EXIT_START - 0.02, EXIT_START + 0.02, 0, 1)
       root.style.setProperty(
         "--gunze-message-alpha",
@@ -387,6 +388,7 @@ export default function GunzeTransition() {
         "--gunze-dot-top",
         "--gunze-dot-scale",
         "--gunze-flood-alpha",
+        "--gunze-scene-dark-alpha",
         "--gunze-message-alpha",
         "--gunze-message-y",
         "--gunze-mv-alpha",

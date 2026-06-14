@@ -1,5 +1,6 @@
 import { Mail, Phone, Download, ArrowUpRight } from "lucide-react"
 import { profile } from "@/data"
+import Notebook from "./Notebook"
 
 function Github({ className }: { className?: string }) {
   return (
@@ -37,7 +38,9 @@ const links = [
 
 export default function Contact() {
   return (
-    <section id="contact" className="mx-auto max-w-6xl scroll-mt-24 px-6 py-24 md:py-32">
+    <>
+      <Notebook />
+      <section id="contact" className="mx-auto max-w-6xl scroll-mt-24 px-6 py-24 md:py-32">
       <div className="relative overflow-hidden rounded-3xl glass-strong p-8 md:p-16">
         <div className="pointer-events-none absolute -bottom-24 -right-12 size-72 rounded-full bg-accent/20 blur-[120px]" />
         <div className="pointer-events-none absolute inset-0 grid-bg opacity-30" />
@@ -124,6 +127,7 @@ export default function Contact() {
           <ArrowUpRight className="size-3.5" />
         </a>
       </footer>
-    </section>
+      </section>
+    </>
   )
 }
