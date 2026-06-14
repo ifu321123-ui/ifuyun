@@ -26,7 +26,7 @@ export default function NeuService() {
   const headP = useScrollProgress<HTMLDivElement>(0.85, 0.42)
 
   return (
-    <section className="neu-service" data-neu-dark data-neu-section="service">
+    <section className="neu-service" id="neu-service" data-neu-dark data-neu-section="service">
       <div
         ref={ref}
         className="neu-wrap neu-service__card"

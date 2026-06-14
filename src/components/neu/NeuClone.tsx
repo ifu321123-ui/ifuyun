@@ -1,12 +1,16 @@
 import { useEffect, useRef, useState } from "react"
 import { useLenis } from "lenis/react"
+import NeuLoading from "./NeuLoading"
 import NeuNav, { type NeuSection } from "./NeuNav"
 import NeuHero from "./NeuHero"
 import NeuMarquee from "./NeuMarquee"
-import NeuPixel from "./NeuPixel"
+import NeuTransition from "./NeuTransition"
 import NeuAbout from "./NeuAbout"
+import NeuPixel from "./NeuPixel"
 import NeuService from "./NeuService"
-import NeuFooter from "./NeuFooter"
+import NeuTeam from "./NeuTeam"
+import NeuNews from "./NeuNews"
+import NeuContact from "./NeuContact"
 import "./neu.css"
 
 const NAV_LINE = 56 // 判定线：导航栏中心大致 y 值
@@ -34,7 +38,7 @@ export default function NeuClone() {
 
       const sectionEls = el.querySelectorAll<HTMLElement>("[data-neu-section]")
       let current: NeuSection = "top"
-      const line = window.innerHeight * 0.38
+      const line = window.innerHeight * 0.4
       sectionEls.forEach((s) => {
         if (s.getBoundingClientRect().top <= line) {
           current = (s.dataset.neuSection as NeuSection) ?? current
@@ -69,14 +73,18 @@ export default function NeuClone() {
   }
 
   return (
-    <div className="neu-root" ref={root}>
+    <div className="neu-root neu-page" ref={root}>
+      <NeuLoading />
       <NeuNav active={active} onDark={onDark} onJump={onJump} />
       <NeuHero />
       <NeuMarquee />
+      <NeuTransition />
       <NeuAbout />
       <NeuPixel />
       <NeuService />
-      <NeuFooter />
+      <NeuTeam />
+      <NeuNews />
+      <NeuContact />
     </div>
   )
 }

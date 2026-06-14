@@ -29,15 +29,10 @@ export default function NeuAbout() {
   const drop = (1 - eased) * 34 // vh
   const scale = 0.9 + 0.1 * eased
   const radius = 44 * (1 - eased)
-  // 白色幕布（含缠绕大图）在放大末段淡出，让临界点后成为纯蓝连续滚动。
-  const veil = 1 - clamp01((grow - 0.62) / 0.38)
 
   return (
     <section ref={ref} className="neu-about" id="neu-about" data-neu-section="about" data-neu-dark>
       <div className="neu-about__pin">
-        <div className="neu-about__veil" style={{ opacity: veil }} aria-hidden>
-          <img src="/neu/neu-hero-swirl.png" alt="" />
-        </div>
         <div
           className="neu-about__card"
           style={{ transform: `translateY(${drop}vh) scale(${scale})`, borderRadius: `${radius}px` }}
@@ -48,6 +43,9 @@ export default function NeuAbout() {
             <p className="neu-about__body">
               Neu Inc.はSNS領域における映像コンテンツの広告運用を強みとした、成果報酬型広告運用チーム。メンバー全員が広告への愛を持ち、泥臭いPDCAの中で、論理だけでなく、直感的な言葉選び・テンポなどのニュアンスを徹底的に考察し、描いた絵図を攻略することを楽しむ。その純粋な”広告への愛”が、日々液体のように変化し続ける広告アルゴリズムに順応し成果出せる秘訣です。そうして偉大な成果に繋げていく、広告オタク集団ノイです。
             </p>
+            <div className="neu-about__cta">
+              <a className="neu-pill" href="#neu-service">ノイについて</a>
+            </div>
           </div>
         </div>
       </div>

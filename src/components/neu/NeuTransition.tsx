@@ -90,10 +90,12 @@ export default function NeuTransition() {
               key={i}
               className="neu-transition__block"
               style={{
-                left: `${b.left}vw`,
-                top: `${b.top}vh`,
-                width: `${b.w}vw`,
-                height: `${b.h}vh`,
+                // 以「舞台」为基准用百分比定位：独立整页时舞台即满屏（% == vw/vh），
+                // 内嵌缩放时也能始终铺满舞台，避免出血宽度不足。
+                left: `${b.left}%`,
+                top: `${b.top}%`,
+                width: `${b.w}%`,
+                height: `${b.h}%`,
                 borderRadius: `${b.radius}px`,
                 transform: `translateY(${(1 - reveal) * b.rise}vh)`,
               }}

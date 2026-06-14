@@ -1,23 +1,14 @@
 import { useWindowScroll } from "./useNeuScroll"
 
+// 缠绕飘带 KV：用原站视频海报图代替视频（视频可用图片代替）。
+const KV_IMG = "https://framerusercontent.com/images/BI5gzMhjpP2PS8NV0P1BJzWlzU.png"
+
 const BG_ROWS = [
   "広告に、成果報酬型広告に、こだわりと執念を。 狂気と楽しさを。 GEEK-DRIVEN",
   "Nuance-Driven, 愛とロジックを。 アフィリエイト運用に、こだわりと執念を。 Hack to Win",
   "SNS広告に、アフィリエイト運用に、試行と執着を。 狂気と楽しさを。 好きと成果を。",
   "Web広告に、 成果報酬型広告に、 狂気と楽しさを。 好きと成果を。 愛とロジックを。",
   "GEEK-DRIVEN Think to Win Edit to Win 広告に、こだわりと偏愛を 狂気と楽しさを。",
-]
-
-// 散落蓝块：x/y 百分比、尺寸、视差系数
-const BLOCKS = [
-  { x: 8, y: 64, w: 96, h: 150, soft: false, k: 0.12 },
-  { x: 3, y: 78, w: 110, h: 175, soft: false, k: 0.2 },
-  { x: 4, y: 56, w: 84, h: 110, soft: true, k: 0.34 },
-  { x: 34, y: 60, w: 110, h: 250, soft: false, k: 0.16 },
-  { x: 30, y: 88, w: 96, h: 130, soft: true, k: 0.26 },
-  { x: 55, y: 58, w: 120, h: 240, soft: false, k: 0.22 },
-  { x: 72, y: 64, w: 175, h: 200, soft: false, k: 0.14 },
-  { x: 92, y: 78, w: 70, h: 150, soft: true, k: 0.3 },
 ]
 
 export default function NeuHero() {
@@ -34,23 +25,12 @@ export default function NeuHero() {
         ))}
       </div>
 
-      <div className="neu-hero__blocks" aria-hidden>
-        {BLOCKS.map((b, i) => (
-          <span
-            key={i}
-            className={b.soft ? "neu-block neu-block--soft" : "neu-block"}
-            style={{
-              left: `${b.x}%`,
-              top: `${b.y}%`,
-              width: b.w,
-              height: b.h,
-              transform: `translateY(${-y * b.k}px)`,
-            }}
-          />
-        ))}
+      {/* 缠绕大图：随滚动轻微视差上移，呼应原站 KV 视频 */}
+      <div className="neu-hero__art" style={{ transform: `translate(-50%, calc(-50% - ${y * 0.06}px))` }}>
+        <img src={KV_IMG} alt="Neu key visual" loading="eager" />
       </div>
 
-      <div className="neu-hero__title">
+      <div className="neu-hero__copy">
         <h1>
           広告に、
           <br />

@@ -34,6 +34,9 @@ export default function App() {
   const page = useRoute()
   const isNotebookHome = page === "home"
   const isNeu = page === "neu"
+  // 工作经历页内嵌了 Neu（其设计基准 1rem=10px，会把整页根字号设为 62.5%）。
+  // 这里把本站内容整体放大 1.6 倍还原 16px 视感，Neu 区块再自行抵消，实现 1:1 共存。
+  const isExperience = page === "experience"
 
   // Neu 复刻页：完全独立的全屏页面，自带固定导航与平滑滚动，不套用本站的 Navbar / 内边距。
   if (isNeu) {
@@ -46,7 +49,7 @@ export default function App() {
 
   return (
     <SmoothScroll>
-      <div className="relative min-h-screen bg-background">
+      <div className={cn("relative min-h-screen bg-background", isExperience && "neu-host-scale")}>
         {!isNotebookHome && <Navbar />}
         <main
           key={page}

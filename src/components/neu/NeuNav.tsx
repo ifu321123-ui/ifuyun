@@ -1,11 +1,14 @@
 import { navigate } from "@/hooks/useRoute"
 
-export type NeuSection = "top" | "about" | "service"
+export type NeuSection = "top" | "about" | "service" | "team" | "news" | "contact"
 
 const LINKS: { id: NeuSection; label: string }[] = [
   { id: "top", label: "Top" },
   { id: "about", label: "About" },
   { id: "service", label: "Service" },
+  { id: "team", label: "Team" },
+  { id: "news", label: "News" },
+  { id: "contact", label: "Contact" },
 ]
 
 export default function NeuNav({
@@ -27,6 +30,20 @@ export default function NeuNav({
       >
         Neu
       </button>
+
+      <nav className="neu-navlinks">
+        {LINKS.map((l) => (
+          <button
+            key={l.id}
+            type="button"
+            className="neu-navlink"
+            data-active={active === l.id}
+            onClick={() => onJump(l.id)}
+          >
+            {l.label}
+          </button>
+        ))}
+      </nav>
     </header>
   )
 }

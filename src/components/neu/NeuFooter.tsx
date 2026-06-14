@@ -1,18 +1,37 @@
-export default function NeuFooter() {
+import type { NeuSection } from "./NeuNav"
+
+const MENU: { en: string; jp: string; id: NeuSection }[] = [
+  { en: "Top", jp: "トップ", id: "top" },
+  { en: "Team", jp: "チーム Neu", id: "team" },
+  { en: "About", jp: "Neuについて", id: "about" },
+  { en: "News", jp: "お知らせ", id: "news" },
+  { en: "Service", jp: "サービスと強み", id: "service" },
+  { en: "Contact", jp: "お問合せ", id: "contact" },
+]
+
+export default function NeuFooter({ onJump }: { onJump: (id: NeuSection) => void }) {
   return (
     <footer className="neu-footer" data-neu-dark>
       <div className="neu-wrap neu-footer__inner">
         <div className="neu-footer__logo">Neu</div>
-        <nav className="neu-footer__links">
-          <span>Top</span>
-          <span>About</span>
-          <span>Service</span>
-          <span>Team</span>
-          <span>News</span>
-          <span>Contact</span>
-          <span>Privacy Policy</span>
-        </nav>
-        <div className="neu-footer__copy">© Neu INC.（本页为学习用复刻 demo）</div>
+
+        <div className="neu-footer__menu">
+          {MENU.map((m) => (
+            <a
+              key={m.en}
+              className="neu-footer__item"
+              href={`#neu-${m.id}`}
+              onClick={(e) => {
+                e.preventDefault()
+                onJump(m.id)
+              }}
+            >
+              <span className="neu-footer__item-en">{m.en}</span>
+              <span className="neu-footer__item-jp">{m.jp}</span>
+            </a>
+          ))}
+        </div>
+
       </div>
     </footer>
   )

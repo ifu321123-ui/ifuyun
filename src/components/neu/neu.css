@@ -1,21 +1,25 @@
 /* ============================================================
-   Neu (neu-ad.jp) 首页复刻 —— 独立作用域样式
+   Neu (neu-ad.jp) 首页 1:1 复刻 —— 独立作用域样式
    所有规则收敛在 .neu-root 下，避免污染本站其它页面。
-   字体：日文大标题 Zen Kaku Gothic New / Antique；
-        像素英文 DotGothic16；英文标题 Figtree。
-   主色：电光蓝 #1d01fe；强调线 rgb(97,77,255)→rgb(20,0,171)。
+   字体：日文标题 Zen Kaku Gothic New / Antique；
+        像素/等宽英文 DotGothic16（替代 BestTen-CRT）；英文 Figtree。
+   主色：电光蓝 #1d01fe；强调 rgb(97,77,255) / rgb(20,0,171)。
+   根字号 62.5%（1rem = 10px），与原站一致，便于按 *N 还原字号。
    ============================================================ */
 
-@import url("https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Zen+Kaku+Gothic+Antique:wght@400;500;700;900&family=DotGothic16&family=Figtree:ital,wght@0,400;0,600;0,700;0,900;1,700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Zen+Kaku+Gothic+Antique:wght@400;500;700;900&family=DotGothic16&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;0,900;1,700&display=swap");
 
 .neu-root {
   --neu-blue: #1d01fe;
   --neu-blue-soft: #614dff;
   --neu-blue-deep: #1400ab;
-  --neu-ink: #050505;
+  --neu-blue-ink: #0100c4;
+  --neu-ink: #0f0f0f;
   --neu-paper: #ffffff;
   --neu-lilac: #dcdceb;
+  --neu-lilac-2: #c3c3ed;
   --neu-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --neu-ease-framer: cubic-bezier(0.76, 0, 0.24, 1);
 
   position: relative;
   min-height: 100vh;
@@ -23,6 +27,31 @@
   color: var(--neu-blue);
   font-family: "Zen Kaku Gothic New", "Hiragino Kaku Gothic ProN", sans-serif;
   font-weight: 700;
+  font-size: 1.6rem;
+  overflow-x: clip;
+}
+/* 根字号 62.5% → 1rem = 10px，匹配原站按 *N 设定字号的写法。
+   独立整页（.neu-page）与内嵌页（.neu-embed）都启用，保证 Neu 1:1。 */
+html:has(.neu-page),
+html:has(.neu-embed) {
+  font-size: 62.5%;
+}
+
+/* ------------------------------------------------------------
+   内嵌模式：把整套 Neu 作为本站页面里的真实区块直接铺进去，并保持 1:1。
+   做法：内嵌所在页面也把根字号设为 62.5%（1rem=10px），让 Neu 与独立整页
+   完全一致（vw/vh、出血、滚动编排都原生正确）；为避免连累本站其它内容，
+   用 .neu-host-scale 把宿主内容整体 zoom 1.6 还原回 16px 视感，再用 .neu-bleed
+   zoom 0.625 抵消该放大，使 Neu 区块净缩放为 1.0（即真正 1:1）。
+   ------------------------------------------------------------ */
+.neu-host-scale {
+  zoom: 1.6;
+}
+.neu-bleed {
+  zoom: 0.625;
+}
+.neu-embed {
+  min-height: 0;
   overflow-x: clip;
 }
 
@@ -34,65 +63,136 @@
 
 /* 通用容器 */
 .neu-wrap {
-  width: min(92vw, 1180px);
+  width: min(92vw, 1200px);
   margin-inline: auto;
 }
-
 .neu-eyebrow {
   font-family: "DotGothic16", monospace;
   font-weight: 400;
-  font-size: clamp(0.78rem, 1.4vw, 0.95rem);
-  letter-spacing: 0.04em;
+  font-size: clamp(1.2rem, 1.4vw, 1.4rem);
+  letter-spacing: 0.06em;
 }
 
 /* ============================================================
-   1) 固定导航
+   0) Loading 开场覆盖层（复刻 framer-aVTu8 loading(simple)）
+   全屏蓝底 + 白色大标题 + 底部进度线，播完上移退场。
+   ============================================================ */
+.neu-loading {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  background: var(--neu-blue);
+  transition: transform 0.9s var(--neu-ease-framer);
+  will-change: transform;
+}
+.neu-loading[data-done="true"] {
+  transform: translateY(-100%);
+}
+.neu-loading__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(1.6rem, 3vw, 2.6rem);
+  width: min(86vw, 70rem);
+}
+.neu-loading__title {
+  margin: 0;
+  font-family: "Zen Kaku Gothic New", sans-serif;
+  font-weight: 700;
+  font-size: clamp(2.6rem, 5.6vw, 5.6rem);
+  line-height: 1;
+  color: #fff;
+  text-align: center;
+  overflow: hidden;
+}
+.neu-loading__title span {
+  display: inline-block;
+  transform: translateY(110%);
+  animation: neu-rise 0.9s var(--neu-ease-framer) forwards 0.1s;
+}
+.neu-loading__line {
+  position: relative;
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.18);
+  overflow: hidden;
+}
+.neu-loading__bar {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 1%;
+  background: #fff;
+  animation: neu-load-bar 1.4s var(--neu-ease-framer) forwards 0.15s;
+}
+@keyframes neu-rise {
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes neu-load-bar {
+  to {
+    width: 100%;
+  }
+}
+
+/* ============================================================
+   1) 固定导航（logo + 6 胶囊；深色区反白；当前项高亮）
    ============================================================ */
 .neu-nav {
   position: fixed;
   inset: 0 0 auto 0;
-  z-index: 80;
+  z-index: 90;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: clamp(1rem, 2.4vw, 1.9rem) clamp(1.1rem, 3vw, 2.6rem);
+  padding: clamp(1.4rem, 2.2vw, 2.4rem) clamp(1.4rem, 3vw, 3rem);
   pointer-events: none;
+  opacity: 0;
+  transform: translateY(-12px);
+  animation: neu-nav-in 0.6s var(--neu-ease-framer) forwards 0.2s;
+}
+@keyframes neu-nav-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 .neu-nav > * {
   pointer-events: auto;
 }
-
 .neu-logo {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
   font-family: "Figtree", sans-serif;
   font-weight: 900;
-  font-size: clamp(1.5rem, 2.6vw, 2.05rem);
+  font-size: clamp(2.2rem, 2.8vw, 2.8rem);
   line-height: 1;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
   color: var(--neu-blue);
   text-decoration: none;
   transition: color 0.4s var(--neu-ease);
-  mix-blend-mode: normal;
 }
-/* 深色区段下 logo 反白 */
 .neu-nav[data-on-dark="true"] .neu-logo {
   color: #fff;
 }
-
 .neu-navlinks {
   display: flex;
   align-items: center;
-  gap: clamp(0.15rem, 0.6vw, 0.5rem);
+  gap: clamp(0.1rem, 0.4vw, 0.4rem);
   padding: 0.5rem 0.6rem;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(12px);
   box-shadow: 0 8px 30px -18px rgba(29, 1, 254, 0.5);
   transition: background 0.4s var(--neu-ease);
 }
 .neu-nav[data-on-dark="true"] .neu-navlinks {
-  background: rgba(29, 1, 254, 0.32);
+  background: rgba(255, 255, 255, 0.14);
 }
-
 .neu-navlink {
   appearance: none;
   border: 0;
@@ -100,9 +200,9 @@
   cursor: pointer;
   font-family: "Figtree", sans-serif;
   font-weight: 700;
-  font-size: clamp(0.82rem, 1.2vw, 0.98rem);
+  font-size: clamp(1.3rem, 1.1vw, 1.5rem);
   letter-spacing: 0.01em;
-  padding: 0.42rem 0.95rem;
+  padding: 0.5rem 1.05rem;
   border-radius: 999px;
   color: var(--neu-blue);
   transition:
@@ -110,7 +210,7 @@
     color 0.3s var(--neu-ease);
 }
 .neu-nav[data-on-dark="true"] .neu-navlink {
-  color: rgba(255, 255, 255, 0.82);
+  color: rgba(255, 255, 255, 0.85);
 }
 .neu-navlink:hover {
   opacity: 0.78;
@@ -125,7 +225,7 @@
 }
 
 /* ============================================================
-   2) 首屏 KV
+   2) 首屏 KV（缠绕大图 = 视频海报图；左下蓝色标题块）
    ============================================================ */
 .neu-hero {
   position: relative;
@@ -134,8 +234,7 @@
   overflow: hidden;
   background: var(--neu-paper);
 }
-
-/* 背景重复文案层（极淡灰，铺纹理） */
+/* 背景极淡重复文案（铺纹理） */
 .neu-hero__bgtext {
   position: absolute;
   inset: 0;
@@ -151,10 +250,10 @@
 .neu-hero__bgrow {
   display: flex;
   white-space: nowrap;
-  font-size: clamp(1.1rem, 2.1vw, 1.65rem);
+  font-size: clamp(1.4rem, 2.1vw, 2rem);
   font-weight: 700;
   letter-spacing: 0.02em;
-  color: rgba(29, 1, 254, 0.1);
+  color: rgba(29, 1, 254, 0.08);
   overflow: hidden;
 }
 .neu-hero__bgrow span {
@@ -166,70 +265,64 @@
   animation-direction: reverse;
   animation-duration: 46s;
 }
-
-/* 中心缠绕大图 */
+/* 缠绕大图 */
 .neu-hero__art {
   position: absolute;
   top: 50%;
   left: 50%;
   z-index: 1;
-  width: min(82vw, 1020px);
-  transform: translate(-50%, -52%);
+  width: min(86vw, 1080px);
+  transform: translate(-50%, -50%);
   will-change: transform;
   pointer-events: none;
-  filter: drop-shadow(0 30px 60px rgba(29, 1, 254, 0.18));
 }
-.neu-hero__art img {
+.neu-hero__art img,
+.neu-hero__art video {
   display: block;
   width: 100%;
   height: auto;
+  object-fit: contain;
 }
-
-/* 散落蓝色圆角块 */
-.neu-hero__blocks {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-}
-.neu-block {
-  position: absolute;
-  border-radius: 999px;
-  background: var(--neu-blue);
-  will-change: transform;
-}
-.neu-block--soft {
-  background: var(--neu-lilac);
-}
-
 /* 主标题块（蓝色圆角容器，左下） */
-.neu-hero__title {
+.neu-hero__copy {
   position: absolute;
   left: clamp(1.1rem, 3vw, 3rem);
   bottom: clamp(2.2rem, 8vh, 6rem);
   z-index: 3;
-  padding: clamp(1.1rem, 2.6vw, 2rem) clamp(1.4rem, 3vw, 2.6rem) clamp(1rem, 2.2vw, 1.7rem);
+  padding: clamp(1.4rem, 2.6vw, 2.4rem) clamp(1.6rem, 3vw, 3rem) clamp(1.1rem, 2.2vw, 1.8rem);
   border-radius: clamp(1.4rem, 2.6vw, 2.4rem);
   background: var(--neu-blue);
   color: #fff;
   box-shadow: 0 30px 60px -30px rgba(29, 1, 254, 0.7);
+  animation: neu-fade-up 0.8s var(--neu-ease-framer) both 0.7s;
 }
-.neu-hero__title h1 {
+@keyframes neu-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.neu-hero__copy h1 {
   margin: 0;
-  font-weight: 900;
-  font-size: clamp(2.4rem, 6.6vw, 5.4rem);
-  line-height: 1.02;
-  letter-spacing: 0.01em;
+  font-weight: 500;
+  font-size: clamp(3.2rem, 6.4vw, 6.4rem);
+  line-height: 1;
+  letter-spacing: 0;
+  white-space: nowrap;
 }
-.neu-hero__title .neu-eyebrow {
+.neu-hero__copy .neu-eyebrow {
   display: block;
-  margin-top: 0.7rem;
+  margin-top: 0.9rem;
   color: rgba(255, 255, 255, 0.92);
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
 }
 
 /* ============================================================
-   3) Ticker（倾斜循环标语，三行）
+   3) 横向循环标语（三行）
    ============================================================ */
 .neu-marquee {
   position: relative;
@@ -251,8 +344,8 @@
   flex: none;
   gap: 1.4rem;
   padding-right: 1.4rem;
-  font-weight: 900;
-  font-size: clamp(1.6rem, 3.6vw, 3.1rem);
+  font-weight: 700;
+  font-size: clamp(2rem, 3.6vw, 3.2rem);
   letter-spacing: 0.01em;
   color: var(--neu-blue);
   animation: neu-marquee 26s linear infinite;
@@ -277,7 +370,6 @@
    ============================================================ */
 .neu-transition {
   position: relative;
-  /* 高于视口，给 sticky 阶段留出滚动行程；越高节奏越舒缓 */
   height: 240vh;
   background: var(--neu-paper);
   pointer-events: none;
@@ -288,7 +380,6 @@
   height: 100vh;
   overflow: hidden;
 }
-/* 收尾时升起的纯蓝底，封住圆角缝隙 */
 .neu-transition__fill {
   position: absolute;
   inset: -2px;
@@ -302,7 +393,123 @@
 }
 
 /* ============================================================
-   4) 像素大字区块
+   4) About（蓝色卡片）—— 钉住缩放转场
+   ============================================================ */
+.neu-about {
+  position: relative;
+  z-index: 5;
+  height: 210vh;
+  background: var(--neu-blue);
+}
+.neu-about__pin {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+.neu-about__veil {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: var(--neu-paper);
+  will-change: opacity;
+  pointer-events: none;
+}
+.neu-about__veil img {
+  width: min(82vw, 1020px);
+  height: auto;
+  opacity: 0.9;
+}
+.neu-about__card {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 100vw;
+  height: 100vh;
+  background: var(--neu-blue);
+  color: #fff;
+  transform-origin: center bottom;
+  will-change: transform;
+  box-shadow: 0 40px 90px -50px rgba(29, 1, 254, 0.7);
+  overflow: hidden;
+}
+/* 背景极淡缠绕文字（呼应原站蓝屏内重复文案） */
+.neu-about__bgtext {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.6rem;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0.12;
+}
+.neu-about__bgtext div {
+  white-space: nowrap;
+  font-size: clamp(1.6rem, 2.4vw, 2.4rem);
+  color: #fff;
+}
+.neu-about__inner {
+  position: relative;
+  z-index: 1;
+  padding-block: clamp(2rem, 6vw, 5rem);
+}
+.neu-about .neu-eyebrow {
+  color: rgba(255, 255, 255, 0.82);
+}
+.neu-about__title {
+  margin: clamp(1.2rem, 2.4vw, 2rem) 0 clamp(1.6rem, 3vw, 2.6rem);
+  font-family: "Zen Kaku Gothic Antique", sans-serif;
+  font-weight: 700;
+  font-size: clamp(2.4rem, 4.8vw, 4.8rem);
+  line-height: 1.2;
+  color: #fff;
+}
+.neu-about__body {
+  font-family: "Zen Kaku Gothic Antique", sans-serif;
+  font-weight: 500;
+  font-size: clamp(1.4rem, 1.8vw, 2.4rem);
+  line-height: 2;
+  max-width: 62ch;
+  color: rgba(255, 255, 255, 0.94);
+}
+.neu-about__cta {
+  margin-top: clamp(1.8rem, 4vw, 3rem);
+}
+
+/* 通用胶囊按钮 */
+.neu-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.95rem 2.1rem;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--neu-blue);
+  font-family: "Zen Kaku Gothic Antique", sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.4rem, 1.4vw, 1.6rem);
+  text-decoration: none;
+  cursor: pointer;
+  border: 0;
+  box-shadow: 0 14px 30px -16px rgba(0, 0, 0, 0.4);
+  transition: transform 0.3s var(--neu-ease);
+}
+.neu-pill:hover {
+  transform: translateY(-3px);
+}
+.neu-pill--solid {
+  background: var(--neu-blue);
+  color: #fff;
+}
+
+/* ============================================================
+   5) Neu.Inc 像素大字（蓝底）
    ============================================================ */
 .neu-pixel {
   position: relative;
@@ -321,114 +528,12 @@
 .neu-pixel__mark {
   font-family: "DotGothic16", monospace;
   font-weight: 400;
-  font-size: clamp(3.5rem, 17vw, 15rem);
+  font-size: clamp(5rem, 17vw, 18rem);
   line-height: 0.9;
   letter-spacing: 0.02em;
   color: #fff;
   text-align: center;
   will-change: transform, opacity;
-}
-
-/* 通用胶囊按钮（白底蓝字） */
-.neu-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.85rem 1.9rem;
-  border-radius: 999px;
-  background: #fff;
-  color: var(--neu-blue);
-  font-family: "DotGothic16", monospace;
-  font-weight: 400;
-  font-size: clamp(0.82rem, 1.4vw, 1rem);
-  text-decoration: none;
-  box-shadow: 0 14px 30px -16px rgba(0, 0, 0, 0.4);
-  transition: transform 0.3s var(--neu-ease);
-}
-.neu-pill:hover {
-  transform: translateY(-3px);
-}
-.neu-pill--solid {
-  background: var(--neu-blue);
-  color: #fff;
-}
-
-/* ============================================================
-   5) About（蓝色卡片）—— 复刻 .framer-4knxa8 钉住缩放转场
-   外层高于视口提供滚动行程，内部 sticky 满屏舞台钉住卡片：
-   卡片由窄 → 满幅放大（钉在固定位置），随后整段滚出露出后续内容。
-   舞台底色为蓝，确保放大到位后与下一段无缝衔接；白色幕布在
-   放大过程中淡出，模拟卡片浮于白色 KV 之上的观感。
-   ============================================================ */
-.neu-about {
-  position: relative;
-  z-index: 5;
-  height: 210vh; /* 行程：越高放大越舒缓；放大在临界点完成后随即释放钉住 */
-  background: var(--neu-blue);
-}
-.neu-about__pin {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-}
-/* 白色幕布 + 缠绕大图：放大过程中淡出 */
-.neu-about__veil {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  background: var(--neu-paper);
-  will-change: opacity;
-  pointer-events: none;
-}
-.neu-about__veil img {
-  width: min(82vw, 1020px);
-  height: auto;
-  opacity: 0.9;
-  filter: drop-shadow(0 30px 60px rgba(29, 1, 254, 0.18));
-}
-/* 蓝色卡片本体：满幅时铺满视口，缩小时四周露出幕布 */
-.neu-about__card {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  place-items: center;
-  width: 100vw;
-  height: 100vh;
-  background: var(--neu-blue);
-  color: #fff;
-  /* 以底边为锚点：放大时顶边上移、自下而上「升起」覆盖白色 KV */
-  transform-origin: center bottom;
-  will-change: transform;
-  box-shadow: 0 40px 90px -50px rgba(29, 1, 254, 0.7);
-}
-.neu-about__inner {
-  padding-block: clamp(2rem, 6vw, 5rem);
-}
-.neu-about .neu-eyebrow {
-  color: rgba(255, 255, 255, 0.78);
-}
-.neu-about__title {
-  margin: clamp(1rem, 2.4vw, 1.8rem) 0 clamp(1.4rem, 3vw, 2.4rem);
-  font-family: "Zen Kaku Gothic Antique", sans-serif;
-  font-weight: 700;
-  font-size: clamp(1.9rem, 5vw, 3.3rem);
-  line-height: 1.2;
-  color: #fff;
-}
-.neu-about__body {
-  font-family: "Zen Kaku Gothic Antique", sans-serif;
-  font-weight: 500;
-  font-size: clamp(0.95rem, 1.6vw, 1.3rem);
-  line-height: 2;
-  max-width: 60ch;
-  color: rgba(255, 255, 255, 0.94);
-}
-.neu-about__cta {
-  margin-top: clamp(1.8rem, 4vw, 3rem);
 }
 
 /* ============================================================
@@ -449,8 +554,8 @@
   margin: clamp(0.8rem, 2vw, 1.4rem) 0 clamp(2rem, 5vw, 3.5rem);
   font-family: "Zen Kaku Gothic Antique", sans-serif;
   font-weight: 700;
-  font-size: clamp(1.7rem, 4.6vw, 3rem);
-  line-height: 1.2;
+  font-size: clamp(2.4rem, 4.6vw, 4rem);
+  line-height: 1.1;
 }
 .neu-service__grid {
   display: grid;
@@ -460,7 +565,7 @@
 }
 .neu-service__list {
   display: grid;
-  gap: clamp(1.4rem, 3vw, 2.4rem);
+  gap: clamp(1.6rem, 3vw, 2.8rem);
 }
 .neu-srv-item__head {
   display: flex;
@@ -468,34 +573,34 @@
   gap: 0.7rem;
   font-family: "Figtree", sans-serif;
   font-weight: 700;
-  font-size: clamp(1.2rem, 2.4vw, 1.85rem);
+  font-size: clamp(1.8rem, 2.4vw, 2.6rem);
   color: var(--neu-blue);
 }
 .neu-srv-item__head::before {
   content: "";
-  width: 0.6em;
-  height: 0.6em;
+  width: 0.5em;
+  height: 0.5em;
   border-radius: 999px;
   background: var(--neu-blue);
 }
 .neu-srv-item__body {
   margin-top: 0.7rem;
-  font-family: "Zen Kaku Gothic Antique", sans-serif;
+  font-family: "Zen Kaku Gothic New", sans-serif;
   font-weight: 500;
-  font-size: clamp(0.85rem, 1.4vw, 1rem);
-  line-height: 1.9;
-  color: rgba(5, 5, 5, 0.78);
+  font-size: clamp(1.3rem, 1.4vw, 1.4rem);
+  letter-spacing: 0.04em;
+  line-height: 1.65;
+  color: var(--neu-ink);
 }
-
 /* 流程图 */
 .neu-flow {
   position: relative;
-  min-height: clamp(20rem, 40vw, 30rem);
+  min-height: clamp(22rem, 40vw, 32rem);
 }
 .neu-flow__node {
   position: absolute;
-  width: clamp(11rem, 22vw, 17rem);
-  padding: clamp(1rem, 2vw, 1.6rem) clamp(1.1rem, 2.2vw, 1.7rem);
+  width: clamp(13rem, 22vw, 19rem);
+  padding: clamp(1.1rem, 2vw, 1.8rem) clamp(1.2rem, 2.2vw, 1.9rem);
   border-radius: clamp(1.2rem, 2vw, 1.8rem);
   background: var(--neu-blue);
   color: #fff;
@@ -504,26 +609,26 @@
   margin: 0 0 0.5rem;
   font-family: "Figtree", sans-serif;
   font-weight: 700;
-  font-size: clamp(1rem, 1.8vw, 1.35rem);
+  font-size: clamp(1.4rem, 1.8vw, 1.9rem);
 }
 .neu-flow__node p {
   margin: 0;
   font-family: "Zen Kaku Gothic Antique", sans-serif;
   font-weight: 500;
-  font-size: clamp(0.75rem, 1.2vw, 0.92rem);
-  line-height: 1.7;
-  color: rgba(255, 255, 255, 0.85);
+  font-size: clamp(1.1rem, 1.2vw, 1.3rem);
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.88);
 }
 .neu-flow__node--1 {
   left: 0;
-  top: 22%;
+  top: 26%;
 }
 .neu-flow__node--2 {
   right: 0;
   top: 0;
 }
 .neu-flow__node--3 {
-  right: 4%;
+  right: 6%;
   bottom: 0;
 }
 .neu-flow__svg {
@@ -541,11 +646,11 @@
 }
 .neu-flow__mark {
   position: absolute;
-  left: 46%;
-  top: 44%;
+  left: 42%;
+  top: 46%;
   font-family: "Figtree", sans-serif;
   font-weight: 900;
-  font-size: clamp(1.4rem, 3vw, 2.4rem);
+  font-size: clamp(2rem, 3vw, 2.8rem);
   color: var(--neu-blue);
   transform: translate(-50%, -50%);
 }
@@ -554,7 +659,7 @@
 }
 
 /* ============================================================
-   7) Team（CRT 相框照片错落）
+   7) Team（CRT 相框照片错落，随滚动从两侧飞入）
    ============================================================ */
 .neu-team {
   position: relative;
@@ -567,23 +672,23 @@
   text-align: center;
   margin-bottom: clamp(2rem, 6vw, 5rem);
   color: var(--neu-blue-soft);
+  font-size: clamp(1.6rem, 2vw, 2rem);
 }
 .neu-team__stage {
   position: relative;
-  width: min(92vw, 1180px);
+  width: min(94vw, 1200px);
   margin-inline: auto;
-  min-height: clamp(34rem, 58vw, 46rem);
+  min-height: clamp(60rem, 120vw, 120rem);
 }
 .neu-frame {
   position: absolute;
-  width: clamp(13rem, 24vw, 20rem);
-  will-change: transform;
+  width: clamp(16rem, 30vw, 36rem);
+  will-change: transform, opacity;
 }
 .neu-frame__crt {
   position: relative;
-  aspect-ratio: 4 / 3;
-  /* CRT 老电视圆角：四角大弧度 */
-  border-radius: 28% / 38%;
+  aspect-ratio: 3 / 2;
+  border-radius: 22% / 33%;
   overflow: hidden;
   background: #000;
   box-shadow: 0 24px 50px -24px rgba(0, 0, 0, 0.4);
@@ -593,7 +698,6 @@
   height: 100%;
   object-fit: cover;
 }
-/* 老电视玻璃高光 */
 .neu-frame__crt::after {
   content: "";
   position: absolute;
@@ -606,70 +710,181 @@
   );
   pointer-events: none;
 }
-.neu-frame__cap {
-  margin-top: 0.7rem;
-  font-family: "DotGothic16", monospace;
-  font-weight: 400;
-  font-size: clamp(0.72rem, 1.2vw, 0.9rem);
-  color: var(--neu-blue);
-}
-.neu-frame--1 {
-  left: 0;
-  top: 4%;
-}
-.neu-frame--2 {
-  right: 2%;
-  top: 0;
-}
-.neu-frame--3 {
-  left: 6%;
-  top: 44%;
-}
-.neu-frame--4 {
-  right: 6%;
-  top: 50%;
-}
-/* 散落的装饰小方块 */
+/* 散落装饰小方块 */
 .neu-team__chip {
   position: absolute;
-  border-radius: 0.5rem;
-  background: var(--neu-lilac);
+  border-radius: 0.6rem;
+  background: var(--neu-lilac-2);
   will-change: transform;
 }
 
 /* ============================================================
-   8) Footer
+   8) News（蓝底，3 张资讯卡）
    ============================================================ */
-.neu-footer {
-  padding: clamp(2.5rem, 6vw, 4.5rem) 0 clamp(2rem, 5vw, 3.5rem);
+.neu-news {
+  background: var(--neu-paper);
+  padding: clamp(3rem, 8vw, 7rem) 0 clamp(4rem, 10vw, 9rem);
+}
+.neu-news .neu-eyebrow {
+  display: block;
+  margin-bottom: clamp(1.6rem, 4vw, 3rem);
+  color: var(--neu-blue);
+}
+.neu-news__list {
+  display: grid;
+  gap: clamp(1.2rem, 2.4vw, 2rem);
+}
+.neu-news__card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: clamp(1.4rem, 4vw, 3.2rem);
+  padding-bottom: clamp(1.2rem, 2.4vw, 2rem);
+  border-bottom: 1.5px solid rgba(29, 1, 254, 0.18);
+  text-decoration: none;
+  color: var(--neu-blue);
+  transition: opacity 0.3s var(--neu-ease);
+}
+.neu-news__card:hover {
+  opacity: 0.7;
+}
+.neu-news__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.neu-news__date {
+  font-family: "Figtree", sans-serif;
+  font-weight: 600;
+  font-size: clamp(1.2rem, 1.4vw, 1.4rem);
+}
+.neu-news__tag {
+  font-family: "Figtree", sans-serif;
+  font-weight: 700;
+  font-size: clamp(2rem, 3.2vw, 3.2rem);
+  line-height: 1;
+}
+.neu-news__title {
+  font-family: "Zen Kaku Gothic New", sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.6rem, 2vw, 2rem);
+  letter-spacing: 0.06em;
+  line-height: 1.3;
+  color: var(--neu-blue);
+}
+.neu-news__arrow {
+  width: clamp(3rem, 4vw, 4rem);
+  height: clamp(3rem, 4vw, 4rem);
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 1.5px solid var(--neu-blue);
+  font-size: 1.6rem;
+}
+
+/* ============================================================
+   9) Contact CTA（蓝色大卡）
+   ============================================================ */
+.neu-contact {
+  background: var(--neu-paper);
+  padding: 0 0 clamp(3rem, 8vw, 6rem);
+}
+.neu-contact__card {
+  position: relative;
   background: var(--neu-blue);
   color: #fff;
+  border-radius: clamp(2rem, 4vw, 3.2rem);
+  padding: clamp(3rem, 7vw, 6rem) clamp(2rem, 6vw, 5rem);
+  overflow: hidden;
+  text-align: center;
+}
+.neu-contact__eyebrow {
+  font-family: "DotGothic16", monospace;
+  font-weight: 400;
+  font-size: clamp(2.4rem, 4vw, 3.2rem);
+  color: #fff;
+}
+.neu-contact__body {
+  margin: clamp(1.4rem, 3vw, 2.2rem) auto clamp(2rem, 4vw, 3rem);
+  max-width: 52ch;
+  font-family: "Zen Kaku Gothic Antique", sans-serif;
+  font-weight: 500;
+  font-size: clamp(1.3rem, 1.5vw, 1.5rem);
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.92);
+}
+.neu-contact__btn {
+  background: #fff;
+  color: var(--neu-blue);
+}
+
+/* ============================================================
+   10) Footer（mega-menu + 纵向 marquee 装饰柱）
+   ============================================================ */
+.neu-footer {
+  position: relative;
+  background: var(--neu-blue-ink);
+  color: #fff;
+  padding: clamp(3rem, 7vw, 6rem) 0 clamp(2rem, 5vw, 3.5rem);
+  overflow: hidden;
 }
 .neu-footer__inner {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1.2rem;
+  position: relative;
+  z-index: 1;
 }
 .neu-footer__logo {
   font-family: "Figtree", sans-serif;
   font-weight: 900;
-  font-size: clamp(2rem, 5vw, 3.4rem);
-  letter-spacing: -0.03em;
+  font-size: clamp(4rem, 10vw, 9rem);
+  letter-spacing: -0.04em;
+  line-height: 1;
 }
-.neu-footer__links {
+.neu-footer__menu {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1.6rem, 4vw, 3rem) clamp(2rem, 6vw, 5rem);
+  margin: clamp(2.4rem, 6vw, 4rem) 0 clamp(2rem, 5vw, 3rem);
+}
+.neu-footer__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  text-decoration: none;
+  color: #fff;
+  transition: opacity 0.3s var(--neu-ease);
+}
+.neu-footer__item:hover {
+  opacity: 0.7;
+}
+.neu-footer__item-en {
+  font-family: "Figtree", sans-serif;
+  font-weight: 700;
+  font-size: clamp(2.4rem, 4vw, 3.2rem);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.neu-footer__item-jp {
+  font-family: "Zen Kaku Gothic Antique", sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.2rem, 1.4vw, 1.4rem);
+  color: rgba(255, 255, 255, 0.7);
+}
+.neu-footer__bar {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.6rem 1.6rem;
-  font-family: "DotGothic16", monospace;
-  font-size: 0.85rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: clamp(1.2rem, 3vw, 2rem);
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+  font-family: "Figtree", sans-serif;
+  font-size: 1.4rem;
+}
+.neu-footer__bar a {
+  color: #fff;
+  text-decoration: none;
 }
 .neu-footer__copy {
-  width: 100%;
-  margin-top: 1.5rem;
-  font-family: "DotGothic16", monospace;
-  font-size: 0.78rem;
   color: rgba(255, 255, 255, 0.7);
 }
 
@@ -677,40 +892,32 @@
    响应式
    ============================================================ */
 @media (max-width: 860px) {
+  .neu-hero__copy h1 {
+    white-space: normal;
+  }
   .neu-service__grid {
     grid-template-columns: 1fr;
   }
   .neu-flow {
-    min-height: 28rem;
+    min-height: 30rem;
   }
-  .neu-frame {
-    width: clamp(11rem, 42vw, 16rem);
+  .neu-footer__menu {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .neu-frame--1 {
-    left: 0;
-    top: 2%;
+  .neu-news__card {
+    grid-template-columns: auto 1fr;
   }
-  .neu-frame--2 {
-    right: 0;
-    top: 16%;
-  }
-  .neu-frame--3 {
-    left: 4%;
-    top: 50%;
-  }
-  .neu-frame--4 {
-    right: 2%;
-    top: 66%;
-  }
-  .neu-team__stage {
-    min-height: 70rem;
+  .neu-news__arrow {
+    display: none;
   }
 }
 
 /* 尊重「减少动态效果」 */
 @media (prefers-reduced-motion: reduce) {
   .neu-marquee__track,
-  .neu-hero__bgrow {
-    animation: none !important;
+  .neu-hero__bgrow,
+  .neu-loading__bar,
+  .neu-loading__title span {
+    animation-duration: 0.01ms !important;
   }
 }
