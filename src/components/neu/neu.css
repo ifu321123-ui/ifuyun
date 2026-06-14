@@ -437,23 +437,6 @@ html:has(.neu-embed) {
   box-shadow: 0 40px 90px -50px rgba(29, 1, 254, 0.7);
   overflow: hidden;
 }
-/* 背景极淡缠绕文字（呼应原站蓝屏内重复文案） */
-.neu-about__bgtext {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 0.6rem;
-  pointer-events: none;
-  overflow: hidden;
-  opacity: 0.12;
-}
-.neu-about__bgtext div {
-  white-space: nowrap;
-  font-size: clamp(1.6rem, 2.4vw, 2.4rem);
-  color: #fff;
-}
 .neu-about__inner {
   position: relative;
   z-index: 1;
@@ -819,76 +802,6 @@ html:has(.neu-embed) {
 }
 
 /* ============================================================
-   10) Footer（mega-menu + 纵向 marquee 装饰柱）
-   ============================================================ */
-.neu-footer {
-  position: relative;
-  background: var(--neu-blue-ink);
-  color: #fff;
-  padding: clamp(3rem, 7vw, 6rem) 0 clamp(2rem, 5vw, 3.5rem);
-  overflow: hidden;
-}
-.neu-footer__inner {
-  position: relative;
-  z-index: 1;
-}
-.neu-footer__logo {
-  font-family: "Figtree", sans-serif;
-  font-weight: 900;
-  font-size: clamp(4rem, 10vw, 9rem);
-  letter-spacing: -0.04em;
-  line-height: 1;
-}
-.neu-footer__menu {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(1.6rem, 4vw, 3rem) clamp(2rem, 6vw, 5rem);
-  margin: clamp(2.4rem, 6vw, 4rem) 0 clamp(2rem, 5vw, 3rem);
-}
-.neu-footer__item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  text-decoration: none;
-  color: #fff;
-  transition: opacity 0.3s var(--neu-ease);
-}
-.neu-footer__item:hover {
-  opacity: 0.7;
-}
-.neu-footer__item-en {
-  font-family: "Figtree", sans-serif;
-  font-weight: 700;
-  font-size: clamp(2.4rem, 4vw, 3.2rem);
-  letter-spacing: -0.02em;
-  line-height: 1;
-}
-.neu-footer__item-jp {
-  font-family: "Zen Kaku Gothic Antique", sans-serif;
-  font-weight: 700;
-  font-size: clamp(1.2rem, 1.4vw, 1.4rem);
-  color: rgba(255, 255, 255, 0.7);
-}
-.neu-footer__bar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding-top: clamp(1.2rem, 3vw, 2rem);
-  border-top: 1px solid rgba(255, 255, 255, 0.25);
-  font-family: "Figtree", sans-serif;
-  font-size: 1.4rem;
-}
-.neu-footer__bar a {
-  color: #fff;
-  text-decoration: none;
-}
-.neu-footer__copy {
-  color: rgba(255, 255, 255, 0.7);
-}
-
-/* ============================================================
    响应式
    ============================================================ */
 @media (max-width: 860px) {
@@ -900,9 +813,6 @@ html:has(.neu-embed) {
   }
   .neu-flow {
     min-height: 30rem;
-  }
-  .neu-footer__menu {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .neu-news__card {
     grid-template-columns: auto 1fr;
