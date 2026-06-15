@@ -319,7 +319,9 @@
 }
 
 .junni-about__copy {
-  font-size: clamp(1rem, 1.55vw, 1.35rem);
+  /* 对齐原站 home_about 字号：原站约 21px@1024（≈2vw），此前因 vw 系数偏小被
+     clamp 收到 1rem 下限而显小，这里抬高 vw 系数与上下限。 */
+  font-size: clamp(1.25rem, 2vw, 1.9rem);
   font-weight: 500;
   line-height: 1.95;
   letter-spacing: 0.055em;
