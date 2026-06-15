@@ -875,8 +875,8 @@
     padding: clamp(3.5rem, 9vh, 7rem) max(1.25rem, 6vw) clamp(4rem, 10vh, 6rem);
     overflow: hidden;
     isolation: isolate;
-    color: var(--notebook-cream);
-    background: var(--color-background);
+    color: var(--gunze-ink);
+    background: var(--gunze-bg);
   }
 
   .hi-grid-bg {
@@ -896,7 +896,7 @@
     font-family: var(--font-mono);
     font-size: 0.62rem;
     letter-spacing: 0.42em;
-    color: rgb(242 227 207 / 60%);
+    color: rgb(11 7 19 / 60%);
     opacity: 0.7;
     user-select: none;
   }
@@ -920,13 +920,13 @@
     font-weight: 700;
     line-height: 1;
     letter-spacing: 0.04em;
-    color: var(--notebook-cream);
+    color: var(--gunze-ink);
   }
   .hi-name-latin {
     font-family: var(--font-mono);
     font-size: clamp(0.78rem, 1.5vw, 1rem);
     letter-spacing: 0.5em;
-    color: rgb(242 227 207 / 60%);
+    color: rgb(11 7 19 / 60%);
     text-transform: uppercase;
   }
   .hi-version {
@@ -949,7 +949,7 @@
     font-family: var(--font-mono);
     font-size: clamp(0.72rem, 1.4vw, 0.9rem);
     letter-spacing: 0.28em;
-    color: rgb(242 227 207 / 60%);
+    color: rgb(11 7 19 / 60%);
     text-transform: uppercase;
   }
   .hi-arrow {
@@ -962,7 +962,7 @@
     gap: 0.45rem;
   }
   .hi-slash {
-    color: rgb(242 227 207 / 30%);
+    color: rgb(11 7 19 / 30%);
   }
 
   .hi-display {
@@ -978,10 +978,10 @@
     font-size: clamp(2.9rem, 11vw, 7.4rem);
     line-height: 0.86;
     letter-spacing: -0.03em;
-    color: var(--notebook-cream);
+    color: var(--gunze-ink);
     transform: skewX(-7deg);
     transform-origin: left;
-    text-shadow: 0 6px 40px rgb(0 0 0 / 45%);
+    text-shadow: 0 6px 40px rgb(11 7 19 / 12%);
   }
   .hi-display-line--mark {
     align-self: flex-start;
@@ -1003,14 +1003,14 @@
     font-size: clamp(1.1rem, 2.6vw, 1.7rem);
     font-weight: 600;
     letter-spacing: 0.01em;
-    color: var(--notebook-cream);
+    color: var(--gunze-ink);
   }
   .hi-caption {
     margin-top: 0.5rem;
     font-family: var(--font-mono);
     font-size: clamp(0.7rem, 1.4vw, 0.85rem);
     letter-spacing: 0.32em;
-    color: rgb(242 227 207 / 60%);
+    color: rgb(11 7 19 / 60%);
     text-transform: uppercase;
   }
 
@@ -1022,7 +1022,7 @@
     font-family: var(--font-mono);
     font-size: 0.74rem;
     letter-spacing: 0.26em;
-    color: rgb(242 227 207 / 60%);
+    color: rgb(11 7 19 / 60%);
     text-transform: uppercase;
   }
   .hi-scroll-cn {
@@ -1048,7 +1048,7 @@
     font-family: var(--font-mono);
     font-size: 0.66rem;
     letter-spacing: 0.22em;
-    color: rgb(242 227 207 / 60%);
+    color: rgb(11 7 19 / 60%);
     text-transform: uppercase;
   }
   .hi-status-left {
@@ -1208,8 +1208,8 @@
     z-index: 1;
     overflow: hidden;
     padding: clamp(4rem, 9vw, 8rem) 0 clamp(4rem, 8vw, 7rem);
-    background: var(--color-background);
-    color: var(--notebook-cream);
+    background: var(--gunze-bg);
+    color: var(--gunze-ink);
   }
 
   .business-intro__inner {
@@ -1220,7 +1220,7 @@
 
   .business-intro__lead {
     margin: 0;
-    color: var(--notebook-cream);
+    color: var(--gunze-ink);
     font-size: clamp(1.4rem, 3.2vw, 2.6rem);
     font-weight: 950;
     letter-spacing: -0.04em;
@@ -1228,7 +1228,7 @@
 
   .business-intro__lead-soft {
     font-weight: 500;
-    color: rgb(242 227 207 / 75%);
+    color: rgb(11 7 19 / 60%);
   }
 
   .business-intro__word {
@@ -1243,7 +1243,7 @@
   .business-intro__text {
     margin: clamp(1.5rem, 4vw, 3rem) auto 0;
     max-width: min(86vw, 720px);
-    color: rgb(242 227 207 / 82%);
+    color: rgb(11 7 19 / 72%);
     font-size: clamp(0.9rem, 1.5vw, 1.15rem);
     font-weight: 900;
     line-height: 1.9;
@@ -1258,7 +1258,7 @@
     position: relative;
     z-index: 1;
     height: 215vh;
-    background: var(--color-background);
+    background: var(--gunze-bg);
   }
 
   .gunze-scene {
@@ -1267,8 +1267,8 @@
     height: 100vh;
     height: 100dvh;
     overflow: hidden;
-    color: var(--notebook-cream);
-    background: var(--color-background);
+    color: var(--gunze-ink);
+    background: var(--gunze-bg);
   }
 
   .gunze-scene::after {
@@ -1276,7 +1276,7 @@
     position: absolute;
     inset: 0;
     z-index: 13;
-    background: var(--color-background);
+    background: var(--gunze-bg);
     opacity: var(--gunze-scene-dark-alpha);
     pointer-events: none;
     will-change: opacity;
@@ -1741,8 +1741,13 @@
     position: relative;
     z-index: 1;
     overflow: hidden;
-    background: var(--color-background);
-    color: var(--notebook-cream);
+    background: var(--gunze-bg);
+    color: var(--gunze-ink);
+  }
+
+  .gunze-movie .gunze-section-title,
+  .gunze-ceo .gunze-section-title {
+    color: var(--gunze-blue);
   }
 
   .gunze-movie {
@@ -1757,7 +1762,7 @@
 
   .gunze-title-jp {
     margin-top: 1rem;
-    color: var(--notebook-cream);
+    color: var(--gunze-ink);
     font-size: clamp(1.3rem, 2.6vw, 2.4rem);
     font-weight: 950;
     letter-spacing: -0.06em;
@@ -1884,7 +1889,7 @@
     border: 0;
     border-bottom: 0.2rem solid currentColor;
     background: transparent;
-    color: var(--notebook-cream);
+    color: var(--gunze-ink);
     font-size: clamp(1.05rem, 1.8vw, 1.4rem);
     font-weight: 900;
     letter-spacing: 0.04em;
@@ -1917,8 +1922,8 @@
     place-items: center;
     border: 0.25rem solid currentColor;
     border-radius: 50%;
-    background: var(--color-background);
-    color: var(--notebook-cream);
+    background: var(--gunze-bg);
+    color: var(--gunze-ink);
     cursor: pointer;
   }
 
@@ -1937,7 +1942,7 @@
     align-items: center;
     gap: 1rem;
     min-width: min(70vw, 26rem);
-    color: var(--notebook-cream);
+    color: var(--gunze-ink);
     font-size: 2rem;
     font-weight: 950;
   }
@@ -1948,13 +1953,13 @@
     height: 0.45rem;
     overflow: hidden;
     border-radius: 999px;
-    background: rgb(242 227 207 / 20%);
+    background: rgb(11 7 19 / 15%);
   }
 
   .gunze-progress__bar div {
     width: 100%;
     height: 100%;
-    background: var(--notebook-cream);
+    background: var(--gunze-ink);
     transform-origin: left center;
     transition: transform 0.35s var(--ease-out-expo);
   }
@@ -2182,7 +2187,7 @@
 
   .gunze-ceo figcaption {
     margin-top: 1rem;
-    color: var(--notebook-cream);
+    color: var(--gunze-ink);
     font-size: clamp(0.9rem, 1.5vw, 1.2rem);
     font-weight: 950;
     line-height: 1.45;
@@ -2197,7 +2202,7 @@
 
   .gunze-ceo__catch {
     margin: 0 0 1.4rem;
-    color: var(--notebook-cream);
+    color: var(--gunze-blue);
     font-size: clamp(1.6rem, 4vw, 3rem);
     font-weight: 950;
     line-height: 1;
@@ -2205,7 +2210,7 @@
   }
 
   .gunze-ceo__copy p:not(.gunze-ceo__catch) {
-    color: var(--notebook-cream);
+    color: var(--gunze-ink);
     font-size: clamp(1rem, 1.55vw, 1.2rem);
     font-weight: 900;
     line-height: 2;
@@ -2243,7 +2248,7 @@
     place-items: center;
     padding: clamp(4rem, 8vw, 7rem) clamp(1.25rem, 5vw, 5rem);
     overflow: hidden;
-    background: var(--color-background);
+    background: var(--gunze-bg);
     color: var(--gunze-ink);
   }
 
