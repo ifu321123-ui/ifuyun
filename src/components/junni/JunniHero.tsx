@@ -22,9 +22,6 @@ const FLIP_END = 0.82
 // 距离权重最大附加延迟：调大→中心与四角时间差更大、同心波浪更明显。
 const FLIP_SPREAD = 0.6
 
-// 鼠标微随动最大角度（°），随 progress 增大而衰减。
-const TILT_MAX = 5
-
 function clamp(v: number, min: number, max: number) {
   return Math.min(max, Math.max(min, v))
 }
@@ -90,21 +87,10 @@ export default function JunniHero({ onInZoneChange }: JunniHeroProps) {
     const cards = cardRefs.current.filter(Boolean) as HTMLDivElement[]
     const flips = flipRefs.current.filter(Boolean) as HTMLDivElement[]
 
-    // 当前鼠标微随动目标角度（progress=0 时生效）。
-    const tilt = { tx: 0, ty: 0 }
     let lastProgress = 0
 
     const clearHover = () => {
       flips.forEach((el) => el.classList.remove("is-hovered"))
-    }
-
-    const applyTilt = (progress: number) => {
-      // 翻面一旦开始就快速收掉悬浮，避免与翻转角叠加产生眩晕。
-      const damp = 1 - clamp(progress / FLIP_START, 0, 1)
-      const rx = (tilt.tx * TILT_MAX * damp).toFixed(3)
-      const ry = (tilt.ty * TILT_MAX * damp).toFixed(3)
-      grid.style.setProperty("--junni-tilt-x", `${rx}deg`)
-      grid.style.setProperty("--junni-tilt-y", `${ry}deg`)
     }
 
     const apply = (progress: number) => {
@@ -116,8 +102,6 @@ export default function JunniHero({ onInZoneChange }: JunniHeroProps) {
         const local = map(p, FLIP_START + dist * FLIP_SPREAD, FLIP_END, 0, 1)
         card.style.transform = `rotateY(${(local * 180).toFixed(2)}deg)`
       })
-
-      applyTilt(p)
 
       // 一旦开始滚动翻面，撤掉所有 Hover 翻面，避免与 scroll 翻转角打架。
       if (p > FLIP_START) clearHover()
@@ -135,26 +119,6 @@ export default function JunniHero({ onInZoneChange }: JunniHeroProps) {
       matrix.style.display = "none"
       return
     }
-
-    const onMouseMove = (event: MouseEvent) => {
-      if (lastProgress > FLIP_START) return
-      const rect = scene.getBoundingClientRect()
-      const px = clamp((event.clientX - rect.left) / rect.width - 0.5, -0.5, 0.5)
-      const py = clamp((event.clientY - rect.top) / rect.height - 0.5, -0.5, 0.5)
-      // 指针在右侧 → 绕 Y 正向；指针在下方 → 绕 X 负向，符合物理悬浮直觉。
-      tilt.ty = px * 2
-      tilt.tx = -py * 2
-      applyTilt(lastProgress)
-    }
-
-    const onMouseLeave = () => {
-      tilt.tx = 0
-      tilt.ty = 0
-      applyTilt(lastProgress)
-    }
-
-    scene.addEventListener("mousemove", onMouseMove)
-    scene.addEventListener("mouseleave", onMouseLeave)
 
     // 逐格 Hover 独立翻面：仅在首屏静止（progress<=FLIP_START）时激活；
     // 180° 增量挂在 .junni-card-flip 上，由 CSS transition 平滑完成，与 scroll 翻转层互不干扰。
@@ -206,14 +170,10 @@ export default function JunniHero({ onInZoneChange }: JunniHeroProps) {
     ScrollTrigger.refresh()
 
     return () => {
-      scene.removeEventListener("mousemove", onMouseMove)
-      scene.removeEventListener("mouseleave", onMouseLeave)
       hoverCleanups.forEach((fn) => fn())
       lenis?.off("scroll", onScroll)
       tween.scrollTrigger?.kill()
       tween.kill()
-      grid.style.removeProperty("--junni-tilt-x")
-      grid.style.removeProperty("--junni-tilt-y")
     }
   }, [lenis, onInZoneChange, cells])
 

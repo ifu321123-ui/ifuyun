@@ -56,10 +56,9 @@
   grid-template-rows: repeat(6, 1fr);
   gap: var(--junni-gap);
   transform-style: preserve-3d;
-  /* 纵深 -20px + 鼠标 ±5° 物理悬浮 */
-  transform: translateZ(-20px) rotateX(var(--junni-tilt-x, 0deg))
-    rotateY(var(--junni-tilt-y, 0deg));
-  transition: transform 0.18s ease-out;
+  /* 仅保留 3D 空间安全舱纵深；不做整体鼠标随动（否则整张网格随指针晃动，
+     而原站只有被悬浮的单格翻面）。 */
+  transform: translateZ(-20px);
 }
 
 /* ===== 3. 36 格定位窗（不再裁切、不再独立透视）=====
@@ -270,7 +269,6 @@
 
 /* ===== 8. 无障碍降级 ===== */
 @media (prefers-reduced-motion: reduce) {
-  .junni-grid,
   .junni-card-flip {
     transition: none;
   }

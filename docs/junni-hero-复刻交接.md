@@ -120,9 +120,11 @@ src/components/junni/
 - **不要用** GSAP `stagger:{grid:[6,6]}`——它基于时间，与 `scrub` 不兼容，会「翻转不跟手」
 - pin **优先用 `position:sticky`**，不要 `pin:true`（与 Lenis 易冲突，需额外 scrollerProxy）
 
-### 4.5 鼠标随动（加分项）
-- 未滚动时绑定轻量 `onMouseMove`，给网格父层施加 ±5° 的 `rotateX/Y` 微随动
-- 父层留 `translateZ(-20px)` 纵深（对应原站 `translate3d(0,0,-20px)`）
+### 4.5 ~~鼠标随动~~（❌ 已废弃，曾是错误理解）
+- ⚠️ **曾错误地**给网格父层 `.junni-grid` 施加 ±5° 的 `rotateX/Y` 全局随动，结果**整张 6×6 大网格跟着鼠标晃动**——这不是原站行为。
+- **原站真实行为**：黑底首屏静止时**只有指针正下方的那一个小方块翻面**，其余纹丝不动；没有任何整体倾斜。
+- **正解**：父层只保留 `translateZ(-20px)` 作为 3D 空间「安全舱」纵深，**写死、不接任何鼠标变量**；交互只走逐格 Hover（见 4.6 / 坑 7 / 坑 10）。
+- 2026-06-15 已彻底移除 `TILT_MAX` / `tilt` / `applyTilt` / `onMouseMove` / `onMouseleave` 及 `.junni-grid` 上的 `--junni-tilt-x/y`（详见坑 10）。
 
 ### 4.6 下一层衔接
 - 翻完继续下滚进入 `home_about` 风格：荧光绿底 + 逐字日文文案 + `ABOUT JUNNI`
@@ -195,6 +197,7 @@ rotateY = ( px*2) * TILT_MAX * damp                       // 写到 .junni-grid 
 8. **巧克力网格视觉高保真（对齐原站 `.home_kv_panel_item` computed）**：原站每格不是糊死的纯黑，而是 **`#1c1d21`（RGB 28,29,33）暗阶 + 响应式圆角 + 单元缝隙**，缝隙露出更深的底色形成网格线，整体像“巧克力块”。落地：`.junni-grid` 改 **CSS Grid**（`repeat(6,1fr)`+`gap:var(--junni-gap)`，整除拼合不会因 flex 子像素累计错行）；`--junni-panel:#1c1d21` 给 front fill，scene 底 `#0a0a0a`（更深）透过缝隙当网格线；圆角用 `.junni-face { clip-path: inset(0 round var(--junni-radius)); border-radius:var(--junni-radius) }`。
    > **2026-06-15 浏览器实测原站静止态（scrollY 0，vw 832）**：`.home_kv_panel_item` 的 `background-color: rgb(28,29,33)`、`border-radius: 5.2px`（占格宽 3.86%）、`.home_kv_image` 的 `gap: 1.597px`。换算成 vw ≈ **圆角 0.625vw、缝隙 0.192vw**（代入 1440 宽 = 9px / 2.76px，即早期记的“原站值”其实是 @1440 的快照）。**关键：原站圆角/缝隙随视口缩放，而本站早期写死 px，窄屏下圆角比例偏小（仅约 1.22%）显得发直**。已把 `--junni-radius` 改为 `0.625vw` 对齐；缝隙 `--junni-gap` 暂留 2.76px（如需全宽度严格一致可改 `0.192vw`）。**附带收益**：刻意的网格缝隙正好把负位移方案的亚像素接缝“做成”网格线，原本静止时 N/I 的锯齿断裂随之消失。
 9. **首屏只放 Logo+手写标语，主张文案归绿底区**：原站黑底首屏**只有**居中巨型 `JUNNI` + 手写体 `自由に、ユニークに。`（`junniData.tagline`），克制留白。早期把 `manifesto`（わたしたち…）大段塞在黑底左下是错的——已移入 `JunniAbout` 绿底区作引导大字（`.junni-about__copy--lead`）。Logo 用 `font-size: clamp(4rem,14.5vw,44rem)` 随视口线性缩放（约占 48% 宽），**注意别用过小的 `max`（如旧的 15rem）**，否则宽屏/高 DPR 下被截断显小。布局：`.junni-kv__center` 绝对居中、MENU 右上、`SCROLL` 用 `writing-mode:vertical-rl` 竖排左侧。
+10. **❌ 别把「3D 安全舱」误当成「全局鼠标倾斜」**（2026-06-15 净化）：`.junni-grid` 的 `translateZ(-20px)` 只是为卡片翻面提供透视纵深的「空间安全舱」，**不该接鼠标变量**。早期画蛇添足地在它上面叠了 `rotateX(var(--junni-tilt-x)) rotateY(var(--junni-tilt-y))` + `onMouseMove`，导致**鼠标一动整张 6×6 大网格集体歪斜偏移**（截图穿帮），而原站静止首屏**只有指针所在的那一个小方块翻面**。**已彻底移除**：JS 侧删 `TILT_MAX`/`tilt`/`applyTilt`/`scene` 上的 `mousemove`+`mouseleave` 监听及清理时的 `--junni-tilt-*` 善后；CSS 侧 `.junni-grid` 收敛为 `transform: translateZ(-20px);`（去掉 `transition` 与两个 rotate 变量），并把 `prefers-reduced-motion` 块里多余的 `.junni-grid` 摘掉。**只保留逐格 Hover**（坑 7）：`progress<=FLIP_START` 时 `mouseenter` 给单个 `.junni-card-flip` 挂 `.is-hovered` → 原地 `rotateY(180deg)`、CSS transition 平滑。**教训**：纵深/透视类「空间舱」属性要写死，交互只下沉到被命中的叶子单元，别在共享父层做全局随动。
 
 ### E. 实测证据（浏览器内验证通过）
 - **from-center 扩散**：progress≈0.38 时角度网格呈同心梯度 `中心64° → 42° → 25° → 角0°`。
