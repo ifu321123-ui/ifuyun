@@ -33,7 +33,7 @@ function map(p: number, inMin: number, inMax: number, outMin: number, outMax: nu
 
 /**
  * 满屏 100vw×100vh 的正面 KV 画面（黑底白字），每格内部各放一份后做负位移裁切拼回整图。
- * 背面是纯荧光绿实底：因 rotateY(180) 会把内容逐格镜像，平铺纯色才能无缝拼回，故背面不放文案。
+ * 背面是纯荧光绿实底：因 rotateX(180) 会把内容逐格镜像，平铺纯色才能无缝拼回，故背面不放文案。
  */
 function HeroKV() {
   return (
@@ -57,6 +57,7 @@ export default function JunniHero({ onInZoneChange }: JunniHeroProps) {
   const sceneRef = useRef<HTMLDivElement>(null)
   const matrixRef = useRef<HTMLDivElement>(null)
   const gridRef = useRef<HTMLDivElement>(null)
+  const cellRefs = useRef<(HTMLDivElement | null)[]>([])
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
   const flipRefs = useRef<(HTMLDivElement | null)[]>([])
   const lenis = useLenis()
@@ -86,6 +87,7 @@ export default function JunniHero({ onInZoneChange }: JunniHeroProps) {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
     const cards = cardRefs.current.filter(Boolean) as HTMLDivElement[]
     const flips = flipRefs.current.filter(Boolean) as HTMLDivElement[]
+    const wells = cellRefs.current
 
     let lastProgress = 0
 
@@ -100,7 +102,8 @@ export default function JunniHero({ onInZoneChange }: JunniHeroProps) {
       cards.forEach((card, i) => {
         const dist = cells[i]?.dist ?? 0
         const local = map(p, FLIP_START + dist * FLIP_SPREAD, FLIP_END, 0, 1)
-        card.style.transform = `rotateY(${(local * 180).toFixed(2)}deg)`
+        // 绕 X 轴上下翻面（对齐原站 rotateX(-180deg)）；负角 = 向上翻，180° 终点显现绿底。
+        card.style.transform = `rotateX(${(-(local * 180)).toFixed(2)}deg)`
       })
 
       // 一旦开始滚动翻面，撤掉所有 Hover 翻面，避免与 scroll 翻转角打架。
@@ -120,18 +123,21 @@ export default function JunniHero({ onInZoneChange }: JunniHeroProps) {
       return
     }
 
-    // 逐格 Hover 独立翻面：仅在首屏静止（progress<=FLIP_START）时激活；
-    // 180° 增量挂在 .junni-card-flip 上，由 CSS transition 平滑完成，与 scroll 翻转层互不干扰。
-    const hoverCleanups = flips.map((el) => {
+    // 逐格 Hover 独立翻面：仅在首屏静止（progress<=FLIP_START）时激活。
+    // 解耦：mouseenter/leave 绑在永不旋转的静止底座 .junni-cell（命中靶稳定，杜绝抽搐），
+    // 180° 增量则加到对应内层 .junni-card-flip（旋转链已 pointer-events:none 对鼠标隐形）。
+    const hoverCleanups = wells.map((well, i) => {
+      const flip = flipRefs.current[i]
+      if (!well || !flip) return () => {}
       const onEnter = () => {
-        if (lastProgress <= FLIP_START) el.classList.add("is-hovered")
+        if (lastProgress <= FLIP_START) flip.classList.add("is-hovered")
       }
-      const onLeave = () => el.classList.remove("is-hovered")
-      el.addEventListener("mouseenter", onEnter)
-      el.addEventListener("mouseleave", onLeave)
+      const onLeave = () => flip.classList.remove("is-hovered")
+      well.addEventListener("mouseenter", onEnter)
+      well.addEventListener("mouseleave", onLeave)
       return () => {
-        el.removeEventListener("mouseenter", onEnter)
-        el.removeEventListener("mouseleave", onLeave)
+        well.removeEventListener("mouseenter", onEnter)
+        well.removeEventListener("mouseleave", onLeave)
       }
     })
 
@@ -191,6 +197,9 @@ export default function JunniHero({ onInZoneChange }: JunniHeroProps) {
               <div
                 key={i}
                 className="junni-cell"
+                ref={(el) => {
+                  cellRefs.current[i] = el
+                }}
                 style={
                   {
                     "--col": cell.col,

@@ -69,15 +69,20 @@
   /* 尺寸由 grid 轨道决定（含 gap），自身只做定位与 3D 传递 */
   position: relative;
   transform-style: preserve-3d;
+  /* 静止轨道盒子 = 首屏唯一鼠标命中靶：永不旋转，指针稳定停留于此，杜绝 hover 抽搐 */
+  pointer-events: auto;
 }
 
-/* ===== 4. 卡片：scroll 翻转层（rotateY 由 JS 每帧覆写）===== */
+/* ===== 4. 卡片：scroll 翻转层（rotateX 由 JS 每帧覆写）===== */
 .junni-card {
   position: absolute;
   inset: 0;
   transform-style: preserve-3d;
-  /* JS 写入 transform: rotateY(...)，无 transition 保证 scrub 跟手 */
+  /* JS 写入 transform: rotateX(...)，无 transition 保证 scrub 跟手 */
   will-change: transform;
+  /* 旋转链根：靠 pointer-events 继承让 card-flip 与两个 face 全部对鼠标隐形，
+     避免旋转时元素脱离指针触发 mouseleave→mouseenter 鬼畜死循环（命中交回 .junni-cell）。 */
+  pointer-events: none;
 }
 
 /* ===== 4b. Hover 翻转层：独立 180° 增量，CSS transition 平滑，不干扰 scroll 层 ===== */
@@ -89,7 +94,7 @@
 }
 
 .junni-card-flip.is-hovered {
-  transform: rotateY(180deg);
+  transform: rotateX(-180deg); /* 静止态局部 Hover 也走上下翻面，与 scroll 层同轴 */
 }
 
 .junni-face {
@@ -104,7 +109,7 @@
 }
 
 .junni-face--back {
-  transform: rotateY(180deg);
+  transform: rotateX(180deg); /* 绕 X 轴预转，与 scroll/hover 的 rotateX 同轴贴合 3D 双面 */
 }
 
 /* ===== 5. 方案 B：满屏画面负位移拼回整图 ===== */
