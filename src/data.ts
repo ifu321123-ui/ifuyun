@@ -181,12 +181,32 @@ export const experiences = [
 
 export type ProjectCategory = "B端" | "创新设计"
 
+export type ProjectMeta = {
+  client: string
+  type: string
+  date: string
+  role: string
+  tools: string
+}
+
+export type Project = {
+  category: ProjectCategory
+  title: string
+  desc: string
+  loop: string
+  tags: string[]
+  slug?: string
+  subtitle?: string
+  meta?: ProjectMeta
+  gallery?: string[]
+}
+
 export const projectTabs: { key: ProjectCategory; label: string }[] = [
   { key: "B端", label: "企业级 B 端项目" },
   { key: "创新设计", label: "创新体验与文化设计" },
 ]
 
-export const projects = [
+export const projects: Project[] = [
   {
     category: "B端" as ProjectCategory,
     title: "四川银行问卷后台管理系统",
@@ -218,8 +238,25 @@ export const projects = [
   {
     category: "创新设计" as ProjectCategory,
     title: "食援",
+    slug: "shiyuan",
+    subtitle: "中医药膳科普 · 助农电商平台",
     desc: "饮食文化疗愈体验设计，连接内容叙事与情感体验。",
     loop: "创意概念：饮食与情绪疗愈结合；核心亮点：可感知互动体验；价值输出：提升公益传播温度。",
+    meta: {
+      client: "蓝桥杯大赛参赛作品",
+      type: "产品设计 / UI 设计 / IP 设计",
+      date: "2025",
+      role: "产品策划 · 视觉设计 · 原型表达",
+      tools: "Figma / Photoshop / Illustrator",
+    },
+    gallery: [
+      "/works/shiyuan/01.png",
+      "/works/shiyuan/02.png",
+      "/works/shiyuan/03.png",
+      "/works/shiyuan/04.png",
+      "/works/shiyuan/05.png",
+      "/works/shiyuan/06.png",
+    ],
     tags: ["文化设计", "服务体验"],
   },
   {

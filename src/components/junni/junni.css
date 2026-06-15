@@ -1,0 +1,293 @@
+/* —— junni.co.jp Hero MVP（命名空间 .junni-*） —— */
+
+.junni-root {
+  --junni-black: #0a0a0a;
+  --junni-green: #cbea41;
+  --junni-ink: #0a0a0a;
+  --junni-white: #f5f5f5;
+  --junni-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  z-index: 20;
+  background: var(--junni-black);
+  color: var(--junni-white);
+  font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+.junni-hero-stage {
+  position: relative;
+  height: calc(var(--junni-stage-vh, 2.15) * 100vh);
+  height: calc(var(--junni-stage-vh, 2.15) * 100dvh);
+  background: var(--junni-green);
+}
+
+.junni-hero-scene {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* 翻转后露出的荧光绿底层 */
+.junni-hero-reveal {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: clamp(1.5rem, 4vw, 3.5rem);
+  background: var(--junni-green);
+  color: var(--junni-ink);
+}
+
+.junni-hero-reveal__copy {
+  max-width: min(42rem, 88vw);
+  font-size: clamp(0.82rem, 1.35vw, 1rem);
+  line-height: 2;
+  letter-spacing: 0.04em;
+  opacity: var(--junni-reveal-copy, 0);
+  transform: translateY(calc((1 - var(--junni-reveal-copy, 0)) * 2rem));
+  transition: none;
+}
+
+.junni-hero-reveal__copy p {
+  margin: 0;
+}
+
+.junni-hero-reveal__headline {
+  margin-top: clamp(2rem, 6vh, 4rem);
+  font-size: clamp(2.4rem, 9vw, 6.5rem);
+  font-weight: 900;
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  opacity: var(--junni-reveal-title, 0);
+  transform: translateY(calc((1 - var(--junni-reveal-title, 0)) * 3rem));
+}
+
+.junni-hero-reveal__headline span {
+  display: block;
+}
+
+/* 切片容器：3D 透视 */
+.junni-hero-slices {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  perspective: 1400px;
+  perspective-origin: 50% 40%;
+  pointer-events: none;
+}
+
+.junni-slice {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--slice-i) * 100% / var(--slice-n));
+  height: calc(100% / var(--slice-n));
+  overflow: hidden;
+  transform-style: preserve-3d;
+}
+
+.junni-slice-inner {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform-origin: center top;
+  backface-visibility: hidden;
+  will-change: transform, opacity;
+}
+
+.junni-slice-fill {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  top: calc(var(--slice-i) * -100vh / var(--slice-n));
+  top: calc(var(--slice-i) * -100dvh / var(--slice-n));
+  background: var(--junni-black);
+}
+
+/* 黑底上的完整 Hero 画面（每片各裁一份） */
+.junni-hero-panel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(1.25rem, 3vw, 2.5rem);
+}
+
+.junni-hero-menu {
+  align-self: flex-end;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--junni-white);
+  mix-blend-mode: difference;
+  pointer-events: auto;
+}
+
+.junni-hero-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-bottom: clamp(3rem, 10vh, 6rem);
+}
+
+.junni-hero-logo {
+  margin: 0;
+  font-size: clamp(4.5rem, 18vw, 13rem);
+  font-weight: 900;
+  line-height: 0.82;
+  letter-spacing: -0.05em;
+  text-transform: uppercase;
+  color: var(--junni-white);
+  mix-blend-mode: difference;
+}
+
+.junni-hero-manifesto {
+  margin-top: clamp(1.5rem, 4vh, 3rem);
+  max-width: min(36rem, 90vw);
+  font-size: clamp(0.78rem, 1.2vw, 0.95rem);
+  line-height: 2.1;
+  letter-spacing: 0.06em;
+  color: var(--junni-white);
+  mix-blend-mode: difference;
+}
+
+.junni-hero-manifesto p {
+  margin: 0;
+}
+
+.junni-hero-about {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: clamp(1.5rem, 4vh, 2.5rem);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--junni-white);
+  mix-blend-mode: difference;
+  pointer-events: auto;
+}
+
+.junni-hero-about::after {
+  content: "→";
+  font-size: 1rem;
+}
+
+/* 浮动标签 */
+.junni-hero-tags {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.junni-hero-tag {
+  position: absolute;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid currentColor;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--junni-green);
+  mix-blend-mode: difference;
+  opacity: var(--junni-tag-opacity, 1);
+  transform: translate(
+    calc(var(--junni-tag-x, 0) * 1px),
+    calc(var(--junni-tag-y, 0) * 1px)
+  );
+}
+
+.junni-hero-tag--0 {
+  top: 22%;
+  left: 58%;
+  --junni-tag-x: var(--junni-tag-x-0, 0);
+  --junni-tag-y: var(--junni-tag-y-0, 0);
+  --junni-tag-opacity: var(--junni-tag-opacity-0, 1);
+}
+
+.junni-hero-tag--1 {
+  top: 48%;
+  left: 12%;
+  --junni-tag-x: var(--junni-tag-x-1, 0);
+  --junni-tag-y: var(--junni-tag-y-1, 0);
+  --junni-tag-opacity: var(--junni-tag-opacity-1, 1);
+}
+
+.junni-hero-tag--2 {
+  top: 68%;
+  right: 18%;
+  --junni-tag-x: var(--junni-tag-x-2, 0);
+  --junni-tag-y: var(--junni-tag-y-2, 0);
+  --junni-tag-opacity: var(--junni-tag-opacity-2, 1);
+}
+
+/* 底部跑马灯 */
+.junni-hero-marquee {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: clamp(1rem, 3vh, 2rem);
+  z-index: 6;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: calc(1 - var(--junni-marquee-fade, 0));
+}
+
+.junni-hero-marquee__track {
+  display: flex;
+  width: max-content;
+  animation: junni-marquee 18s linear infinite;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--junni-white);
+  mix-blend-mode: difference;
+}
+
+.junni-hero-marquee__track span {
+  padding-right: 2rem;
+  white-space: nowrap;
+}
+
+@keyframes junni-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* 滚动出口哨兵（供 Navbar 显隐判定） */
+.junni-exit-sentinel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .junni-hero-marquee__track {
+    animation: none;
+  }
+
+  .junni-slice-inner {
+    transition: opacity 0.4s ease;
+  }
+}

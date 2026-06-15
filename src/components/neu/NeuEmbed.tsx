@@ -5,7 +5,6 @@ import NeuAbout from "./NeuAbout"
 import NeuPixel from "./NeuPixel"
 import NeuService from "./NeuService"
 import NeuTeam from "./NeuTeam"
-import NeuNews from "./NeuNews"
 import NeuContact from "./NeuContact"
 import "./neu.css"
 
@@ -25,7 +24,6 @@ export default function NeuEmbed() {
       <NeuPixel />
       <NeuService />
       <NeuTeam />
-      <NeuNews />
       <NeuContact />
     </div>
   )

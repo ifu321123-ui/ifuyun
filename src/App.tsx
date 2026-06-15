@@ -1,5 +1,7 @@
+import { useEffect, useState } from "react"
 import Navbar from "./components/Navbar"
 import Hero from "./components/Hero"
+import JunniTop from "./components/junni/JunniTop"
 import Experience from "./components/Experience"
 import Projects from "./components/Projects"
 import Contact from "./components/Contact"
@@ -7,10 +9,14 @@ import QuickActions from "./components/QuickActions"
 import IntroFlip from "./components/IntroFlip"
 import SmoothScroll from "./components/SmoothScroll"
 import NeuClone from "./components/neu/NeuClone"
+import ProjectDetail from "./components/ProjectDetail"
 import { cn } from "./lib/utils"
 import { useRoute } from "./hooks/useRoute"
 
-function renderPage(page: string) {
+function renderPage(
+  page: string,
+  onJunniZoneChange?: (inJunniZone: boolean) => void,
+) {
   switch (page) {
     case "experience":
       return <Experience />
@@ -21,6 +27,7 @@ function renderPage(page: string) {
     default:
       return (
         <>
+          <JunniTop onInZoneChange={onJunniZoneChange} />
           <Hero />
         </>
       )
@@ -28,8 +35,15 @@ function renderPage(page: string) {
 }
 
 export default function App() {
-  const page = useRoute()
+  const route = useRoute()
+  const page = route.page
   const isNotebookHome = page === "home"
+  const [inJunniZone, setInJunniZone] = useState(true)
+  const onJunniZoneChange = isNotebookHome ? setInJunniZone : undefined
+
+  useEffect(() => {
+    if (isNotebookHome) setInJunniZone(true)
+  }, [isNotebookHome])
   const isNeu = page === "neu"
   // 工作经历页内嵌了 Neu（其设计基准 1rem=10px，会把整页根字号设为 62.5%）。
   // 这里把本站内容整体放大 1.6 倍还原 16px 视感，Neu 区块再自行抵消，实现 1:1 共存。
@@ -45,6 +59,14 @@ export default function App() {
     )
   }
 
+  if (page === "work") {
+    return (
+      <SmoothScroll>
+        <ProjectDetail slug={route.slug} />
+      </SmoothScroll>
+    )
+  }
+
   return (
     <SmoothScroll>
       <div
@@ -54,9 +76,9 @@ export default function App() {
           isExperience && "neu-host-scale",
         )}
       >
-        <Navbar />
+        <Navbar hidden={isNotebookHome && inJunniZone} />
         <main key={page} className="min-h-screen animate-fade-up">
-          {renderPage(page)}
+          {renderPage(page, onJunniZoneChange)}
         </main>
         {!isNotebookHome && <QuickActions />}
         {!isNotebookHome && <IntroFlip />}

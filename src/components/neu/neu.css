@@ -702,71 +702,7 @@ html:has(.neu-embed) {
 }
 
 /* ============================================================
-   8) News（蓝底，3 张资讯卡）
-   ============================================================ */
-.neu-news {
-  background: var(--neu-paper);
-  padding: clamp(3rem, 8vw, 7rem) 0 clamp(4rem, 10vw, 9rem);
-}
-.neu-news .neu-eyebrow {
-  display: block;
-  margin-bottom: clamp(1.6rem, 4vw, 3rem);
-  color: var(--neu-blue);
-}
-.neu-news__list {
-  display: grid;
-  gap: clamp(1.2rem, 2.4vw, 2rem);
-}
-.neu-news__card {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: clamp(1.4rem, 4vw, 3.2rem);
-  padding-bottom: clamp(1.2rem, 2.4vw, 2rem);
-  border-bottom: 1.5px solid rgba(29, 1, 254, 0.18);
-  text-decoration: none;
-  color: var(--neu-blue);
-  transition: opacity 0.3s var(--neu-ease);
-}
-.neu-news__card:hover {
-  opacity: 0.7;
-}
-.neu-news__meta {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-.neu-news__date {
-  font-family: "Figtree", sans-serif;
-  font-weight: 600;
-  font-size: clamp(1.2rem, 1.4vw, 1.4rem);
-}
-.neu-news__tag {
-  font-family: "Figtree", sans-serif;
-  font-weight: 700;
-  font-size: clamp(2rem, 3.2vw, 3.2rem);
-  line-height: 1;
-}
-.neu-news__title {
-  font-family: "Zen Kaku Gothic New", sans-serif;
-  font-weight: 700;
-  font-size: clamp(1.6rem, 2vw, 2rem);
-  letter-spacing: 0.06em;
-  line-height: 1.3;
-  color: var(--neu-blue);
-}
-.neu-news__arrow {
-  width: clamp(3rem, 4vw, 4rem);
-  height: clamp(3rem, 4vw, 4rem);
-  display: grid;
-  place-items: center;
-  border-radius: 999px;
-  border: 1.5px solid var(--neu-blue);
-  font-size: 1.6rem;
-}
-
-/* ============================================================
-   9) Contact CTA（蓝色大卡）
+   8) Contact CTA（蓝色大卡）
    ============================================================ */
 .neu-contact {
   background: var(--neu-paper);
@@ -813,12 +749,6 @@ html:has(.neu-embed) {
   }
   .neu-flow {
     min-height: 30rem;
-  }
-  .neu-news__card {
-    grid-template-columns: auto 1fr;
-  }
-  .neu-news__arrow {
-    display: none;
   }
 }
 

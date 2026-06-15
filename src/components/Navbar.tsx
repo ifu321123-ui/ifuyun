@@ -10,7 +10,11 @@ const ROUTE_BY_NAV: Record<string, PageId> = {
   connect: "contact",
 }
 
-export default function Navbar() {
+interface NavbarProps {
+  hidden?: boolean
+}
+
+export default function Navbar({ hidden = false }: NavbarProps) {
   const active = useRoute()
   const [scrolled, setScrolled] = useState(false)
 
@@ -39,6 +43,7 @@ export default function Navbar() {
       className={cn(
         "fixed inset-x-0 top-0 z-50 flex justify-center px-6 transition-all duration-300",
         scrolled ? "py-3" : "py-5",
+        hidden && "pointer-events-none translate-y-[-120%] opacity-0",
       )}
     >
       <nav
