@@ -93,7 +93,9 @@
 }
 
 .junni-card-flip.is-hovered {
-  animation: junni-hover-flip 0.8s linear;
+  /* back-ease-out：转到 -360° 时先冲过一点再弹回，模拟惯性「轻微回弹」。
+     第二个控制点 y=1.56>1 即过冲量，调大→弹更明显。 */
+  animation: junni-hover-flip 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 @keyframes junni-hover-flip {
