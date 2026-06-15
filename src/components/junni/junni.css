@@ -93,7 +93,7 @@
 }
 
 .junni-card-flip.is-hovered {
-  animation: junni-hover-flip 0.92s var(--junni-ease);
+  animation: junni-hover-flip 0.8s linear;
 }
 
 @keyframes junni-hover-flip {
