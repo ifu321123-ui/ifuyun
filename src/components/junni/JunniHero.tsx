@@ -162,14 +162,18 @@ export default function JunniHero({ onInZoneChange }: JunniHeroProps) {
       return
     }
 
-    // 逐格 Hover 独立翻面：仅在首屏静止（progress<=FLIP_START）时激活。
+    // 逐格 Hover 独立 360° 翻面：仅在首屏静止（progress<=FLIP_START）时激活。
     // 解耦：mouseenter/leave 绑在永不旋转的静止底座 .junni-cell（命中靶稳定，杜绝抽搐），
-    // 180° 增量则加到对应内层 .junni-card-flip（旋转链已 pointer-events:none 对鼠标隐形）。
+    // 一次性动画加到对应内层 .junni-card-flip（旋转链已 pointer-events:none 对鼠标隐形）。
     const hoverCleanups = wells.map((well, i) => {
       const flip = flipRefs.current[i]
       if (!well || !flip) return () => {}
       const onEnter = () => {
-        if (lastProgress <= FLIP_START) flip.classList.add("is-hovered")
+        if (lastProgress <= FLIP_START) {
+          flip.classList.remove("is-hovered")
+          void flip.offsetWidth
+          flip.classList.add("is-hovered")
+        }
       }
       const onLeave = () => flip.classList.remove("is-hovered")
       well.addEventListener("mouseenter", onEnter)

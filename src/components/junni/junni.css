@@ -85,16 +85,25 @@
   pointer-events: none;
 }
 
-/* ===== 4b. Hover 翻转层：独立 180° 增量，CSS transition 平滑，不干扰 scroll 层 ===== */
+/* ===== 4b. Hover 翻转层：独立 360° 一圈动画，不干扰 scroll 层 ===== */
 .junni-card-flip {
   position: absolute;
   inset: 0;
   transform-style: preserve-3d;
-  transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .junni-card-flip.is-hovered {
-  transform: rotateX(-180deg); /* 静止态局部 Hover 也走上下翻面，与 scroll 层同轴 */
+  animation: junni-hover-flip 0.92s var(--junni-ease);
+}
+
+@keyframes junni-hover-flip {
+  from {
+    transform: rotateX(0deg);
+  }
+
+  to {
+    transform: rotateX(-360deg);
+  }
 }
 
 .junni-face {
@@ -373,6 +382,6 @@
 /* ===== 8. 无障碍降级 ===== */
 @media (prefers-reduced-motion: reduce) {
   .junni-card-flip {
-    transition: none;
+    animation: none;
   }
 }
