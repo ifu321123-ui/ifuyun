@@ -18,7 +18,7 @@ const ROWS = JUNNI_GRID_ROWS
 // from-center 扩散参数：翻面在 flipStart→flipEnd 区间内完成，
 // 每格按到中心的欧几里得距离追加 0~spread 的延迟权重。
 const FLIP_START = 0.06
-const FLIP_END = 0.82
+const FLIP_END = 0.94
 // 距离权重最大附加延迟：调大→中心与四角时间差更大、同心波浪更明显。
 const FLIP_SPREAD = 0.6
 
@@ -69,13 +69,6 @@ function BackKV() {
         </p>
         <div className="junni-kv__welcome" aria-hidden="true">
           <span className="junni-kv__welcome-text">Welcome</span>
-          <svg className="junni-kv__baku" viewBox="0 0 128 72" role="img">
-            <path d="M31 43c-8 0-14-5-14-12 0-9 8-15 19-15h35c15 0 27 9 27 21 0 11-10 20-24 20H45c-8 0-14-6-14-14Z" />
-            <path d="M88 22c3-8 9-13 17-13 10 0 18 8 18 18 0 9-6 17-16 23-7-5-13-11-19-19v-9Z" />
-            <path d="M18 29 4 24l8 16 8-5-2-6Z" />
-            <circle cx="40" cy="31" r="3" fill="currentColor" />
-            <path d="M39 55v13M55 56v12M76 56v12M90 53v13" stroke="currentColor" strokeWidth="7" strokeLinecap="round" />
-          </svg>
         </div>
       </div>
     </div>
@@ -147,8 +140,9 @@ export default function JunniHero({ onInZoneChange }: JunniHeroProps) {
       // 网格细缝随之由黑转绿、与 home_about 无缝衔接，且消除黑底上的绿色缝隙。
       scene.style.background = p >= FLIP_END ? "#cbea41" : "#0a0a0a"
 
-      // 翻完并滚出 sticky 视口后，销毁 72 个满屏图层的渲染开销。
-      matrix.style.display = p >= 0.999 ? "none" : ""
+      // 原站翻完后 kv_back 不会立刻消失，而是跟随 pin 释放自然滚出视窗。
+      // 因此保留矩阵，避免背面文字在 manifesto 上来前突兀消失。
+      matrix.style.display = ""
     }
 
     if (reducedMotion) {

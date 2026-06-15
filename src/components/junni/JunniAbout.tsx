@@ -41,8 +41,8 @@ export default function JunniAbout() {
       },
       scrollTrigger: {
         trigger: section,
-        start: "top 82%",
-        end: "bottom 64%",
+        start: "top 60%",
+        end: "bottom 60%",
         scrub: 0.4,
         invalidateOnRefresh: true,
       },

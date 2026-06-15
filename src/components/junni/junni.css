@@ -275,7 +275,7 @@
 .junni-kv__welcome-text {
   font-family: "Yuji Syuku", "Klee One", "Caveat", "Segoe Script",
     "STKaiti", "KaiTi", cursive;
-  font-size: clamp(0.95rem, 1.7vw, 2.35rem);
+  font-size: clamp(1.7rem, 3.2vw, 4.25rem);
   font-weight: 700;
   line-height: 1;
 }
@@ -285,17 +285,13 @@
   margin-left: 0.18em;
 }
 
-.junni-kv__baku {
-  width: clamp(4.5rem, 9vw, 10.5rem);
-  height: auto;
-  color: var(--junni-ink);
-  fill: currentColor;
-}
-
 /* ===== 7. home_about：绿底黑字 + ABOUT JUNNI ===== */
 .junni-about {
   position: relative;
   z-index: 3;
+  /* 让 manifesto 更贴近 kv_back 小牛，但仍在翻完后从视口底部进入。 */
+  margin-top: -22vh;
+  margin-top: -22dvh;
   min-height: 118vh;
   min-height: 118dvh;
   display: flex;

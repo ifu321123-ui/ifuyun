@@ -1,7 +1,7 @@
 # JUNNI Hero 复刻 · 对话交接文档
 
 > 用途：在新对话里继续调整 junni.co.jp 首屏（Hero）复刻效果。把本文件作为上下文喂给新会话即可无缝接力。
-> 最后更新：2026-06-15（MVP 2.0 6×6 网格卡片版已落地并实测通过；翻转轴改为 `rotateX` 上下翻面 + 根除 Hover 抽搐；背面已按原站真实 `kv_back` 逻辑补入绿底全景文字切片；**最新：背面文案对位 1:1——KV 背面 = `ASOBIGOKORO × TECHNOLOGY` 标题 + 副标题 `kvLead`（アソビゴコロとテクノロジーで…）+ Welcome 小牛；`manifesto`（わたしたちジュニは…）只由下方普通流 `JunniAbout` 自然滚动叠加（kvLead≠manifesto）；并修标题溢出裁切，详见坑 13；**`home_about` 已 1:1 还原原站逐字显色：3 段日文逐字 `span` 化 + GSAP scrub 让字符从背景绿 `#cbea41` 渐显为黑 `#111`，居中排版、消除空绿死区，详见坑 14**）
+> 最后更新：2026-06-15（MVP 2.0 6×6 网格卡片版已落地并实测通过；翻转轴改为 `rotateX` 上下翻面 + 根除 Hover 抽搐；背面已按原站真实 `kv_back` 逻辑补入绿底全景文字切片；背面文案对位 1:1——KV 背面 = `ASOBIGOKORO × TECHNOLOGY` 标题 + 副标题 `kvLead`（アソビゴコロとテクノロジーで…）+ Welcome 小牛；`manifesto`（わたしたちジュニは…）只由下方普通流 `JunniAbout` 自然滚动叠加（kvLead≠manifesto）；并修标题溢出裁切，详见坑 13；`home_about` 已 1:1 还原原站逐字显色：3 段日文逐字 `span` 化 + GSAP scrub 让字符从背景绿 `#cbea41` 渐显为黑 `#111`，居中排版、消除空绿死区，详见坑 14；**最新：用原站未编译 DOM 源码核对，新增「问题 2/3 诊断」第 4¾ 节——确认翻转=纯 CSS DOM 百叶窗（非 Three.js）、about=普通流逐字显色（非居中 pin 淡入）；登记两处待修：① 背面文字跨 36 格 3D 拼接致切断/z 错乱 → 改位图切片或纯绿；② 翻完空绿尾巴 + about 从底部爬升 → 收紧衔接。详见第 4¾ 节**）
 
 ---
 
@@ -230,6 +230,51 @@ rotateX = -(local * 180)                                  // 写到 .junni-card�
 
 ---
 
+## 4¾. 问题 2 / 3 诊断 + 原站源码核对（2026-06-15 新增，新对话必读）
+
+> 这一节记录针对两个用户痛点（**问题 2：文字登场时机/位置断层**、**问题 3：文字被切断 / z-index 错乱**）的根因分析，并用**原站未编译 DOM 源码**做了核对，修正了之前的部分猜想。新对话改这两块前先读本节，避免重走弯路。
+
+### A. 两个问题的现象（用户录屏对比）
+- **问题 2（时机/位置断层）**：原站——黑面板一翻开，绿底中央就有日文在原位顺滑显现，不用狂滚。本站——百叶窗翻完后先露**一大片空白纯绿**，再继续滚很多，日文才**从屏幕最下方慢吞吞爬上来**。
+- **问题 3（层级切断）**：本站翻转中途，绿底上的日文被黑格子**切成好几段**，文字一会儿在黑格前面、一会儿被盖住（z-index / 深度测试错乱）。原站下层绿色内容是一个整体，无此现象。
+
+### B. 原站源码核对结论（实锤，修正此前猜想）
+抓到原站未编译 DOM 后确认：
+
+1. **翻转网格是纯 DOM + CSS，不是 Three.js**（⚠️ 推翻 Gemini 的判断）。每个格子是 HTML div + 背景图切片 + 自带 `rotateX(-180deg)`：
+   ```html
+   <div class="home_kv_panel" style="...transform: translate3d(0,0,0) rotateX(-180deg);">
+     <div class="home_kv_panel_item" data-panel-item="front"
+       style="background-size:1145px 726.807px; background-position:left -190.833px top 85.5967px;"></div>
+     <div class="home_kv_panel_item" data-panel-item="back"
+       style="background-size:1145px 726.807px; background-position:left -190.833px top 85.5967px;"></div>
+   </div>
+   ```
+   - front=kv_front、back=kv_back，两面**同一 `background-position`**，翻面是 CSS transform。
+   - `<canvas data-engine="three.js r162">`（1160×898）**只是氛围噪点/颗粒层**，配合 `gooeyCursor`/`noise`，**不承载翻转**。
+2. **`home_about`（わたしたちジュニは… manifesto）是普通流 HTML，不是 KV 背面、也不是绝对居中 pin 叠加层**。它排在 `home_kv` 之后，逐字 `<span>` 化，靠**逐字 color 绿 `rgb(204,234,78)`→黑 `rgb(17,17,17)` 的 scrub** 显现（源码里能看到一条软渐变锋面：段2末尾还绿、段3整段全绿）。被 pin 的是 `home_kv`（有 `pin-spacer-home_kv`），`home_about` 不 pin、自然上滚。
+3. **绿底中央那段“翻开即见”的文字 = kv_back 背景图里烤好的**（`ASOBIGOKORO × TECHNOLOGY` + 副标题）；它随翻面在原位显现。manifesto 是另一段、在下方普通流。**两段文案不同，别混。**
+
+### C. 本站两个问题的真实根因
+- **问题 3 根因**：本站把绿底文字（`BackKV`）用**36 个会各自翻转的 3D 卡片背面 + 负位移**拼接（`JunniHero.tsx` 的 `BackKV` + `.junni-face--back .junni-face-fill`）。在 `.junni-grid` 共享 `perspective:1200px` + `translateZ(-20px)` + 一路 `preserve-3d` 的空间里，翻转中途各卡片角度不同，100vw 大平面经 3D 投影**互相穿插**（`clip-path` 只能限 2D，挡不住 3D 投影叠压），叠加 `--junni-gap:2.76px` 黑缝横切，导致文字被切段、忽前忽后。**原站不会，因为它背面是一张烤好的位图切片，不是跨格 DOM 文字。**
+- **问题 2 根因**：本站文字被拆成两套——`kvLead` 烤在卡片背面（翻完才拼齐，且翻转途中糊）、`manifesto` 在 sticky 舞台之后的 `JunniAbout` 普通流（sticky 释放后才从底部上滚）。又因 `FLIP_END=0.82` 到 `1.0` 还有约 18% 行程只剩小 `kvLead`+大片绿 → 空绿尾巴；之后 about 才进场 → “空绿→从底部爬上来”。
+
+### D. 修正后的正确修复方向（综合三方、贴原站机制）
+> ⚠️ **不要**照 Gemini 那段重构指令做：他要求“canvas/Three.js 当底层 + `.home_about` 绝对居中 pin 叠加 + 与翻面同步 opacity 淡入 + `pin:true`”。问题：① 原站翻转不在 Three.js（本项目也无 Three.js）；② 原站 about 是普通流逐字显色、非居中淡入，照他做是**伪 1:1**；③ `pin:true` 与 Lenis 冲突（见坑，已用 sticky 替代）。
+
+1. **翻转层维持纯 CSS/DOM（现路线对）**，但**背面别再用 36 格 DOM 文字负位移拼**：
+   - 优选：像原站用一张预合成的 `kv_back` 背景图做 `background-position` 切片（front/back 同位置）；
+   - 退而求其次：**背面纯绿、不放文字**，文字全交给下方 `JunniAbout`。
+   - 任一方案都能**根除问题 3** 的跨格 3D 穿插 / 切段（纯绿/位图无可读跨格拼接）。
+2. **`JunniAbout` 保持普通流 + 逐字绿→黑 scrub**（源码确认正确，已实现，勿改成居中 opacity 淡入）。
+3. **问题 2 调的是“衔接”，不是架构**：缩短翻完后的空绿尾巴（调 `FLIP_END` 更贴近 1.0 / 调小 `JUNNI_STAGE_VH`），并让 `JunniAbout` 用普通流（可加负 `margin-top` 提前 overlap）在翻完瞬间已进入视口中部开始显字，消除“空绿→底部爬升”。
+4. 若要 1:1 还原“翻开即见居中文字”，把 `ASOBIGOKORO × TECHNOLOGY`+`kvLead` 做成 kv_back 风格的**单层位图/单层居中 DOM（不跨格、不进 3D 翻转链）**，随翻面进度显现即可。
+
+### E. 一句话给新对话
+翻转=纯 CSS DOM 百叶窗（非 Three.js）；about=普通流逐字显色（非居中 pin 淡入）；问题 3 来自“绿底文字塞进 36 个 3D 翻转卡片背面跨格拼接”，问题 2 来自“文字两套拆分 + 空绿尾巴 + 普通流从底部进场”。修法：背面改位图切片或纯绿、文字交普通流、收紧翻完到 about 的衔接。
+
+---
+
 ## 5. 日文文案（已抓取，存于 junniData.ts，1:1 保留）
 
 **主张（manifesto）**：
@@ -290,6 +335,8 @@ WEBサイトやアプリ、動画配信サービスや、
 - [x] **背面文案对位 + 标题不裁切（1:1 对齐截图）**：新增 `kvLead` 副标题（≠manifesto）、`manifesto` 仅留 `JunniAbout`、标题字号收窄两侧留白，浏览器实测对齐原站（见坑 13，2026-06-15）
 - [x] `home_about` 绿底逐字日文区（JunniAbout.tsx）
 - [x] **`home_about` 逐字显色 reveal（1:1 还原原站）**：3 段拆分 + 逐字 `span` + GSAP scrub 绿→黑、居中排版、消除空绿死区、原站式箭头按钮（见坑 14，2026-06-15）
+- [ ] **修问题 3：背面文字别跨 36 格 3D 拼接**（改 kv_back 位图切片 或 背面纯绿+文字交普通流，根除切断/z 错乱，见第 4¾ 节 C/D）
+- [ ] **修问题 2：消除空绿尾巴 + about 底部爬升**（收紧 `FLIP_END`/`JUNNI_STAGE_VH` + `JunniAbout` 负 margin 提前 overlap，翻完即进视口显字，见第 4¾ 节 C/D）
 - [ ] 圆形游标 SCROLL DOWN / gooey cursor（氛围，可选）
 - [ ] WORKS 区块（精选 4–5）
 - [ ] SERVICE 区块（01–06）

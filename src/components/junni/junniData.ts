@@ -58,4 +58,4 @@ export const JUNNI_GRID_ROWS = 6
 export const JUNNI_GRID_COUNT = JUNNI_GRID_COLS * JUNNI_GRID_ROWS
 
 /** 舞台总高（vh 倍数）：决定 sticky 钉住期间用于翻面的滚动行程 */
-export const JUNNI_STAGE_VH = 2.6
+export const JUNNI_STAGE_VH = 2.35
