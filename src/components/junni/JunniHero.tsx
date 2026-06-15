@@ -59,11 +59,14 @@ function BackKV() {
           <span className="junni-kv__back-cross">×</span>
           <span>TECHNOLOGY</span>
         </p>
-        <div className="junni-kv__back-copy" aria-label={junniHero.manifesto.join("")}>
-          {junniHero.manifesto.map((line) => (
-            <p key={line}>{line}</p>
+        {/* KV 背面副标题（原站 kv_back 主视觉）。注意：这是 KV 自己的文案，
+            与 manifesto（わたしたちジュニは…）不同——manifesto 只在下方普通流
+            JunniAbout 自然滚动升起、叠在 fixed 网格上滑行。 */}
+        <p className="junni-kv__back-lead">
+          {junniHero.kvLead.map((line) => (
+            <span key={line}>{line}</span>
           ))}
-        </div>
+        </p>
         <div className="junni-kv__welcome" aria-hidden="true">
           <span className="junni-kv__welcome-text">Welcome</span>
           <svg className="junni-kv__baku" viewBox="0 0 128 72" role="img">

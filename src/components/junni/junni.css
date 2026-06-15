@@ -226,15 +226,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(0.85rem, 3vw, 2.75rem);
-  width: min(78vw, 82rem);
+  gap: clamp(0.6rem, 2.4vw, 2.25rem);
+  width: min(94vw, 92rem);
   margin: 0;
   color: transparent;
   -webkit-text-stroke: clamp(1px, 0.12vw, 2px) var(--junni-ink);
-  font-size: clamp(2.25rem, 7.1vw, 9rem);
+  /* 缩小到可整行容纳：原站 ASOBIGOKORO × TECHNOLOGY 居中且两侧留白不裁切 */
+  font-size: clamp(1.35rem, 4.4vw, 6rem);
   font-weight: 800;
   line-height: 0.92;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
   white-space: nowrap;
 }
 
@@ -246,18 +247,22 @@
   line-height: 0.75;
 }
 
-.junni-kv__back-copy {
+/* KV 背面副标题（原站 kv_back 主视觉那 3 行黑体日文）。
+   ★与 manifesto 无关：manifesto 只在下方 JunniAbout 普通流（见坑 13）。 */
+.junni-kv__back-lead {
   display: grid;
-  gap: clamp(0.28rem, 1.25vh, 0.85rem);
+  gap: clamp(0.1rem, 0.6vh, 0.45rem);
   margin: 0;
-  font-size: clamp(1.45rem, 3.05vw, 4.25rem);
-  font-weight: 900;
-  line-height: 1.42;
-  letter-spacing: 0.055em;
+  color: var(--junni-ink);
+  font-size: clamp(1.3rem, 3.6vw, 4.5rem);
+  font-weight: 800;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  text-align: center;
 }
 
-.junni-kv__back-copy p {
-  margin: 0;
+.junni-kv__back-lead span {
+  display: block;
 }
 
 .junni-kv__welcome {
@@ -290,72 +295,71 @@
 /* ===== 7. home_about：绿底黑字 + ABOUT JUNNI ===== */
 .junni-about {
   position: relative;
-  z-index: 1;
-  min-height: 100vh;
-  min-height: 100dvh;
+  z-index: 3;
+  min-height: 118vh;
+  min-height: 118dvh;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  justify-content: center;
   background: var(--junni-green);
-  color: var(--junni-ink);
-  padding: clamp(3rem, 10vh, 8rem) clamp(1.5rem, 6vw, 6rem);
+  color: #111111;
+  padding: clamp(4.5rem, 13vh, 8rem) clamp(1.5rem, 6vw, 6rem) clamp(7rem, 18vh, 12rem);
 }
 
 .junni-about__inner {
-  max-width: min(56rem, 92vw);
-}
-
-.junni-about__label {
-  display: inline-block;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.32em;
-  text-transform: uppercase;
-  margin-bottom: clamp(1.5rem, 4vh, 3rem);
+  width: min(56rem, 92vw);
+  margin-inline: auto;
+  text-align: center;
 }
 
 .junni-about__copy {
-  font-size: clamp(1.15rem, 2.6vw, 2.1rem);
-  font-weight: 600;
-  line-height: 2;
-  letter-spacing: 0.02em;
+  font-size: clamp(1rem, 1.55vw, 1.35rem);
+  font-weight: 500;
+  line-height: 1.95;
+  letter-spacing: 0.055em;
 }
 
-.junni-about__copy p {
-  margin: 0;
+.junni-about__text {
+  margin: 0 0 clamp(1.7rem, 4.6vh, 3.1rem);
 }
 
-/* 由首屏黑底迁移过来的主张文案：作为绿底区的引导大字 */
-.junni-about__copy--lead {
-  margin-bottom: clamp(1.5rem, 4vh, 2.5rem);
-  font-weight: 700;
+.junni-about__text:last-child {
+  margin-bottom: 0;
+}
+
+.junni-about__char {
+  color: var(--junni-green);
+  will-change: color;
 }
 
 .junni-about__cta {
   display: inline-flex;
   align-items: center;
-  gap: 0.65rem;
-  margin-top: clamp(2.5rem, 6vh, 4rem);
-  padding: 0.85rem 1.6rem;
-  border: 1.5px solid var(--junni-ink);
-  border-radius: 999px;
+  justify-content: center;
+  gap: clamp(0.8rem, 1.6vw, 1.25rem);
+  margin-top: clamp(3.2rem, 9vh, 5.5rem);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
   background: transparent;
-  color: var(--junni-ink);
-  font-size: 0.74rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
+  color: #111111;
+  font-size: clamp(1.25rem, 2.25vw, 2rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: background 0.3s var(--junni-ease), color 0.3s var(--junni-ease);
-}
-
-.junni-about__cta::after {
-  content: "→";
-  font-size: 1rem;
+  transition: opacity 0.3s var(--junni-ease);
 }
 
 .junni-about__cta:hover {
-  background: var(--junni-ink);
-  color: var(--junni-green);
+  opacity: 0.65;
+}
+
+.junni-about__cta-icon {
+  width: 0.52em;
+  height: auto;
+  stroke-width: 4;
 }
 
 /* ===== 8. 无障碍降级 ===== */

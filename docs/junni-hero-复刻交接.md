@@ -1,7 +1,7 @@
 # JUNNI Hero 复刻 · 对话交接文档
 
 > 用途：在新对话里继续调整 junni.co.jp 首屏（Hero）复刻效果。把本文件作为上下文喂给新会话即可无缝接力。
-> 最后更新：2026-06-15（MVP 2.0 6×6 网格卡片版已落地并实测通过；翻转轴改为 `rotateX` 上下翻面 + 根除 Hover 抽搐；背面已按原站真实 `kv_back` 逻辑补入绿底全景文字切片）
+> 最后更新：2026-06-15（MVP 2.0 6×6 网格卡片版已落地并实测通过；翻转轴改为 `rotateX` 上下翻面 + 根除 Hover 抽搐；背面已按原站真实 `kv_back` 逻辑补入绿底全景文字切片；**最新：背面文案对位 1:1——KV 背面 = `ASOBIGOKORO × TECHNOLOGY` 标题 + 副标题 `kvLead`（アソビゴコロとテクノロジーで…）+ Welcome 小牛；`manifesto`（わたしたちジュニは…）只由下方普通流 `JunniAbout` 自然滚动叠加（kvLead≠manifesto）；并修标题溢出裁切，详见坑 13；**`home_about` 已 1:1 还原原站逐字显色：3 段日文逐字 `span` 化 + GSAP scrub 让字符从背景绿 `#cbea41` 渐显为黑 `#111`，居中排版、消除空绿死区，详见坑 14**）
 
 ---
 
@@ -102,7 +102,7 @@ src/components/junni/
 - 每格内部 front/back 各放一份满屏 `100vw×100vh` 的完整 Hero 画面
 - 用 `transform: translate(-col*100%, -row*100%)`（相对格子）把整图拼回
 - front：黑底白字 `IFUYUN` + 手写标语
-- back：荧光绿 `#CBEA41` 底 + `ASOBIGOKORO × TECHNOLOGY` + 日文主张 + Welcome 小牛（正向 DOM 内容，复用同一套负位移）
+- back：荧光绿 `#CBEA41` 底 + `ASOBIGOKORO × TECHNOLOGY` 标题 + 副标题 `kvLead`（アソビゴコロとテクノロジーで…）+ Welcome 小牛（正向 DOM，复用同一套负位移；**注意 `kvLead`≠`manifesto`，manifesto 只在下方 about**，见坑 13）
 - 好处：零素材依赖、可缩放、60fps
 
 ### 4.3 翻转机制（修正 Gemini 错误）
@@ -196,6 +196,25 @@ rotateX = -(local * 180)                                  // 写到 .junni-card�
 11. **翻转轴 `rotateY` → `rotateX`（2026-06-15 对齐原站实测 DOM）**：原站实时抓取的内联样式是 `transform: translate3d(0,0,0) rotateX(-180deg)`，即**绕 X 轴上下百叶窗翻面**（不是左右开门的 `rotateY`）。改动为 **4 处连动**，缺一处就会 3D 双面错位/斜翻：① JS 驱动层 `.junni-card` 由 `rotateY(local*180)` 改为**负角** `rotateX(-(local*180))`（负角=向上翻，1:1 还原原站方向）；② 背面 `.junni-face--back` 由 `rotateY(180deg)` 改为 `rotateX(180deg)`；③ Hover 层 `.junni-card-flip.is-hovered` 由 `rotateY(180deg)` 改为 `rotateX(-180deg)`，与 scroll 层同轴叠加。**死守 180° 终点不变**：local→1 时卡片转到 −180°、背面正对镜头显现满屏荧光绿，随后 `scene` 黑切绿 + matrix `display:none` 无缝滑入绿底 `JunniAbout`。**关键认知**：曾误判原站是「转 360° 回到黑底」——实为**翻 180° 到绿、再被下方同色（#CBEA41）的 `home_about` 升起接管**造成的视觉错觉；若真做 `local*360` 会在结尾翻回黑底、与绿底 about 硬切，故**严禁 360°**。
 12. **Hover「鬼畜抽搐」根因 = 旋转层自己接鼠标事件（2026-06-15 事件解耦）**：把 `mouseenter/mouseleave` 绑在会旋转的 `.junni-card-flip` 上时，hover→翻面→卡片转到接近 90° 在屏幕上「立起来」高度趋零→指针脱离→`mouseleave` 撤销→转回→再次 `mouseenter`……形成**死循环闪烁、翻不过去**。**正解三步解耦**：① **底座收事件**——`mouseenter/leave` 改绑到永不旋转的 grid 轨道盒 `.junni-cell`（新增 `cellRefs`，命中靶稳定）；② **内层做动画**——`onEnter` 仍按同索引把 `.is-hovered` 加到对应 `flipRefs[i]`（`.junni-card-flip`）；③ **旋转链对鼠标隐形**——在旋转链根 `.junni-card` 写 `pointer-events:none`，靠**继承**让 `.junni-card-flip` 与两个 `.junni-face` 全部透明，`.junni-cell` 写 `pointer-events:auto` 作唯一命中靶（**不用 `!important`**：只给叶子 `.junni-face` 加 none 会漏掉中间 `.junni-card-flip`，必须从根 `.junni-card` 继承）。
    > **后续 WORKS/SERVICE 若做 hover 翻牌务必照搬**：任何「悬浮即旋转/位移」的卡片，事件监听都要挂在**不会动的父容器**上，真正变换的子层 `pointer-events:none`，否则必现抽搐死循环。
+13. **★项目灵魂：后半段「文字视差滑行」是同色普通流叠加的障眼法，不是背面在滑（2026-06-15 抓原站滚动期内联样式实锤）**：原站滚动期实时代码显示 `.home_kv_inner` 全程 `position: fixed`（GSAP pin 生成 pin-spacer + fixed），即**整张 6×6 网格大底座死死钉在视口中央，绝不上移、绝不碎裂推走**；且每格背面 `.home_kv_panel_item[data-panel-item="back"]` 的 `background-position` **逐帧不变**（静态焊死的拼图，背面根本不做任何 DOM 负位移滑行计算）。那段 `わたしたちジュニは…` 黑色日文之所以在绿底里顺滑升起，纯粹是**下方独立的 `.home_about` 文本区（普通流 DOM）随原生滚动条自然上移、叠在还钉着的 fixed 绿网格上方**——因为网格翻到背面已是平整荧光绿 `#CBEA41` 实底、与 `home_about` **同色**，文字滑过去就在视觉上伪装成「文字在格子后方做 3D 视差」。原站文本层只是 `opacity` 随滚动淡入（抓到 `opacity:0.7873`）+ `data-gooey-color`，**没有 `mix-blend-mode:difference`**，切勿臆造反色混合（黑字叠绿底会被反算成怪色穿帮）。
+    - **铁证内联样式**（原站荧光绿滚动期）：
+      ```html
+      <div class="home_kv_inner" style="...position: fixed; transform: translate3d(0px, 269.001px, 0px);">
+      <div class="home_kv_panel" style="...transform: translate3d(0,0,0) rotateX(-180deg);">
+        <div class="home_kv_panel_item" data-panel-item="back" style="background-position: left -190.833px top 85.5967px;"></div>
+      ```
+    - **本站对齐现状（已天然吻合，无需重构）**：① `.junni-hero-scene` 用原生 `position:sticky;top:0;height:100vh` 钉死，功能等价原站 fixed；② `apply(progress)` 对每格**只写 `rotateX`、零 Y 位移**（不存在「碎砖推走」逻辑）；③ 背面 `<BackKV/>` 是静态绿底，`apply()` 从不每帧改其位置；④ `JunniAbout` 是排在 sticky 舞台后的普通流区块，sticky 释放后自然上滚叠加——四点合起来 = 原站同款图层穿透。
+    - **文案对位（像素级对齐截图，2 段不同文案别再搞混）**：
+      - **KV 背面（`kv_back` 主视觉）** = `ASOBIGOKORO × TECHNOLOGY` 描边大标题 + **副标题 `kvLead`**（`アソビゴコロとテクノロジーで、/ 潜在する価値やメッセージを / 新しい体験とともに世界に届ける。` 3 行黑体）+ Welcome 小牛。
+      - **`home_about`（下方普通流）** = `manifesto`（`わたしたちジュニは…`）+ `manifestoExtended`（`創業以来…`）+ `ABOUT JUNNI`。
+      - ⚠️ **`kvLead` 与 `manifesto` 是两段完全不同的日文**！早期 `BackKV` 误把 `manifesto` 当副标题烤在背面，导致 ① 背面文案错（应是 `kvLead`）② 与 `JunniAbout` 的 `manifesto` 重复。2026-06-15 修正：`junniData.ts` 新增 `kvLead` 字段，`BackKV` 渲染 `.junni-kv__back-lead`（取代旧 `.junni-kv__back-copy`），`manifesto` **只**留在 `JunniAbout`。
+      - 顺带修标题溢出：`.junni-kv__back-title` 字号由 `clamp(2.25rem,7.1vw,9rem)` 收为 `clamp(1.35rem,4.4vw,6rem)`、`letter-spacing` 0.08→0.04em、`width` 放宽到 `min(94vw,92rem)`，让 `ASOBIGOKORO × TECHNOLOGY` 整行居中、两侧留白不再被裁切（旧值在 ~1024 视口会左右各切掉约 2 字）。已浏览器实测 1:1 对齐原站截图。
+    > **后续 WORKS/SERVICE 同色过渡若想复刻「文字滑过仍可见的固定背景」叠加瞬间**：让上层内容用普通流自然滚动叠在 sticky/fixed 的同色背景层上即可，**不要**靠让背景层自己反向位移去伪造视差；销毁背景层（`display:none`）的时机也要推迟到上层已覆盖视口之后（本站当前 `progress>=0.999` 即销毁，因前后同为 `#CBEA41`，视觉无差，属可选锦上添花）。
+14. **`home_about` 逐字显色 reveal（2026-06-15 1:1 还原原站 `.home_about_text`）**：原站抓到的 `home_about_text` 是**每个字符独立 `<span>`、`color` 随滚动从背景绿 `rgb(204,234,78)`→黑 `rgb(17,17,17)` 逐字推进**（快照里 paragraph 2 末行 `多様な…` 出现 8 字符软渐变带、paragraph 3 整段仍是绿 = 尚未显现），这就是「文字在绿底里凭空浮现/升起」的真身——隐形绿字滚上来再逐字转黑，配合坑 13 的同色普通流叠加闭环。**落地三件套**：
+    - **数据**（`junniData.ts`）：新增 `aboutParagraphs`，把文案按原站拆成 **3 个段落**（段1=manifesto 4 行；段2=创業以来…5 行；段3=これからも…2 行），每段内是行数组。
+    - **组件**（`JunniAbout.tsx`）：废弃旧的「逐行 `<p>` + ABOUT 小标签」静态结构，改为逐段渲染、行内逐字 `Array.from(line)` 包成 `.junni-about__char`（`translate="no"` 防翻译器拆字），收集 `charRefs`；`useEffect` 里 `gsap.fromTo(chars,{color:#cbea41},{color:#111, ease:'none', stagger:{each:0.018}, scrollTrigger:{trigger:section,start:'top 82%',end:'bottom 64%',scrub:0.4}})` + `lenis.on('scroll', ScrollTrigger.update)`（与 `JunniHero` 同款联动）；`prefers-reduced-motion` 时直接 `gsap.set(chars,{color:#111})` 降级。**stagger 跨全部字符 + scrub = 原站那条逐字软渐变锋面**。
+    - **样式**（`junni.css`）：`.junni-about` 由 `align-items:center`（垂直居中→上方半屏空绿）改为 `align-items:flex-start; justify-content:center`，`.junni-about__inner` `text-align:center; margin-inline:auto` 居中；删 `.junni-about__label` 与旧 `.junni-about__copy--lead`；`.junni-about__char` 初始色 = 背景绿 + `will-change:color`；按钮 `.junni-about__cta` 改成原站式**无边框粗体大字 + SVG 箭头**（取代旧胶囊 + `→` 伪元素）；`.junni-about` 高度加到 `118vh` 且底 padding 加大，避免 `ABOUT JUNNI` 附近过早露出下一屏白底。
+    > **坑：为什么之前会「整屏空绿」**——旧版 `align-items:center` 把文字块垂直居中，上方留半屏空绿，叠加 hero sticky 释放后那段绿背景，滚到中间正好整屏纯绿。改顶对齐 + 逐字 reveal 后消失。**测**：浏览器内滚到 `.junni-about` 实测逐字由绿显黑、首屏不再空绿、按钮区绿底延展正常；`npm run build` 通过、无 lint 报错。
 
 ### E. 实测证据（浏览器内验证通过）
 - **from-center 扩散**：progress≈0.38 时角度网格呈同心梯度 `中心64° → 42° → 25° → 角0°`。
@@ -267,8 +286,10 @@ WEBサイトやアプリ、動画配信サービスや、
 - [x] **共享透视消折叠门梯形**（单灭点 + 一路 preserve-3d + clip-path 裁切，见坑 6）
 - [x] **巧克力网格视觉高保真**（暗阶 `--junni-panel:#1c1d21` + gap 2.76px + 响应式圆角 `--junni-radius:0.625vw`，见坑 8）
 - [x] **首屏布局对齐原站**（JUNNI 居中 + 手写标语，主张文案迁入绿底，见坑 9）
-- [x] **背面绿底全景文字切片**（`ASOBIGOKORO × TECHNOLOGY` + 日文主张 + Welcome 小牛；正向 DOM + 同公式负位移，严禁 counter-mirror）
+- [x] **背面绿底全景文字切片**（`ASOBIGOKORO × TECHNOLOGY` + 副标题 `kvLead` + Welcome 小牛；正向 DOM + 同公式负位移，严禁 counter-mirror）
+- [x] **背面文案对位 + 标题不裁切（1:1 对齐截图）**：新增 `kvLead` 副标题（≠manifesto）、`manifesto` 仅留 `JunniAbout`、标题字号收窄两侧留白，浏览器实测对齐原站（见坑 13，2026-06-15）
 - [x] `home_about` 绿底逐字日文区（JunniAbout.tsx）
+- [x] **`home_about` 逐字显色 reveal（1:1 还原原站）**：3 段拆分 + 逐字 `span` + GSAP scrub 绿→黑、居中排版、消除空绿死区、原站式箭头按钮（见坑 14，2026-06-15）
 - [ ] 圆形游标 SCROLL DOWN / gooey cursor（氛围，可选）
 - [ ] WORKS 区块（精选 4–5）
 - [ ] SERVICE 区块（01–06）
