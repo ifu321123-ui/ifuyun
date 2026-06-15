@@ -50,7 +50,7 @@ export default function App() {
       <div
         className={cn(
           "relative min-h-screen",
-          isContact || isExperience ? "bg-[#f7f7f1]" : "bg-background",
+          isContact || isExperience ? "bg-[#ffffff]" : "bg-background",
           isExperience && "neu-host-scale",
         )}
       >

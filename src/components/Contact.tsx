@@ -36,7 +36,7 @@ const links = [
   },
 ]
 
-const GUNZE_BG = "#f7f7f1"
+const GUNZE_BG = "#ffffff"
 const GUNZE_INK = "#0b0713"
 const GUNZE_BLUE = "#1700ff"
 

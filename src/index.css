@@ -8,12 +8,14 @@
   --font-averia: "Averia Serif Libre", "Noto Serif SC", "Songti SC", serif;
   --font-serif: "Playfair Display", "Averia Serif Libre", "Noto Serif SC", "Songti SC", serif;
 
-  --notebook-red: #e35341;
-  --notebook-ribbon: #ed7164;
+  --notebook-red: #1d01fe;
+  --notebook-ribbon: #4b39ff;
+  /* 红→蓝同色系换肤：把红色皮革/红色线稿插画整体旋到蓝色相 */
+  --notebook-hue: 236deg;
   --notebook-cream: #f2e3cf;
   --notebook-paper: #f5f0e6;
 
-  --gunze-bg: #f7f7f1;
+  --gunze-bg: #ffffff;
 
   /* 黑底拼贴基调（Jackie Zhang 风格）：炭黑画布 / 奶油近白字 / 砖红强调 */
   --color-background: rgb(33, 33, 33);
@@ -187,7 +189,7 @@
     padding: clamp(1.25rem, 20vh, 8rem) max(1rem, 4vw) clamp(7rem, 15vh, 11rem);
     overflow: hidden;
     /* 与工作经历页（GUNZE）统一的浅米白画布 */
-    background: var(--gunze-bg, #f7f7f1);
+    background: var(--gunze-bg, #ffffff);
   }
 
   .notebook-nav {
@@ -322,6 +324,7 @@
     background-position: center, left top;
     background-size: cover, 900px;
     background-blend-mode: overlay, multiply;
+    filter: hue-rotate(var(--notebook-hue));
     box-shadow:
       /* 顶部 rim light + 整圈细高光 */
       inset 0 1px 0 oklch(1 0 0 / 34%),
@@ -586,6 +589,7 @@
     width: clamp(3rem, 7.5vw, 4.6rem);
     height: auto;
     pointer-events: none;
+    filter: hue-rotate(var(--notebook-hue));
   }
   .notebook-slice-decor--bottom {
     top: auto;
@@ -602,6 +606,7 @@
     height: auto;
     object-fit: contain;
     transform: translate(3%, -7px);
+    filter: hue-rotate(var(--notebook-hue));
   }
 
   /* 书脊 */
@@ -763,6 +768,7 @@
     position: absolute;
     z-index: 2;
     pointer-events: none;
+    filter: hue-rotate(var(--notebook-hue));
   }
   .notebook-corner--plant {
     bottom: 0.35rem;
@@ -1159,7 +1165,7 @@
 @layer components {
   :root {
     --gunze-blue: #1700ff;
-    --gunze-bg: #f7f7f1;
+    --gunze-bg: #ffffff;
     --gunze-ink: #0b0713;
     --gunze-yellow: #f2ff00;
     --gunze-body-opacity: 1;

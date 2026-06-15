@@ -6,7 +6,7 @@ import SplitText from "./SplitText"
 
 const BLUE = "#1700ff"
 const INK = "#0b0713"
-const BG = "#f7f7f1"
+const BG = "#ffffff"
 const YELLOW = "#f2ff00"
 
 /** 卡片散落的轻微旋转角度（循环取用） */
