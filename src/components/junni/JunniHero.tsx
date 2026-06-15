@@ -49,6 +49,10 @@ function HeroKV() {
   )
 }
 
+/**
+ * 背面文字：单层满屏覆盖层（不再按 6×6 切片）。
+ * 抽出格子后，黑色文字不会被网格目地（gap）切断，对齐原站 kv_back 的连续渲染。
+ */
 function BackKV() {
   return (
     <div className="junni-kv junni-kv--back">
@@ -87,6 +91,7 @@ export default function JunniHero({ onInZoneChange }: JunniHeroProps) {
   const cellRefs = useRef<(HTMLDivElement | null)[]>([])
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
   const flipRefs = useRef<(HTMLDivElement | null)[]>([])
+  const backOverlayRef = useRef<HTMLDivElement>(null)
   const lenis = useLenis()
 
   // 每格到网格中心的归一化距离（0~1），用作翻面延迟权重。
@@ -115,6 +120,7 @@ export default function JunniHero({ onInZoneChange }: JunniHeroProps) {
     const cards = cardRefs.current.filter(Boolean) as HTMLDivElement[]
     const flips = flipRefs.current.filter(Boolean) as HTMLDivElement[]
     const wells = cellRefs.current
+    const backOverlay = backOverlayRef.current
 
     let lastProgress = 0
 
@@ -140,14 +146,19 @@ export default function JunniHero({ onInZoneChange }: JunniHeroProps) {
       // 网格细缝随之由黑转绿、与 home_about 无缝衔接，且消除黑底上的绿色缝隙。
       scene.style.background = p >= FLIP_END ? "#cbea41" : "#0a0a0a"
 
+      // 背面文字整体淡入：等大多数格子翻成绿背后再显现，避免文字浮在半翻的格子上。
+      if (backOverlay) backOverlay.style.opacity = map(p, 0.8, 0.94, 0, 1).toFixed(3)
+
       // 原站翻完后 kv_back 不会立刻消失，而是跟随 pin 释放自然滚出视窗。
       // 因此保留矩阵，避免背面文字在 manifesto 上来前突兀消失。
       matrix.style.display = ""
     }
 
     if (reducedMotion) {
-      // 降级：直接呈现绿底终态，并撤掉重型矩阵。
+      // 降级：直接呈现绿底终态，并撤掉重型矩阵，背面文字常显。
       matrix.style.display = "none"
+      scene.style.background = "#cbea41"
+      if (backOverlay) backOverlay.style.opacity = "1"
       return
     }
 
@@ -252,16 +263,20 @@ export default function JunniHero({ onInZoneChange }: JunniHeroProps) {
                         <HeroKV />
                       </div>
                     </div>
+                    {/* 背面只铺绿色块；文字改由下方单层 overlay 渲染，避免被网格目地切断 */}
                     <div className="junni-face junni-face--back">
-                      <div className="junni-face-fill">
-                        <BackKV />
-                      </div>
+                      <div className="junni-face-fill" />
                     </div>
                   </div>
                 </div>
               </div>
             ))}
           </div>
+        </div>
+        {/* 背面文字单层覆盖：盖在网格之上、翻面接近完成时整体淡入（opacity 由 JS 写）。
+            与原站一致——文字是一整层，不随 6×6 切片，故不会被目地割裂。 */}
+        <div ref={backOverlayRef} className="junni-kv-back-overlay" aria-hidden="true">
+          <BackKV />
         </div>
       </div>
     </section>

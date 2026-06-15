@@ -153,6 +153,16 @@
   color: var(--junni-ink);
 }
 
+/* 背面文字单层覆盖：盖在网格之上、不切片，故黑字不会被目地割断。
+   opacity 由 JS 写（翻面接近完成时淡入）；pointer-events:none 不挡格子 Hover 命中。 */
+.junni-kv-back-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+}
+
 .junni-kv__menu {
   position: absolute;
   top: clamp(1.25rem, 3vw, 2.5rem);
