@@ -2,12 +2,12 @@
 
 .junni-root {
   --junni-black: #0a0a0a; /* 格缝/底层暗色阶，比卡片更深，渲染出网格线 */
-  --junni-panel: #111111; /* 原站卡片正面暗色阶 RGB(17,17,17) */
+  --junni-panel: #1c1d21; /* 卡片正面暗色阶 */
   --junni-green: #cbea41;
   --junni-ink: #0a0a0a;
   --junni-white: #f5f5f5;
   --junni-gap: 2.76px; /* 原站单元缝隙，配合圆角呈“巧克力网格” */
-  --junni-radius: 9px; /* 原站 .home_kv_panel_item 圆角 */
+  --junni-radius: 0.625vw; /* 原站圆角：响应式，与原站 .home_kv_panel_item 一致（5.2px@832 ≈ 9px@1440，占格宽约 3.86%）*/
   --junni-ease: cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
   z-index: 20;

@@ -165,8 +165,8 @@ section.junni-hero-stage            高 = JUNNI_STAGE_VH*100vh（滚动行程）
 | `TILT_MAX` | `5` | 鼠标随动封顶角度（°）|
 | scrub | `0.4` | ScrollTrigger 跟手阻尼 |
 | `--junni-gap`（css） | `2.76px` | 巧克力网格缝隙（原站值）|
-| `--junni-radius`（css） | `9px` | 单格圆角（原站值）|
-| `--junni-panel`（css） | `#111` | 卡片正面暗阶（原站 RGB 17,17,17）|
+| `--junni-radius`（css） | `0.625vw` | 单格圆角：**响应式**对齐原站（实测 5.2px@832 ≈ 9px@1440，占格宽约 3.86%）。2026-06-15 由固定 9px 改为 vw |
+| `--junni-panel`（css） | `#1c1d21` | 翻转小块正面暗阶。**实测原站真值** `rgb(28,29,33)`（早期文档误记为 #111，2026-06-15 浏览器读 computed 更正）|
 
 ### C. 核心公式
 ```js
@@ -192,7 +192,8 @@ rotateY = ( px*2) * TILT_MAX * damp                       // 写到 .junni-grid 
 6. **共享透视（取代旧的每格独立 `perspective:900px`）**：⚠️ 早期为绕过 `overflow:hidden` 截断 3D 继承，给每格 `.junni-cell` 各加 `perspective:900px`——**这是错误根因**：`overflow:hidden`（以及 `clip-path`、`filter`、`opacity<1` 等）都会创建**扁平化 / 独立 3D 上下文**，逼迫每格各成一个灭点。36 个独立灭点排开后，翻到接近 90° 时各自朝本格中心收窄，整行呈**手风琴 / 折叠门梯形穿帮**（不是 `transform-origin` 的锅，它本就是默认 `center`）。**正解（修正 B 路线1）**：① 透视只在最外层 `.junni-grid-perspective` 写一个（`perspective:1200px`）；② 从 `.junni-grid`→`.junni-cell`→`.junni-card`→`.junni-card-flip` **一路 `transform-style:preserve-3d`**，让全部卡片共用单一灭点、平行整齐翻转；③ 格内裁切下放到 `.junni-face` 的 `clip-path:inset(0)`（在叶子 face 层扁平化无害，仍能把 100vw/vh 负位移拼图限制在本格内）。`.junni-cell` 去掉 `overflow:hidden` 后翻面会有真实 3D 厚度感（卡片旋出格子边界是预期效果，不再被切平）。
 7. **逐格 Hover 翻面用「双层」拆分（修正 A）**：scroll 翻转角由 JS 每帧覆写在 `.junni-card`（**无 transition**，保证 scrub 跟手）；Hover 的 180° 增量单独挂在内层 `.junni-card-flip` 上，靠 CSS `transition: transform 0.5s cubic-bezier(0.25,1,0.5,1)` 平滑。两层都 `preserve-3d`、同轴 `rotateY` 自然叠加，互不打架。仅 `progress<=FLIP_START`（首屏静止）时 `mouseenter` 加 `.is-hovered`；一旦滚动越过 `FLIP_START`，`apply()` 内 `clearHover()` 撤掉所有悬浮翻面。
    > **后续 WORKS/SERVICE 区块若也要做 3D 翻牌/卡片网格，务必遵循此真因**：需要 3D 的层级链上别用 `overflow:hidden`/`clip-path`/`filter`/`opacity<1`，裁切放到不需要再向下传 3D 的叶子层；透视尽量集中在一个父容器上，避免多灭点畸变。
-8. **巧克力网格视觉高保真（对齐原站 `.home_kv_panel_item` computed）**：原站每格不是糊死的纯黑，而是 **`#111`（RGB 17,17,17）暗阶 + `border-radius:9px` 圆角 + 单元缝隙 `gap≈2.76px`**，缝隙露出更深的底色形成网格线，整体像“巧克力块”。落地：`.junni-grid` 改 **CSS Grid**（`repeat(6,1fr)`+`gap:var(--junni-gap)`，整除拼合不会因 flex 子像素累计错行）；`--junni-panel:#111` 给 front fill，scene 底 `#0a0a0a`（更深）透过缝隙当网格线；圆角用 `.junni-face { clip-path: inset(0 round var(--junni-radius)); border-radius:9px }`。**附带收益**：刻意的网格缝隙正好把负位移方案的亚像素接缝“做成”网格线，原本静止时 N/I 的锯齿断裂随之消失。
+8. **巧克力网格视觉高保真（对齐原站 `.home_kv_panel_item` computed）**：原站每格不是糊死的纯黑，而是 **`#1c1d21`（RGB 28,29,33）暗阶 + 响应式圆角 + 单元缝隙**，缝隙露出更深的底色形成网格线，整体像“巧克力块”。落地：`.junni-grid` 改 **CSS Grid**（`repeat(6,1fr)`+`gap:var(--junni-gap)`，整除拼合不会因 flex 子像素累计错行）；`--junni-panel:#1c1d21` 给 front fill，scene 底 `#0a0a0a`（更深）透过缝隙当网格线；圆角用 `.junni-face { clip-path: inset(0 round var(--junni-radius)); border-radius:var(--junni-radius) }`。
+   > **2026-06-15 浏览器实测原站静止态（scrollY 0，vw 832）**：`.home_kv_panel_item` 的 `background-color: rgb(28,29,33)`、`border-radius: 5.2px`（占格宽 3.86%）、`.home_kv_image` 的 `gap: 1.597px`。换算成 vw ≈ **圆角 0.625vw、缝隙 0.192vw**（代入 1440 宽 = 9px / 2.76px，即早期记的“原站值”其实是 @1440 的快照）。**关键：原站圆角/缝隙随视口缩放，而本站早期写死 px，窄屏下圆角比例偏小（仅约 1.22%）显得发直**。已把 `--junni-radius` 改为 `0.625vw` 对齐；缝隙 `--junni-gap` 暂留 2.76px（如需全宽度严格一致可改 `0.192vw`）。**附带收益**：刻意的网格缝隙正好把负位移方案的亚像素接缝“做成”网格线，原本静止时 N/I 的锯齿断裂随之消失。
 9. **首屏只放 Logo+手写标语，主张文案归绿底区**：原站黑底首屏**只有**居中巨型 `JUNNI` + 手写体 `自由に、ユニークに。`（`junniData.tagline`），克制留白。早期把 `manifesto`（わたしたち…）大段塞在黑底左下是错的——已移入 `JunniAbout` 绿底区作引导大字（`.junni-about__copy--lead`）。Logo 用 `font-size: clamp(4rem,14.5vw,44rem)` 随视口线性缩放（约占 48% 宽），**注意别用过小的 `max`（如旧的 15rem）**，否则宽屏/高 DPR 下被截断显小。布局：`.junni-kv__center` 绝对居中、MENU 右上、`SCROLL` 用 `writing-mode:vertical-rl` 竖排左侧。
 
 ### E. 实测证据（浏览器内验证通过）
@@ -261,7 +262,7 @@ WEBサイトやアプリ、動画配信サービスや、
 - [x] 鼠标随动 3D 浮动（±5° rotateX/Y + translateZ(-20px)）
 - [x] **逐格 Hover 独立翻面**（首屏静止时 mouseenter→rotateY(180)，双层叠加见坑 7）
 - [x] **共享透视消折叠门梯形**（单灭点 + 一路 preserve-3d + clip-path 裁切，见坑 6）
-- [x] **巧克力网格视觉高保真**（#111 暗阶 + gap 2.76px + radius 9px，见坑 8）
+- [x] **巧克力网格视觉高保真**（暗阶 `--junni-panel:#1c1d21` + gap 2.76px + 响应式圆角 `--junni-radius:0.625vw`，见坑 8）
 - [x] **首屏布局对齐原站**（JUNNI 居中 + 手写标语，主张文案迁入绿底，见坑 9）
 - [x] `home_about` 绿底逐字日文区（JunniAbout.tsx）
 - [ ] 圆形游标 SCROLL DOWN / gooey cursor（氛围，可选）
