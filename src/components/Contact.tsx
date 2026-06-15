@@ -36,97 +36,118 @@ const links = [
   },
 ]
 
+const GUNZE_BG = "#f7f7f1"
+const GUNZE_INK = "#0b0713"
+const GUNZE_BLUE = "#1700ff"
+
 export default function Contact() {
   return (
     <>
       <Notebook />
-      <section id="contact" className="mx-auto max-w-6xl scroll-mt-24 px-6 py-24 md:py-32">
-      <div className="relative overflow-hidden rounded-3xl glass-strong p-8 md:p-16">
-        <div className="pointer-events-none absolute -bottom-24 -right-12 size-72 rounded-full bg-accent/20 blur-[120px]" />
-        <div className="pointer-events-none absolute inset-0 grid-bg opacity-30" />
+      <section
+        id="contact"
+        className="mx-auto max-w-6xl scroll-mt-24 px-6 py-24 md:py-32"
+        style={{ backgroundColor: GUNZE_BG, color: GUNZE_INK }}
+      >
+        <div
+          className="relative overflow-hidden rounded-3xl border-4 bg-white p-8 md:p-16"
+          style={{ borderColor: GUNZE_INK, boxShadow: "0.9rem 0.9rem 0 rgb(11 7 19 / 18%)" }}
+        >
+          <div className="relative">
+            <div
+              className="mb-4 inline-flex items-center gap-2 rounded-full border-2 px-3 py-1 text-xs font-black uppercase tracking-[0.08em]"
+              style={{ color: GUNZE_BLUE, borderColor: GUNZE_BLUE, backgroundColor: "#fff" }}
+            >
+              <span className="size-1.5 rounded-full" style={{ backgroundColor: GUNZE_BLUE }} />
+              联系我
+            </div>
+            <h2
+              className="max-w-2xl text-balance text-3xl font-black leading-tight tracking-[-0.06em] md:text-5xl"
+              style={{ color: GUNZE_BLUE }}
+            >
+              Let&apos;s Build Something Together.
+            </h2>
+            <p className="mt-4 max-w-lg text-pretty leading-relaxed text-[#0b0713]/72">
+              {profile.brandClosing}
+            </p>
 
-        <div className="relative">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border-strong px-3 py-1 text-xs font-medium text-accent">
-            <span className="size-1.5 rounded-full bg-accent animate-pulse-glow" />
-            联系我
-          </div>
-          <h2 className="max-w-2xl text-balance text-3xl font-semibold leading-tight tracking-tight md:text-5xl">
-            Let&apos;s Build Something Together.
-          </h2>
-          <p className="mt-4 max-w-lg text-pretty leading-relaxed text-muted-foreground">
-            {profile.brandClosing}
-          </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {profile.targetJobs.map((job) => (
+                <span
+                  key={job}
+                  className="rounded-full border-2 px-3 py-1 text-xs font-bold text-[#0b0713]/72"
+                  style={{ borderColor: "rgb(11 7 19 / 18%)", backgroundColor: GUNZE_BG }}
+                >
+                  {job}
+                </span>
+              ))}
+            </div>
 
-          <div className="mt-4 flex flex-wrap gap-2">
-            {profile.targetJobs.map((job) => (
-              <span
-                key={job}
-                className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground"
-              >
-                {job}
-              </span>
-            ))}
-          </div>
+            <div className="mt-10 grid gap-4 sm:grid-cols-3">
+              {links.map((l) => (
+                <a
+                  key={l.label}
+                  href={l.href}
+                  target={l.href.startsWith("http") ? "_blank" : undefined}
+                  rel="noreferrer"
+                  className="group flex items-center gap-4 rounded-2xl border-[3px] bg-white p-5 transition-all duration-300 hover:-translate-y-1"
+                  style={{ borderColor: GUNZE_INK, boxShadow: "0.35rem 0.35rem 0 rgb(11 7 19 / 18%)" }}
+                >
+                  <div
+                    className="grid size-11 place-items-center rounded-xl text-white transition-colors group-hover:bg-[#f2ff00] group-hover:text-[#0b0713]"
+                    style={{ backgroundColor: GUNZE_BLUE }}
+                  >
+                    <l.icon className="size-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-xs font-bold text-[#0b0713]/62">{l.label}</div>
+                    <div className="truncate text-sm font-black">{l.value}</div>
+                  </div>
+                </a>
+              ))}
+            </div>
 
-          <div className="mt-10 grid gap-4 sm:grid-cols-3">
-            {links.map((l) => (
-              <a
-                key={l.label}
-                href={l.href}
-                target={l.href.startsWith("http") ? "_blank" : undefined}
-                rel="noreferrer"
-                className="group flex items-center gap-4 rounded-2xl border border-border bg-surface/40 p-5 transition-all duration-300 hover:border-accent/40 hover:-translate-y-1"
-              >
-                <div className="grid size-11 place-items-center rounded-xl bg-accent-muted text-accent transition-colors group-hover:bg-accent group-hover:text-accent-foreground">
-                  <l.icon className="size-5" />
-                </div>
-                <div className="min-w-0">
-                  <div className="text-xs text-muted-foreground">{l.label}</div>
-                  <div className="truncate text-sm font-medium">{l.value}</div>
-                </div>
-              </a>
-            ))}
-          </div>
-
-          <div className="mt-8">
-            <div className="flex flex-wrap gap-3">
-              <a
-                href={profile.resumeUrl}
-                download
-                target="_blank"
-                rel="noreferrer"
-                className="group inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground transition-transform hover:scale-[1.03]"
-              >
-                <Download className="size-4" />
-                下载个人简历
-              </a>
-              <a
-                href={profile.portfolioUrl}
-                download
-                target="_blank"
-                rel="noreferrer"
-                className="group inline-flex items-center gap-2 rounded-full border border-border-strong px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
-              >
-                <Download className="size-4" />
-                下载作品集
-              </a>
+            <div className="mt-8">
+              <div className="flex flex-wrap gap-3">
+                <a
+                  href={profile.resumeUrl}
+                  download
+                  target="_blank"
+                  rel="noreferrer"
+                  className="group inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-black text-white transition-transform hover:scale-[1.03]"
+                  style={{ backgroundColor: GUNZE_BLUE }}
+                >
+                  <Download className="size-4" />
+                  下载个人简历
+                </a>
+                <a
+                  href={profile.portfolioUrl}
+                  download
+                  target="_blank"
+                  rel="noreferrer"
+                  className="group inline-flex items-center gap-2 rounded-full border-[3px] bg-white px-6 py-3 text-sm font-black transition-colors hover:bg-[#f2ff00]"
+                  style={{ borderColor: GUNZE_INK, color: GUNZE_INK }}
+                >
+                  <Download className="size-4" />
+                  下载作品集
+                </a>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <footer className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 text-sm text-muted-foreground sm:flex-row">
-        <p>© {new Date().getFullYear()} {profile.name}. 保留所有权利。</p>
-        <a
-          href={profile.github}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex items-center gap-1 transition-colors hover:text-foreground"
-        >
-          使用 React + Vite + Tailwind 构建
-          <ArrowUpRight className="size-3.5" />
-        </a>
-      </footer>
+        <footer className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-[#0b0713]/15 pt-8 text-sm text-[#0b0713]/62 sm:flex-row">
+          <p>© {new Date().getFullYear()} {profile.name}. 保留所有权利。</p>
+          <a
+            href={profile.github}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1 transition-colors hover:text-[#0b0713]"
+          >
+            使用 React + Vite + Tailwind 构建
+            <ArrowUpRight className="size-3.5" />
+          </a>
+        </footer>
       </section>
     </>
   )

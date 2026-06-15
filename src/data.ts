@@ -101,7 +101,6 @@ export const notebookNav = [
   { id: "about" as const, label: "关于" },
   { id: "work" as const, label: "工作" },
   { id: "project" as const, label: "项目" },
-  { id: "thinking" as const, label: "思考" },
   { id: "connect" as const, label: "联系" },
 ]
 
@@ -299,6 +298,5 @@ export const navItems = [
   { id: "home", label: "首页" },
   { id: "experience", label: "工作经历" },
   { id: "projects", label: "项目作品" },
-  { id: "thinking", label: "产品思考" },
   { id: "contact", label: "联系我" },
 ]

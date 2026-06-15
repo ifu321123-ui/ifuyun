@@ -39,12 +39,12 @@ export default function NeuAbout() {
         >
           <div className="neu-wrap neu-about__inner">
             <span className="neu-eyebrow">( About Neu )</span>
-            <h2 className="neu-about__title">“広告への愛”を、偉大な成果に。</h2>
+            <h2 className="neu-about__title">将“数据的虚像”，转化为港口的孪生。</h2>
             <p className="neu-about__body">
-              Neu Inc.はSNS領域における映像コンテンツの広告運用を強みとした、成果報酬型広告運用チーム。メンバー全員が広告への愛を持ち、泥臭いPDCAの中で、論理だけでなく、直感的な言葉選び・テンポなどのニュアンスを徹底的に考察し、描いた絵図を攻略することを楽しむ。その純粋な”広告への愛”が、日々液体のように変化し続ける広告アルゴリズムに順応し成果出せる秘訣です。そうして偉大な成果に繋げていく、広告オタク集団ノイです。
+              成都四方伟业 · 盐田港数字孪生项目。在数字孪生与大模型的激流中，我们拒绝浮夸的视效，专注全域态势感知的硬核落地。在盐田国际集装箱码头的巨型坐标系下，我们通过三维重构与智能监管，重塑港口的生产力。绝不只是画面的复刻，而是将数据治理、智慧告警与危险品总览完美融合。在瞬息万变的数据流中，捕捉传统港口向精细化管理转型的每一次脉搏。
             </p>
             <div className="neu-about__cta">
-              <a className="neu-pill" href="#neu-service">ノイについて</a>
+              <a className="neu-pill" href="https://www.yict.com.cn/index.html?locale=zh_CN" target="_blank" rel="noopener noreferrer">了解盐田港</a>
             </div>
           </div>
         </div>

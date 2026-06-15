@@ -2,16 +2,16 @@ import { useScrollProgress } from "./useNeuScroll"
 
 const ITEMS = [
   {
-    en: "Research & Planning",
-    jp: "まずNeuが取り組むのはリサーチとプランニング。ユーザーの「隠れた心理」や「無意識の欲求」をはじめ、SNS広告における競合の打ち手や、商品・サービスの競合優位性までを徹底リサーチ。SNSという一般投稿と広告が入り交じる情報の大海原で埋もれずに勝つための戦略を構築します。",
+    en: "需求同频与管控",
+    jp: "作为需求接口人，直接博弈盐田港客户。24小时内将含糊的“业务语言”降维翻译为高精度“研发语言”。颗粒度对齐，拒绝无节制变更，以书面留痕与变更日志（Change Log）牢守项目底线。",
   },
   {
-    en: "Creative Production",
-    jp: "Neuの強みの核は、“成果につながる”映像コンテンツ制作にあります。行動を引き起こすセールスライティングに基づくシナリオ設計と、演出・カットテンポ・エフェクト・テロップまで視覚心理に基づいたこだわりの詰まった編集で、成果を最大化します。",
+    en: "原型构建与输出",
+    jp: "深度操盘智慧告警、危险品总览等核心业务模块的中高保真原型迭代与切图。从用户视角出发，以直观的界面逻辑，推演大型港口数字化转型的最佳路径。",
   },
   {
-    en: "Ad Operations",
-    jp: "広告運用の本質はクリエイティブにある——これがNeuの哲学です。運用テクニックにとどまらず、クリエイティブ起点でのアカウント設計と配信戦略により、短期的な成果だけでなく中長期でも安定したコンバージョンと質の高い成果を実現します。",
+    en: "指标对齐与沉淀",
+    jp: "全量核对岸吊、龙门吊、出入车辆等海量集装箱指标。拉通功能清单与合作方清单，完成了高价值《用户手册》与《指标文档》的最终沉淀。",
   },
 ]
 
@@ -55,7 +55,7 @@ export default function NeuService() {
             transform: `translateY(${(1 - headP.progress) * 80}px)`,
           }}
         >
-          SNSを主とした成果報酬型広告
+          成都四方伟业 · 盐田港数字孪生项目
         </h2>
 
         <div className="neu-service__grid">
@@ -75,18 +75,18 @@ export default function NeuService() {
               <path d="M40 92 C 12 96, 6 70, 6 50" />
             </svg>
             <div className="neu-flow__node neu-flow__node--1">
-              <h4>Research &amp; Planning</h4>
-              <p>営業戦略から逆算したシナリオ設計</p>
+              <h4>需求同频与管控</h4>
+              <p>需求同频与变更管控</p>
             </div>
             <div className="neu-flow__node neu-flow__node--2">
-              <h4>Creative Production</h4>
-              <p>学ぶ価値の高いSNS映像コンテンツ制作</p>
+              <h4>原型构建与输出</h4>
+              <p>中高保真原型构建与输出</p>
             </div>
             <div className="neu-flow__node neu-flow__node--3">
-              <h4>Ad Operations</h4>
-              <p>泥臭く成果を出す広告運用</p>
+              <h4>指标对齐与沉淀</h4>
+              <p>指标对齐与全周期交付</p>
             </div>
-            <span className="neu-flow__mark">Neu</span>
+            <span className="neu-flow__mark">4FUTURES</span>
           </div>
         </div>
 

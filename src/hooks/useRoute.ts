@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react"
 
-export type PageId = "home" | "experience" | "projects" | "thinking" | "contact" | "neu"
+export type PageId = "home" | "experience" | "projects" | "contact" | "neu"
 
-const PAGES: PageId[] = ["home", "experience", "projects", "thinking", "contact", "neu"]
+const PAGES: PageId[] = ["home", "experience", "projects", "contact", "neu"]
 
 function parseHash(): PageId {
   const id = window.location.hash.replace(/^#\/?/, "")

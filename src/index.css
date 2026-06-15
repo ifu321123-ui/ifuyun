@@ -13,6 +13,8 @@
   --notebook-cream: #f2e3cf;
   --notebook-paper: #f5f0e6;
 
+  --gunze-bg: #f7f7f1;
+
   /* 黑底拼贴基调（Jackie Zhang 风格）：炭黑画布 / 奶油近白字 / 砖红强调 */
   --color-background: rgb(33, 33, 33);
   --color-foreground: oklch(0.95 0.012 84);
@@ -184,17 +186,8 @@
        否则投影会在区块底缘被硬切出一条突兀的横线 */
     padding: clamp(1.25rem, 20vh, 8rem) max(1rem, 4vw) clamp(7rem, 15vh, 11rem);
     overflow: hidden;
-    /* 笔记本所在区域做柔和提亮：暖色光晕铺在「纯背景实底」之上，
-       且在到达区块顶边前就淡出为透明，保证本区块顶边颜色 = 上一区块（From CEO）的
-       纯背景色 rgb(33,33,33)，两段衔接处不再出现明暗/冷暖断层 */
-    background:
-      radial-gradient(
-        130% 75% at 50% 44%,
-        oklch(0.315 0.007 35) 0%,
-        oklch(0.275 0.004 35) 28%,
-        transparent 54%
-      ),
-      var(--color-background);
+    /* 与工作经历页（GUNZE）统一的浅米白画布 */
+    background: var(--gunze-bg, #f7f7f1);
   }
 
   .notebook-nav {
@@ -214,6 +207,7 @@
     margin-top: 0;
     margin-bottom: 0;
     padding: clamp(2rem, 5vh, 3.5rem) 1rem clamp(1rem, 3vh, 2rem);
+    background: var(--gunze-bg);
   }
 
   .notebook-side-strip {
@@ -283,7 +277,7 @@
     perspective-origin: 50% 40%;
   }
 
-  /* 书本背后的暖色光晕 —— 让本子像被打光，浮在黑底空气中 */
+  /* 书本背后的柔和光晕 —— 浅色画布上减弱强度 */
   .notebook-scene::before {
     content: "";
     position: absolute;
@@ -294,8 +288,8 @@
     transform: translate(-50%, -50%);
     background: radial-gradient(
       50% 50% at 50% 50%,
-      oklch(0.55 0.07 40 / 20%) 0%,
-      oklch(0.4 0.05 30 / 8%) 42%,
+      oklch(0.55 0.07 40 / 8%) 0%,
+      oklch(0.4 0.05 30 / 4%) 42%,
       oklch(0 0 0 / 0%) 72%
     );
     filter: blur(10px);

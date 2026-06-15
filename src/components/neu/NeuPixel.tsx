@@ -13,7 +13,7 @@ export default function NeuPixel() {
           transition: "opacity 0.8s var(--neu-ease), transform 0.8s var(--neu-ease)",
         }}
       >
-        Neu.Inc
+        4FUTURES / YANTIAN PORT
       </div>
     </section>
   )
