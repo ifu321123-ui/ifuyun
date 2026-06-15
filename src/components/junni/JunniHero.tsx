@@ -1,21 +1,29 @@
-import { useEffect, useRef, type CSSProperties } from "react"
+import { useEffect, useMemo, useRef, type CSSProperties } from "react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { useLenis } from "lenis/react"
 import {
-  JUNNI_SLICE_COUNT,
+  JUNNI_GRID_COLS,
+  JUNNI_GRID_ROWS,
+  JUNNI_GRID_COUNT,
   JUNNI_STAGE_VH,
   junniHero,
 } from "./junniData"
 
 gsap.registerPlugin(ScrollTrigger)
 
-const SLICE_COUNT = JUNNI_SLICE_COUNT
-const TAG_LAYOUT = [
-  { x: 0, y: 0 },
-  { x: -12, y: 8 },
-  { x: 18, y: -6 },
-] as const
+const COLS = JUNNI_GRID_COLS
+const ROWS = JUNNI_GRID_ROWS
+
+// from-center 扩散参数：翻面在 flipStart→flipEnd 区间内完成，
+// 每格按到中心的欧几里得距离追加 0~spread 的延迟权重。
+const FLIP_START = 0.06
+const FLIP_END = 0.82
+// 距离权重最大附加延迟：调大→中心与四角时间差更大、同心波浪更明显。
+const FLIP_SPREAD = 0.6
+
+// 鼠标微随动最大角度（°），随 progress 增大而衰减。
+const TILT_MAX = 5
 
 function clamp(v: number, min: number, max: number) {
   return Math.min(max, Math.max(min, v))
@@ -26,18 +34,18 @@ function map(p: number, inMin: number, inMax: number, outMin: number, outMax: nu
   return outMin + (outMax - outMin) * t
 }
 
-function HeroPanelContent() {
+/**
+ * 满屏 100vw×100vh 的正面 KV 画面（黑底白字），每格内部各放一份后做负位移裁切拼回整图。
+ * 背面是纯荧光绿实底：因 rotateY(180) 会把内容逐格镜像，平铺纯色才能无缝拼回，故背面不放文案。
+ */
+function HeroKV() {
   return (
-    <div className="junni-hero-panel">
-      <span className="junni-hero-menu">Menu</span>
-      <div className="junni-hero-body">
-        <h1 className="junni-hero-logo">{junniHero.logo}</h1>
-        <div className="junni-hero-manifesto">
-          {junniHero.manifesto.map((line) => (
-            <p key={line}>{line}</p>
-          ))}
-        </div>
-        <span className="junni-hero-about">{junniHero.aboutCta}</span>
+    <div className="junni-kv junni-kv--front">
+      <span className="junni-kv__menu">{junniHero.menu}</span>
+      <span className="junni-kv__scroll">{junniHero.marquee}</span>
+      <div className="junni-kv__center">
+        <h1 className="junni-kv__logo">{junniHero.logo}</h1>
+        <p className="junni-kv__tagline">{junniHero.tagline}</p>
       </div>
     </div>
   )
@@ -50,58 +58,118 @@ interface JunniHeroProps {
 export default function JunniHero({ onInZoneChange }: JunniHeroProps) {
   const stageRef = useRef<HTMLElement>(null)
   const sceneRef = useRef<HTMLDivElement>(null)
-  const sliceRefs = useRef<(HTMLDivElement | null)[]>([])
+  const matrixRef = useRef<HTMLDivElement>(null)
+  const gridRef = useRef<HTMLDivElement>(null)
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([])
+  const flipRefs = useRef<(HTMLDivElement | null)[]>([])
   const lenis = useLenis()
 
-  const marqueeRepeat = Array.from({ length: 8 }, (_, i) => (
-    <span key={i}>{junniHero.marquee}</span>
-  ))
+  // 每格到网格中心的归一化距离（0~1），用作翻面延迟权重。
+  const cells = useMemo(
+    () =>
+      Array.from({ length: JUNNI_GRID_COUNT }, (_, i) => {
+        const col = i % COLS
+        const row = Math.floor(i / COLS)
+        const cx = (COLS - 1) / 2
+        const cy = (ROWS - 1) / 2
+        const maxDist = Math.hypot(cx, cy) || 1
+        const dist = Math.hypot(col - cx, row - cy) / maxDist
+        return { col, row, dist }
+      }),
+    [],
+  )
 
   useEffect(() => {
     const stage = stageRef.current
     const scene = sceneRef.current
-    if (!stage || !scene) return
+    const matrix = matrixRef.current
+    const grid = gridRef.current
+    if (!stage || !scene || !matrix || !grid) return
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    const slices = sliceRefs.current.filter(Boolean) as HTMLDivElement[]
+    const cards = cardRefs.current.filter(Boolean) as HTMLDivElement[]
+    const flips = flipRefs.current.filter(Boolean) as HTMLDivElement[]
 
-    const apply = (p: number) => {
-      const flipStart = 0.08
-      const flipEnd = 0.88
-      const staggerSpan = 0.55
+    // 当前鼠标微随动目标角度（progress=0 时生效）。
+    const tilt = { tx: 0, ty: 0 }
+    let lastProgress = 0
 
-      slices.forEach((inner, i) => {
-        const sliceDelay = (i / Math.max(SLICE_COUNT - 1, 1)) * staggerSpan
-        const local = map(p, flipStart + sliceDelay * (flipEnd - flipStart), flipEnd, 0, 1)
-        const rotateX = local * -88
-        const opacity = 1 - local
-        inner.style.transform = `rotateX(${rotateX.toFixed(2)}deg)`
-        inner.style.opacity = opacity.toFixed(4)
+    const clearHover = () => {
+      flips.forEach((el) => el.classList.remove("is-hovered"))
+    }
+
+    const applyTilt = (progress: number) => {
+      // 翻面一旦开始就快速收掉悬浮，避免与翻转角叠加产生眩晕。
+      const damp = 1 - clamp(progress / FLIP_START, 0, 1)
+      const rx = (tilt.tx * TILT_MAX * damp).toFixed(3)
+      const ry = (tilt.ty * TILT_MAX * damp).toFixed(3)
+      grid.style.setProperty("--junni-tilt-x", `${rx}deg`)
+      grid.style.setProperty("--junni-tilt-y", `${ry}deg`)
+    }
+
+    const apply = (progress: number) => {
+      const p = clamp(progress, 0, 1)
+      lastProgress = p
+
+      cards.forEach((card, i) => {
+        const dist = cells[i]?.dist ?? 0
+        const local = map(p, FLIP_START + dist * FLIP_SPREAD, FLIP_END, 0, 1)
+        card.style.transform = `rotateY(${(local * 180).toFixed(2)}deg)`
       })
 
-      const revealCopy = map(p, 0.42, 0.78, 0, 1)
-      const revealTitle = map(p, 0.5, 0.86, 0, 1)
-      const marqueeFade = map(p, 0.12, 0.45, 0, 1)
-      const tagDrift = map(p, 0, 1, 0, 1)
+      applyTilt(p)
 
-      scene.style.setProperty("--junni-reveal-copy", revealCopy.toFixed(4))
-      scene.style.setProperty("--junni-reveal-title", revealTitle.toFixed(4))
-      scene.style.setProperty("--junni-marquee-fade", marqueeFade.toFixed(4))
+      // 一旦开始滚动翻面，撤掉所有 Hover 翻面，避免与 scroll 翻转角打架。
+      if (p > FLIP_START) clearHover()
 
-      junniHero.tags.forEach((_, i) => {
-        const layout = TAG_LAYOUT[i] ?? TAG_LAYOUT[0]
-        const x = layout.x + tagDrift * (i % 2 === 0 ? 24 : -18)
-        const y = layout.y + tagDrift * (i % 2 === 0 ? -16 : 22)
-        scene.style.setProperty(`--junni-tag-x-${i}`, x.toFixed(1))
-        scene.style.setProperty(`--junni-tag-y-${i}`, y.toFixed(1))
-        scene.style.setProperty(`--junni-tag-opacity-${i}`, (1 - map(p, 0.35, 0.7, 0, 1)).toFixed(4))
-      })
+      // 接近翻完时把 sticky 底色由黑切绿：此刻多数格子已是绿背，
+      // 网格细缝随之由黑转绿、与 home_about 无缝衔接，且消除黑底上的绿色缝隙。
+      scene.style.background = p >= FLIP_END ? "#cbea41" : "#0a0a0a"
+
+      // 翻完并滚出 sticky 视口后，销毁 72 个满屏图层的渲染开销。
+      matrix.style.display = p >= 0.999 ? "none" : ""
     }
 
     if (reducedMotion) {
-      apply(1)
+      // 降级：直接呈现绿底终态，并撤掉重型矩阵。
+      matrix.style.display = "none"
       return
     }
+
+    const onMouseMove = (event: MouseEvent) => {
+      if (lastProgress > FLIP_START) return
+      const rect = scene.getBoundingClientRect()
+      const px = clamp((event.clientX - rect.left) / rect.width - 0.5, -0.5, 0.5)
+      const py = clamp((event.clientY - rect.top) / rect.height - 0.5, -0.5, 0.5)
+      // 指针在右侧 → 绕 Y 正向；指针在下方 → 绕 X 负向，符合物理悬浮直觉。
+      tilt.ty = px * 2
+      tilt.tx = -py * 2
+      applyTilt(lastProgress)
+    }
+
+    const onMouseLeave = () => {
+      tilt.tx = 0
+      tilt.ty = 0
+      applyTilt(lastProgress)
+    }
+
+    scene.addEventListener("mousemove", onMouseMove)
+    scene.addEventListener("mouseleave", onMouseLeave)
+
+    // 逐格 Hover 独立翻面：仅在首屏静止（progress<=FLIP_START）时激活；
+    // 180° 增量挂在 .junni-card-flip 上，由 CSS transition 平滑完成，与 scroll 翻转层互不干扰。
+    const hoverCleanups = flips.map((el) => {
+      const onEnter = () => {
+        if (lastProgress <= FLIP_START) el.classList.add("is-hovered")
+      }
+      const onLeave = () => el.classList.remove("is-hovered")
+      el.addEventListener("mouseenter", onEnter)
+      el.addEventListener("mouseleave", onLeave)
+      return () => {
+        el.removeEventListener("mouseenter", onEnter)
+        el.removeEventListener("mouseleave", onLeave)
+      }
+    })
 
     const state = { progress: 0 }
     const tween = gsap.to(state, {
@@ -112,49 +180,42 @@ export default function JunniHero({ onInZoneChange }: JunniHeroProps) {
         trigger: stage,
         start: "top top",
         end: "bottom bottom",
-        scrub: 0.45,
+        scrub: 0.4,
         invalidateOnRefresh: true,
         onRefresh: (self) => apply(self.progress),
       },
     })
 
-    const sentinel = stage.querySelector(".junni-exit-sentinel")
-
+    const root = stage.closest(".junni-root") as HTMLElement | null
     const updateNavZone = () => {
-      if (!sentinel) return
-      const stageRect = stage.getBoundingClientRect()
-      const sentinelRect = sentinel.getBoundingClientRect()
-      const passed = sentinelRect.top <= window.innerHeight * 0.92
-      const inZone = stageRect.top <= 4 && !passed
+      if (!root) return
+      const rect = root.getBoundingClientRect()
+      // junni 体验（黑→绿）尚未滚走时隐藏全局导航。
+      const inZone = rect.bottom > window.innerHeight * 0.6
       onInZoneChange?.(inZone)
     }
 
-    const updateScrollTrigger = () => {
+    const onScroll = () => {
       ScrollTrigger.update()
       updateNavZone()
     }
-    lenis?.on("scroll", updateScrollTrigger)
+    lenis?.on("scroll", onScroll)
 
     apply(0)
     updateNavZone()
     ScrollTrigger.refresh()
 
     return () => {
-      lenis?.off("scroll", updateScrollTrigger)
+      scene.removeEventListener("mousemove", onMouseMove)
+      scene.removeEventListener("mouseleave", onMouseLeave)
+      hoverCleanups.forEach((fn) => fn())
+      lenis?.off("scroll", onScroll)
       tween.scrollTrigger?.kill()
       tween.kill()
-      for (const name of [
-        "--junni-reveal-copy",
-        "--junni-reveal-title",
-        "--junni-marquee-fade",
-        ...junniHero.tags.map((_, i) => `--junni-tag-x-${i}`),
-        ...junniHero.tags.map((_, i) => `--junni-tag-y-${i}`),
-        ...junniHero.tags.map((_, i) => `--junni-tag-opacity-${i}`),
-      ]) {
-        scene.style.removeProperty(name)
-      }
+      grid.style.removeProperty("--junni-tilt-x")
+      grid.style.removeProperty("--junni-tilt-y")
     }
-  }, [lenis, onInZoneChange])
+  }, [lenis, onInZoneChange, cells])
 
   return (
     <section
@@ -164,66 +225,46 @@ export default function JunniHero({ onInZoneChange }: JunniHeroProps) {
       aria-label="JUNNI Hero"
     >
       <div ref={sceneRef} className="junni-hero-scene">
-        <div className="junni-hero-reveal">
-          <div className="junni-hero-reveal__copy">
-            {junniHero.manifestoExtended.map((line) => (
-              <p key={line}>{line}</p>
-            ))}
-          </div>
-          <h2 className="junni-hero-reveal__headline">
-            <span>{junniHero.revealTitle}</span>
-            <span>{junniHero.revealSubtitle}</span>
-          </h2>
-        </div>
-
-        <div className="junni-hero-tags" aria-hidden>
-          {junniHero.tags.map((tag, i) => (
-            <span key={tag} className={`junni-hero-tag junni-hero-tag--${i}`}>
-              {tag}
-            </span>
-          ))}
-        </div>
-
-        <div className="junni-hero-marquee" aria-hidden>
-          <div className="junni-hero-marquee__track">{marqueeRepeat}</div>
-        </div>
-
-        <div className="junni-hero-slices">
-          {Array.from({ length: SLICE_COUNT }, (_, i) => (
-            <div
-              key={i}
-              className="junni-slice"
-              style={
-                {
-                  "--slice-i": i,
-                  "--slice-n": SLICE_COUNT,
-                } as React.CSSProperties
-              }
-            >
+        <div ref={matrixRef} className="junni-grid-perspective">
+          <div ref={gridRef} className="junni-grid">
+            {cells.map((cell, i) => (
               <div
-                className="junni-slice-inner"
-                ref={(el) => {
-                  sliceRefs.current[i] = el
-                }}
+                key={i}
+                className="junni-cell"
+                style={
+                  {
+                    "--col": cell.col,
+                    "--row": cell.row,
+                  } as CSSProperties
+                }
               >
                 <div
-                  className="junni-slice-fill"
-                  style={
-                    {
-                      "--slice-i": i,
-                      "--slice-n": SLICE_COUNT,
-                    } as CSSProperties
-                  }
+                  className="junni-card"
+                  ref={(el) => {
+                    cardRefs.current[i] = el
+                  }}
                 >
-                  <HeroPanelContent />
+                  <div
+                    className="junni-card-flip"
+                    ref={(el) => {
+                      flipRefs.current[i] = el
+                    }}
+                  >
+                    <div className="junni-face junni-face--front">
+                      <div className="junni-face-fill">
+                        <HeroKV />
+                      </div>
+                    </div>
+                    <div className="junni-face junni-face--back">
+                      <div className="junni-face-fill" />
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
-
-      <div className="junni-exit-sentinel" aria-hidden />
     </section>
   )
 }
