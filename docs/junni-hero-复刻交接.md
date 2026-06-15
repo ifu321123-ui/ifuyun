@@ -1,7 +1,7 @@
 # JUNNI Hero 复刻 · 对话交接文档
 
 > 用途：在新对话里继续调整 junni.co.jp 首屏（Hero）复刻效果。把本文件作为上下文喂给新会话即可无缝接力。
-> 最后更新：2026-06-15（MVP 2.0 6×6 网格卡片版已落地并实测通过；翻转轴改为 `rotateX` 上下翻面 + 根除 Hover 抽搐，见坑 11 / 坑 12）
+> 最后更新：2026-06-15（MVP 2.0 6×6 网格卡片版已落地并实测通过；翻转轴改为 `rotateX` 上下翻面 + 根除 Hover 抽搐；背面已按原站真实 `kv_back` 逻辑补入绿底全景文字切片）
 
 ---
 
@@ -9,7 +9,7 @@
 
 复刻 [junni.co.jp](https://junni.co.jp/) 首页 TOP 区，作为本站「真正的入口界面」，拼接在现有首页 Hero（图一 `FUYUN PRODUCT OS`）**上方**，向下滚动自然过渡进入图一。最终要完整复刻 Hero + WORKS + SERVICE + AWARDS + RECRUIT + CONTACT，保留日文原文案做 1:1 视觉复刻。
 
-**当前阶段**：`JunniHero` 首屏 MVP 2.0（6×6 网格卡片翻面）+ `JunniAbout` 绿底区**已完成并实测通过**；下一步补 WORKS / SERVICE 等后续区块。
+**当前阶段**：`JunniHero` 首屏 MVP 2.1（6×6 网格卡片翻面 + 背面绿底全景文字切片）+ `JunniAbout` 绿底区**已完成并实测通过**；下一步补 WORKS / SERVICE 等后续区块。
 
 ---
 
@@ -43,14 +43,14 @@ default:
 ```
 src/components/junni/
 ├─ JunniTop.tsx      # 编排器（JunniHero + JunniAbout，预留 WORKS/SERVICE 等）
-├─ JunniHero.tsx     # ✅ 6×6=36 格卡片网格：方案 B 负位移 + rotateX(-180) 上下翻面 + sticky 手动 progress（轴向见坑 11）
+├─ JunniHero.tsx     # ✅ 6×6=36 格卡片网格：方案 B 负位移 + front/back 双面全景 DOM + rotateX(-180) 上下翻面 + sticky 手动 progress
 ├─ JunniAbout.tsx    # ✅ home_about 绿底黑字逐段日文 + ABOUT JUNNI 按钮
 ├─ junni.css         # .junni-* 命名空间（网格/卡片/双面/about + 性能）
 └─ junniData.ts      # 日文文案 + 网格常量（COLS/ROWS/COUNT/STAGE_VH）
 ```
 
-> 已通过浏览器实测：负位移拼回 KV 文字正确、从中心向四周扩散翻面（角度网格呈同心圆梯度）、
-> ±5° 鼠标随动生效、progress=1 后整块 `display:none`、自然滚入绿底 about。
+> 已通过浏览器实测：负位移拼回正面 KV 与背面绿底 KV 文字正确、从中心向四周扩散翻面（角度网格呈同心圆梯度）、
+> 单格 Hover 生效且无抽搐、progress=1 后整块 `display:none`、自然滚入绿底 about。
 
 改动过的既有文件：
 - `src/App.tsx`：引入 `JunniTop`，加 `inJunniZone` 状态与 `onJunniZoneChange`
@@ -101,8 +101,8 @@ src/components/junni/
 项目**没有**原站那两张黑底白字 / 绿底黑字全景图，**禁止用 background-image 切图**。改用纯 DOM 负位移：
 - 每格内部 front/back 各放一份满屏 `100vw×100vh` 的完整 Hero 画面
 - 用 `transform: translate(-col*100%, -row*100%)`（相对格子）把整图拼回
-- front：黑底白字 `JUNNI` + 日文主张
-- back：荧光绿 `#CBEA41` 底 + 局部内容
+- front：黑底白字 `IFUYUN` + 手写标语
+- back：荧光绿 `#CBEA41` 底 + `ASOBIGOKORO × TECHNOLOGY` + 日文主张 + Welcome 小牛（正向 DOM 内容，复用同一套负位移）
 - 好处：零素材依赖、可缩放、60fps
 
 ### 4.3 翻转机制（修正 Gemini 错误）
@@ -152,7 +152,7 @@ section.junni-hero-stage            高 = JUNNI_STAGE_VH*100vh（滚动行程）
                    ├ .junni-face--front  clip-path:inset(0) + backface-visibility:hidden
                    │  └ .junni-face-fill 100vw×100vh + 负位移；内含 <HeroKV/>（黑底白字 KV）
                    └ .junni-face--back   rotateX(180deg) + clip-path:inset(0) + backface-visibility:hidden
-                      └ .junni-face-fill 100vw×100vh 纯荧光绿实底（不放文案，见坑 1）
+                      └ .junni-face-fill 100vw×100vh + 负位移；内含 <BackKV/>（绿底黑字 KV）
 ```
 - `JunniAbout.tsx`：`section.junni-about`（绿底黑字 7 行日文 + `ABOUT JUNNI` 胶囊按钮），由 `JunniTop` 排在 `JunniHero` 之后，sticky 释放后自然滚入。
 
@@ -181,7 +181,7 @@ rotateX = -(local * 180)                                  // 写到 .junni-card�
 - 收尾：`progress>=FLIP_END` → `scene.background` 黑切绿；`progress>=0.999` → `.junni-grid-perspective.display='none'`（销毁 72 图层）。
 
 ### D. 踩坑与决策（重要，别推翻）
-1. **背面必须纯色、不放文案**：`rotateX(180)` 会把背面内容逐格垂直镜像（早期 `rotateY` 则是水平镜像），细节图都会被打乱；纯荧光绿实底才能无缝拼回。契合规格「背面为荧光绿底」。
+1. **背面不是纯色，已按原站补为正向绿底全景 KV**：2026-06-15 DevTools 实测原站 `front`/`back` 分别使用 `kv_front.jpg` / `kv_back.jpg`，且两面 `background-position` 完全一致；`back` 自身 `rotateX(180deg)` 与面板滚动终点 `rotateX(-180deg)` 抵消，视觉上内容正立。本站纯 DOM 方案同理：`.junni-face--back` 内直接放正向 `<BackKV/>`，复用 `.junni-face-fill` 现有负位移公式，**不要**加 `scaleY(-1)`，也**不要**做 `(ROWS - 1 - row)` 行倒序，否则会双重补偿导致穿帮。
 2. **亚像素绿缝 / 外框**：`translateZ(-20px)` 让网格略缩 + 高 DPI 下 1/6 非整数像素，会在黑底 KV 上露出绿色细缝和外框。**解法**：sticky 底色默认 `#0a0a0a`（与正面黑同色而隐形），到 `progress>=FLIP_END`（多数格已翻绿）再切 `#cbea41`，缝隙随之由黑转绿、并与 about 无缝衔接。
 3. **负位移用 vw/vh，不是 %；含 gap 时步进 = (100vw+gap)/6**：CSS `transform` 百分比相对元素自身盒（face-fill=100vw），写 `translate(-col*100%)` 会错位。**且加入网格缝隙 `gap` 后**，单格屏幕步进 = `cellW + gap = (100vw + gap)/6`，故落地为 `translate(calc(var(--col)*(100vw+var(--junni-gap))/6*-1), …)`。这样整图按 1:1 铺满 6 格+5 缝，缝隙处画面被网格线遮住，字形不再错位穿帮。
 4. **`cells` 用 `useMemo([])`**、effect 依赖保持稳定（`lenis` / `onInZoneChange` 均稳定）：避免滚动时 `onInZoneChange` 触发 App re-render 后反复 kill/重建 ScrollTrigger。
@@ -199,7 +199,7 @@ rotateX = -(local * 180)                                  // 写到 .junni-card�
 
 ### E. 实测证据（浏览器内验证通过）
 - **from-center 扩散**：progress≈0.38 时角度网格呈同心梯度 `中心64° → 42° → 25° → 角0°`。
-- **轴向**：滚动/Hover 均为绕 X 轴上下翻面（`rotateX`），180° 终点显现满屏荧光绿。
+- **轴向**：滚动/Hover 均为绕 X 轴上下翻面（`rotateX`），180° 终点显现满屏绿底黑字背面 KV。
 - **Hover 防抽搐**：首屏静止时悬浮单格可**一次性丝滑翻到绿面并稳定停住**，移开才翻回（事件绑 `.junni-cell`、旋转链 `pointer-events:none`）。
 - **性能降级**：progress=1 时 `.junni-grid-perspective` 已 `display:none`。
 - **下一层**：绿底 `JunniAbout` 7 行日文 + 按钮渲染正常。
@@ -248,7 +248,7 @@ WEBサイトやアプリ、動画配信サービスや、
 
 ## 6. 新对话快速启动指令（复制即用）
 
-> 继续 junni.co.jp 首屏复刻。已读 `docs/junni-hero-复刻交接.md`。**JunniHero MVP 2.0（6×6 网格卡片翻面）+ JunniAbout 绿底区已完成并实测通过**（实现细节见第 4½ 节，参数照表调）。下一步请在 `src/components/junni/` 下新增 WORKS 区块（精选 4–5 + and more），沿用 `.junni-*` 命名空间与 sticky/scrub 范式；文案见第 5 节。若要先收尾 Hero，可做「junni → 图一交界过渡」消除绿/黑硬切到浅色 Product OS。
+> 继续 junni.co.jp 首屏复刻。已读 `docs/junni-hero-复刻交接.md`。**JunniHero MVP 2.1（6×6 网格卡片翻面 + 背面绿底全景文字切片）+ JunniAbout 绿底区已完成并实测通过**（实现细节见第 4½ 节，参数照表调）。下一步请在 `src/components/junni/` 下新增 WORKS 区块（精选 4–5 + and more），沿用 `.junni-*` 命名空间与 sticky/scrub 范式；文案见第 5 节。若要先收尾 Hero，可做「junni → 图一交界过渡」消除绿/黑硬切到浅色 Product OS。
 
 ### 调参速查
 - 翻面更快铺满 → 调小 `FLIP_SPREAD`（当前 0.6）或提早 `FLIP_END`（当前 0.82）；调大 `FLIP_SPREAD` 则同心波浪更分明
@@ -267,6 +267,7 @@ WEBサイトやアプリ、動画配信サービスや、
 - [x] **共享透视消折叠门梯形**（单灭点 + 一路 preserve-3d + clip-path 裁切，见坑 6）
 - [x] **巧克力网格视觉高保真**（暗阶 `--junni-panel:#1c1d21` + gap 2.76px + 响应式圆角 `--junni-radius:0.625vw`，见坑 8）
 - [x] **首屏布局对齐原站**（JUNNI 居中 + 手写标语，主张文案迁入绿底，见坑 9）
+- [x] **背面绿底全景文字切片**（`ASOBIGOKORO × TECHNOLOGY` + 日文主张 + Welcome 小牛；正向 DOM + 同公式负位移，严禁 counter-mirror）
 - [x] `home_about` 绿底逐字日文区（JunniAbout.tsx）
 - [ ] 圆形游标 SCROLL DOWN / gooey cursor（氛围，可选）
 - [ ] WORKS 区块（精选 4–5）

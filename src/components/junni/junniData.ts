@@ -1,6 +1,6 @@
 /** junni.co.jp Hero 文案（MVP 2.0：6×6 网格卡片版） */
 export const junniHero = {
-  logo: "JUNNI",
+  logo: "IFUYUN",
   menu: "MENU",
   // 首屏 JUNNI 下方的手写体标语（原站 home_kv 唯一文案）
   tagline: "自由に、ユニークに。",

@@ -149,6 +149,10 @@
   color: var(--junni-white);
 }
 
+.junni-kv--back {
+  color: var(--junni-ink);
+}
+
 .junni-kv__menu {
   position: absolute;
   top: clamp(1.25rem, 3vw, 2.5rem);
@@ -156,6 +160,10 @@
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.28em;
+}
+
+.junni-kv__menu--back {
+  color: var(--junni-ink);
 }
 
 .junni-kv__scroll {
@@ -183,7 +191,8 @@
 .junni-kv__logo {
   margin: 0;
   /* 随视口线性缩放（约占 48% 宽），放开上限避免大屏被截断变小 */
-  font-size: clamp(4rem, 14.5vw, 44rem);
+  /* 6 字母(IFUYUN)较 5 字母(JUNNI)更宽，等比缩小 vw 系数保持总宽度相近 */
+  font-size: clamp(3.4rem, 12vw, 36rem);
   font-weight: 900;
   line-height: 0.82;
   letter-spacing: 0.02em;
@@ -199,6 +208,83 @@
   font-family: "Yuji Syuku", "Klee One", "Caveat", "Segoe Script",
     "STKaiti", "KaiTi", cursive;
   font-style: italic;
+}
+
+.junni-kv__back-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1.2rem, 4.2vh, 3.5rem);
+  text-align: center;
+  padding: clamp(1.5rem, 5vw, 5rem);
+}
+
+.junni-kv__back-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.85rem, 3vw, 2.75rem);
+  width: min(78vw, 82rem);
+  margin: 0;
+  color: transparent;
+  -webkit-text-stroke: clamp(1px, 0.12vw, 2px) var(--junni-ink);
+  font-size: clamp(2.25rem, 7.1vw, 9rem);
+  font-weight: 800;
+  line-height: 0.92;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.junni-kv__back-cross {
+  color: var(--junni-ink);
+  -webkit-text-stroke: 0;
+  font-size: 1.1em;
+  font-weight: 300;
+  line-height: 0.75;
+}
+
+.junni-kv__back-copy {
+  display: grid;
+  gap: clamp(0.28rem, 1.25vh, 0.85rem);
+  margin: 0;
+  font-size: clamp(1.45rem, 3.05vw, 4.25rem);
+  font-weight: 900;
+  line-height: 1.42;
+  letter-spacing: 0.055em;
+}
+
+.junni-kv__back-copy p {
+  margin: 0;
+}
+
+.junni-kv__welcome {
+  display: grid;
+  justify-items: center;
+  gap: clamp(0.25rem, 0.8vh, 0.7rem);
+  transform: rotate(-12deg);
+}
+
+.junni-kv__welcome-text {
+  font-family: "Yuji Syuku", "Klee One", "Caveat", "Segoe Script",
+    "STKaiti", "KaiTi", cursive;
+  font-size: clamp(0.95rem, 1.7vw, 2.35rem);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.junni-kv__welcome-text::after {
+  content: "♡";
+  margin-left: 0.18em;
+}
+
+.junni-kv__baku {
+  width: clamp(4.5rem, 9vw, 10.5rem);
+  height: auto;
+  color: var(--junni-ink);
+  fill: currentColor;
 }
 
 /* ===== 7. home_about：绿底黑字 + ABOUT JUNNI ===== */

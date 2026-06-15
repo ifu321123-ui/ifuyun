@@ -32,8 +32,9 @@ function map(p: number, inMin: number, inMax: number, outMin: number, outMax: nu
 }
 
 /**
- * 满屏 100vw×100vh 的正面 KV 画面（黑底白字），每格内部各放一份后做负位移裁切拼回整图。
- * 背面是纯荧光绿实底：因 rotateX(180) 会把内容逐格镜像，平铺纯色才能无缝拼回，故背面不放文案。
+ * 满屏 100vw×100vh 的 KV 画面，每格内部各放一份后做负位移裁切拼回整图。
+ * front/back 复用同一套拼图坐标：滚动层 rotateX(-180) 与背面预转 rotateX(180) 抵消，
+ * 因此背面内容保持正向渲染，不做 scaleY 或行索引倒序补偿。
  */
 function HeroKV() {
   return (
@@ -43,6 +44,36 @@ function HeroKV() {
       <div className="junni-kv__center">
         <h1 className="junni-kv__logo">{junniHero.logo}</h1>
         <p className="junni-kv__tagline">{junniHero.tagline}</p>
+      </div>
+    </div>
+  )
+}
+
+function BackKV() {
+  return (
+    <div className="junni-kv junni-kv--back">
+      <span className="junni-kv__menu junni-kv__menu--back">{junniHero.menu}</span>
+      <div className="junni-kv__back-center">
+        <p className="junni-kv__back-title">
+          <span>ASOBIGOKORO</span>
+          <span className="junni-kv__back-cross">×</span>
+          <span>TECHNOLOGY</span>
+        </p>
+        <div className="junni-kv__back-copy" aria-label={junniHero.manifesto.join("")}>
+          {junniHero.manifesto.map((line) => (
+            <p key={line}>{line}</p>
+          ))}
+        </div>
+        <div className="junni-kv__welcome" aria-hidden="true">
+          <span className="junni-kv__welcome-text">Welcome</span>
+          <svg className="junni-kv__baku" viewBox="0 0 128 72" role="img">
+            <path d="M31 43c-8 0-14-5-14-12 0-9 8-15 19-15h35c15 0 27 9 27 21 0 11-10 20-24 20H45c-8 0-14-6-14-14Z" />
+            <path d="M88 22c3-8 9-13 17-13 10 0 18 8 18 18 0 9-6 17-16 23-7-5-13-11-19-19v-9Z" />
+            <path d="M18 29 4 24l8 16 8-5-2-6Z" />
+            <circle cx="40" cy="31" r="3" fill="currentColor" />
+            <path d="M39 55v13M55 56v12M76 56v12M90 53v13" stroke="currentColor" strokeWidth="7" strokeLinecap="round" />
+          </svg>
+        </div>
       </div>
     </div>
   )
@@ -225,7 +256,9 @@ export default function JunniHero({ onInZoneChange }: JunniHeroProps) {
                       </div>
                     </div>
                     <div className="junni-face junni-face--back">
-                      <div className="junni-face-fill" />
+                      <div className="junni-face-fill">
+                        <BackKV />
+                      </div>
                     </div>
                   </div>
                 </div>
