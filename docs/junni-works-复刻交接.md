@@ -1,169 +1,124 @@
 # JUNNI home_works 复刻 · 对话交接文档
 
-> 用途：在新对话里继续 1:1 复刻 [junni.co.jp](https://junni.co.jp/) 首页 **home_works**（3D 转鼓 WORKS 轮播 + 巨型层叠标题）。把本文件作为上下文喂给新会话即可无缝接力。
-> 最后更新：2026-06-16（MVP 已落地并接入，`npm run build` 通过；已用浏览器 CDP 抓原站参数校准；标题/大图/半径仍需按第 6 节微调）。
+> 用途：在新对话里继续 1:1 复刻 [junni.co.jp](https://junni.co.jp/) 首页 **home_works**（3D 纸卷圆柱 WORKS 轮播 + 巨型层叠标题 + 浮动球）。把本文件作为上下文喂给新会话即可无缝接力。
+> 最后更新：2026-06-16（**已切换为 three.js 真 3D 圆柱方案**并落地；方向/对齐/比例/光照已修；`npm run build` 通过；已提交 GitHub `云8.0` = commit `8e7ba84`）。
 
 ---
 
 ## 0. 一句话目标
 
-1:1 复刻 junni.co.jp 首页 `home_works` 区块：**双层 pin（巨型 WORKS 标题 + 3D 圆柱转鼓作品轮播）**，随滚动转鼓旋转、当前项放大高亮、描述逐字浮现，配深底 + 黄绿（`#dcff46`）配色与底部 shift 擦除条。先按原站文案/动效 1:1 复刻，素材后续替换。
+1:1 复刻 junni.co.jp 首页 `home_works`：随滚动旋转的 **横置纸卷圆柱（drum）**，6 个作品名贴在圆柱表面随曲面转动，正前方作品名最大最清晰，配 **巨型黄绿描边 WORKS 标题**（进圆柱主体段淡出）、**漂浮金属球**、底部黄绿 shift 擦除条、深底 `#1c1d21` + 黄绿 `#dcff46`。文案/动效先按原站 1:1，鼓面素材后续替换为自己的项目图。
 
-参考截图：image 1（黄底"关于 Junni"按钮下方进入 home_works，巨型黄绿描边层叠"这项工作/WORKS"压满屏）；image 2（转鼓中央放大显示 Alche / 巴西卡 等作品名 + 日文副标题）。
-
----
-
-## 1. 技术栈与现状（已确认）
-
-- 框架：**React 19 + Vite 8 + TypeScript**，Tailwind v4，已装 `gsap` / `lenis`
-- 转鼓旋转：**GSAP ScrollTrigger（scrub）** 驱动 sticky 进度 → 实时计算每项 3D transform
-- 平滑滚动由 `src/components/SmoothScroll.tsx`（Lenis）在 `App` 外层统一包裹
-- 配色/风格沿用既有 junni 组件，CSS 自包含（`.junni-works__*`，不依赖 `.junni-root` 变量）
+参考截图（原站）：横置浅色纸卷圆柱，正前方一个作品名 + Logo，四周漂浮灰色金属球，背后很淡的巨型作品名，跟随鼠标的黄绿 gooey 线框光标。
 
 ---
 
-## 2. 文件清单（已落地）
+## 1. 关键认知：原站是 three.js（已确认）
+
+- 用浏览器 CDP 实测原站：存在 `__THREE__` 全局 + 一个 **webgl2** 的全屏 `<canvas id="canvas">`（挂在 `.container`，`position:fixed; z-index:1`）。
+- 圆柱、作品名、浮动球**全画在这块共享 WebGL canvas 上**；DOM 里只有那个 pin 住的巨型 `repeatText` WORKS 标题 + 隐藏的 `home_works_item`（title/desc 逐字 span，作数据/无障碍用）。
+- 原站 `home_works` 滚动行程 ≈ **2.15×视口高**；6 个作品。
+- 结论：纯 CSS 3D 做不出"文字贴曲面"的纸卷质感，必须用 three.js。**已选方案 A（three.js 真还原）并落地。**
+
+---
+
+## 2. 技术栈与现状
+
+- 框架：**React 19 + Vite 8 + TS**，Tailwind v4，已装 `gsap` / `lenis`。
+- **新增依赖**：`three@^0.184`（dependencies）、`@types/three@^0.184`（devDependencies）。已在 `package.json` / `package-lock.json`。
+- 平滑滚动：`src/components/SmoothScroll.tsx`（Lenis）在 `App` 外层统一包裹。
+- 滚动驱动：**GSAP ScrollTrigger（scrub）** → `progressRef` → three.js rAF 里旋转圆柱 + React state 控制 active 文案/标题淡出。
+- 构建包体因 three.js 增大到 ~950kB（gzip ~278kB），build 有 chunk>500kB warning（仅提示，后续可按需 `dynamic import()` 拆分）。
+
+---
+
+## 3. 文件清单与接入
 
 ```
 src/components/junni/
-├─ JunniWorks.tsx     # ✅ 组件：双层 pin + 3D 转鼓 + repeatText 标题 + 逐字副标题 + shift 条
-├─ JunniWorks.css     # ✅ 自包含样式（.junni-works__* 全套）
-└─ junniData.ts       # ✅ 新增 junniWorks 数组（6 项原站文案 + slug + 占位图）+ JunniWork 类型
+├─ JunniWorks.tsx     # ✅ three.js 圆柱场景（canvas 纹理 + 浮动球 + 滚动旋转）+ DOM 标题/副标题/shift
+├─ JunniWorks.css     # ✅ 自包含样式（canvas 铺满 + 标题 + ghost 大字 + overlay 副标题 + shift 条）
+└─ junniData.ts       # ✅ junniWorks 数组（6 项原站文案 + slug + 占位图 + titleSize）
 ```
 
-改动过的既有文件：
-- `src/components/junni/junniData.ts`：文件末尾新增 `export type JunniWork` 和 `export const junniWorks`（basica / alche-studio / 2nd-star-production / opb_app / master-expo / and_more 六项，原站日文文案与链接 1:1，图片暂用 `/works/shiyuan/01–06.png` 占位）。
-- `src/components/GunzeTransition.tsx`：
-  - 顶部 `import JunniWorks from "./junni/JunniWorks"`
-  - 在 `<JunniService />` **正下方**、`<MovieSection />` 之前插入 `<JunniWorks />`
+接入点：`src/components/GunzeTransition.tsx` 顶部 `import JunniWorks`，在 `<JunniService />`（PERFORMANCE 手风琴）**正下方**、`<MovieSection />` 之前渲染 `<JunniWorks />`。
+首页流：`Hero → … → GunzeTransition(message) → <JunniService/> → <JunniWorks/> → MovieSection → CeoSection`。
 
-> **插入位置（首页流）**：`Hero → BusinessIntro → GunzeTransition`（…message 区）→ `<JunniService />`（PERFORMANCE 手风琴，即截图"图三"）→ **`<JunniWorks />`** → `<MovieSection />` → `<CeoSection />`。
-> `GunzeTransition` 被 `src/components/Hero.tsx` 使用。
-
-构建状态：`npm run build` 通过（Windows PowerShell 不支持 `&&`，命令分开写或用 `;`）。dev：`npm run dev`（端口 5173，strictPort）。
+dev：`npm run dev`（端口 5173，strictPort）。**PowerShell 不支持 `&&`，命令分开或用 `;`**。
 
 ---
 
-## 3. DOM / 组件结构（`JunniWorks.tsx`）
+## 4. JunniWorks.tsx 结构与核心参数（现状值）
 
+**DOM 层（z-index 由低到高）**：
 ```
-section.junni-works[data-gooey-color="yellow"]              # 深底 #1c1d21；min-height ~320vh 提供滚动行程
- └ div.junni-works__pin                                     # position:sticky top:0 height:100vh
-     ├ h2.junni-works__title.repeatText                     # 巨型层叠标题（绝对定位，转鼓后方背景）
-     │   └ span.junni-works__title-wrap.text-repeat
-     │       └ span.junni-works__title-echo × 7             # 6 残影(lower/upper) + 1 主字(main)
-     ├ div.junni-works__wrap                                # perspective 容器（透视）
-     │   └ div.junni-works__inner                           # transform-style: preserve-3d
-     │       ├ div.junni-works__image                       # 背景图面板（含 N 张 crossfade 图 + label）
-     │       └ div.junni-works__slider > ul.junni-works__list
-     │           └ li.junni-works__item[data-item-active][data-item-visible][data-works] × 6
-     │               └ a.junni-works__item-link
-     │                   ├ span.junni-works__item-title[data-size]   # 作品名
-     │                   └ span.junni-works__item-desc               # 逐字 span（--transition-delay 每字 +0.03s）
-     └ div.junni-works__shift > span.junni-works__shift-layer × 4    # 底部黄绿擦除条（氛围）
+section.junni-works[style=stageVars]            # min-height 320vh 提供滚动行程；深底
+ └ div.junni-works__pin                          # sticky top:0 height:100vh
+     ├ h2.junni-works__title (repeatText × 7)     # 巨型 WORKS，全副本 #1c1d21 填充 + #dcff46 描边
+     ├ div.junni-works__ghost-title               # 背后很淡的当前作品大字（进场渐显）
+     ├ canvas.junni-works__canvas                 # three.js 渲染目标，inset:0 铺满
+     ├ div.junni-works__overlay > a > .active-desc# 当前作品日文副标题，逐字浮现（DOM，非纹理）
+     └ div.junni-works__shift (layer × 4)         # 底部黄绿擦除条，进主体段淡出
 ```
 
-数据来源：`junniWorks`（`{ slug, title, description, href, image, titleSize? }` × 6）。
+**three.js 场景（仅初始化一次的 useEffect）**：
+- 渲染器：`WebGLRenderer({alpha:true, antialias:true})`，`pixelRatio=min(dpr,2)`，`outputColorSpace=SRGB`。
+- 相机：`PerspectiveCamera(36, aspect, .1, 100)`，`position.z = 16`。
+- 光：`AmbientLight 1.15` + 顶部 `DirectionalLight 0.55` + 黄绿 `DirectionalLight 0.24`（放平、低反差）。
+- 鼓体：`CylinderGeometry(1.58, 1.58, 7.35, 128, 1, true)`（半径 1.58、轴长 7.35、开口无盖）。
+  - 包在 `Group`：`drum.rotation.z = π/2`（轴向转水平）、`drum.rotation.x = -0.035`（轻俯仰）。
+  - 自转：`tube.rotation.y = baseAngle - progress * SPAN`；`SECTOR = 2π/6`、`SPAN = 5*SECTOR`。
+  - **对齐基准**：`baseAngle = π/2 - SECTOR*2`（让 WebGL 正前方作品 == DOM `activeIndex` 的副标题）。
+  - 材质：`MeshStandardMaterial({map, roughness:.82, metalness:.04, side:DoubleSide})`。
+- 浮动球：`SphereGeometry(0.42)` × 4，灰 `0xb9bcc4`、`metalness .55`，rAF 里轻微正弦浮动 + 自转。
+- 性能：`IntersectionObserver` 进出视口 start/stop rAF；卸载 dispose 几何/材质/纹理/renderer。`prefers-reduced-motion` 渲染一帧静帧。
 
-滚动逻辑（伪代码）：
-```ts
-ScrollTrigger.create({ trigger: section, start:"top top", end:"bottom bottom", scrub:0.45,
-  onUpdate: self => { setProgress(self.progress); setActiveIndex(round(1 + p*(n-2))) }})
-const current = 1 + progress * (n - 2)             // 当前居中的浮点索引
-// 每项：angle = (index - current) * 25°
-```
+**鼓面纹理 `buildDrumTexture()`（关键，纹理方向已调对）**：
+- 2048² canvas，米白底 `#f1f1ef` + 噪点纸感。
+- 映射：canvas X = 圆周方向（堆叠 6 个名字，每个占 `size/6` 带），canvas Y = 圆柱轴向（屏幕水平）。
+- 每个名字：`ctx.translate(cx, size/2); ctx.rotate(Math.PI/2); fillText(标题)`。**无 `scale(-1,1)`、纹理 `flipY` 用默认 true** —— 这套组合是正向可读的最终解（之前 `rotate(-π/2)+scale(-1,1)+flipY=false` 会上下颠倒；`rotate(+π/2)+scale(-1,1)` 会水平镜像）。
+- 字号：normal 128 / middle 110 / small 92。
+- 纹理：`CanvasTexture`，`colorSpace=SRGB`、`anisotropy=8`、`wrap=Repeat`。
+- `document.fonts.ready` 后重建一次纹理，避免首帧 fallback 字体。
+- ⚠️ 目前纹理**只画标题文字**（副标题已移到 DOM overlay，避免重复）。
+
+**stageVars（随 progress 的 CSS 变量）**：
+- `--junni-works-title-opacity = clamp(1 - p*4.2, 0,1)`（WORKS 标题进主体段淡出）
+- `--junni-works-ghost-opacity = clamp((p-.1)*.55, 0,.14)`（背后淡大字渐显）
+- `--junni-works-shift-opacity = clamp(1 - p*3.6, 0,.9)`（shift 条淡出）
 
 ---
 
-## 4. 原站实测参数（浏览器 CDP，2026-06-16，视口 ~1114×898 / 容器 1099）
+## 5. 已修问题（按解决顺序）
 
-### 4.1 3D 转鼓几何（核心，已反推精确公式）
-原站 `li.home_works_item` 的 transform = `translate3d(-50%, Y, Z) rotateX(α)`，`transform-origin:50% 50%`。
-6 项 α 相差 **25°**。由实测两组数据反推为标准圆柱：
+1. ✅ 鼓面文字**上下颠倒** → 调 `rotate` 方向 + 去掉 `flipY=false`。
+2. ✅ 鼓面文字**水平镜像** → 去掉 canvas 的 `scale(-1,1)`。
+3. ✅ **正前方作品与 DOM 副标题不对齐** → `baseAngle = π/2 - SECTOR*2`。
+4. ✅ 圆柱**铺满全屏/太胖** → 相机 z 12→16、半径 2.12→1.58、轴长 10.8→7.35、字号下调。
+5. ✅ 鼓面**上下明暗反差太重** → 环境光升、方向光降、底色提亮。
+6. ✅ 副标题**重复**（鼓面+DOM）→ 纹理只留标题，副标题仅 DOM。
+7. ✅ 底部 shift 条/overlay **打架** → overlay 上移到 `bottom:18vh`，shift 条调细 + 主体段淡出。
+8. ✅ WORKS 标题一直压在圆柱后 → 进主体段按 progress 淡出 + 背后 ghost 大字渐显。
 
-| 来源 | α | Y | Z |
-|---|---|---|---|
-| 初始态 basica | -80° | 381.121 | -319.798 |
-| 初始态 master-expo | -180° | 0 | -774 |
-| 居中态 opb_app(active) | -11.14° | 74.76 | -7.29 |
-
-**精确公式（半径 R≈388px）**：
-```
-Y = -R * sin(α)
-Z =  R * cos(α) - R
-rotateX(α)            // active = α 最接近 0 的项
-```
-验证 α=-155°：Y=-388·sin(-155°)=163.5 ✓、Z=388·cos(-155°)-388=-737.7 ✓。
-> R 建议响应式：`R ≈ 0.353 × 容器宽`（1099 → 388）。
-
-### 4.2 巨型标题 repeatText（image 1 主视觉）
-- `h2.home_works_title`：约 `width 791px / height 443px`（≈72vw），**超大**，pin 成 `position:fixed` 压满屏，在转鼓后方。
-- 配色（实测 computed）：**所有 7 个副本**（含中间主字 `data-ty=0`）均为
-  - `-webkit-text-fill-color: rgb(28,29,33)` = **#1c1d21（深填充）**
-  - `-webkit-text-stroke-color: rgb(220,255,70)` = **#dcff46（黄绿描边）**
-- 7 副本垂直偏移为**百分比**（基于字高），实测settled值：
-  - lower：`+7.78%`(ty20) / `+13.94%`(ty40) / `+18.61%`(ty60)
-  - upper：`-6.21%`(ty-20) / `-13.94%`(ty-40) / `-23.34%`(ty-60)
-  - main：`0`
-- `data-delay`：0 / 0.08 / 0.16（错峰），随滚动 spread→收拢 + opacity 0→1 进场。
-- wrap 实测：`padding-bottom:52px; margin-top:26px`。
-
-### 4.3 背景图面板
-- `home_works_image` 实测在左侧（约 516×290），`background:none`（基本空/暗），**并非居中大亮图**。中央主视觉是"标题 + 作品名转鼓"，没有大缩略图。
-
-### 4.4 其他
-- 区块底色：`#1c1d21`。`data-gooey-color="yellow"`（复用全站 gooey 光标）。
-- `data-size`：normal / small / middle 控制作品名字号。
-- 副标题逐字 `--transition-delay` 每字 +0.03s。
-- 原站还有 `home_works_shift > shift_layer × 4`（进场擦除氛围层）。
+最新验证截图（临时目录）：`junni-works-three-tuned-7.png`（方向正、对齐、比例接近原站纸卷）。
 
 ---
 
-## 5. 已落地实现要点（当前版本）
+## 6. 待办（下一步，新对话从这里继续）★
 
-- `JunniWorks.tsx`：用 `progress` 算 `current` 浮点索引，每项 `angle=(index-current)*25`，CSS 变量 `--junni-works-y/z/rx/opacity` 注入 transform；`activeIndex` 控制 `data-item-active`；描述逐字 span + `--transition-delay`。
-- `JunniWorks.css`：深底 sticky 舞台、标题残影、3D 转鼓、active 放大、逐字浮现、底部黄绿 shift 条、`prefers-reduced-motion` 降级、`max-width:768px` 移动端适配。
-- 已接入 `GunzeTransition` 并 `npm run build` 通过，浏览器实测 active 项随滚动从 Alche → M@STER EXPO → and more 正常切换。
-
----
-
-## 6. 待调整项（下一步，按优先级）★ 关键
-
-> 上一版"差别大"的根因：标题做成了白色实心 + 居中加了大亮图 + 半径偏小。以下为已确认的修正方向。
-
-1. **【高】标题配色** —— 去掉主字（`data-rep-txt-item="main"`）的白色覆盖；**所有副本统一** `fill:#1c1d21 + stroke:#dcff46`。
-2. **【高】标题尺寸** —— 放大到约 `clamp(7rem,16vw,15rem)`，占满宽度（≈72vw），作为转鼓后方大背景。
-3. **【高】标题偏移改百分比** —— 用第 4.2 的 %（+7.8/+13.9/+18.6、-6.2/-13.9/-23.3、0），替换当前的固定 `60/40/20px`。
-4. **【高】去掉/压暗中间大图** —— 原站没有居中高亮缩略图；将 `.junni-works__image` 删除或压成 `opacity:.18; filter:brightness(.45)`，背景保持纯 `#1c1d21`（去掉之前加的居中发光渐变）。
-5. **【中】半径** —— `radius` 从 328 改 **388**（并做成 `min(388, vw*0.35)` 响应式）。
-6. **【中】作品名** —— 浅色大字 `clamp(3.2rem,8vw,7.5rem)`，active 更亮（`#fff`）。
-7. **【低】进场动画** —— 标题副本随滚动 spread→收拢 + opacity 0→1（data-delay 0/0.08/0.16）。
-8. **【低】素材替换** —— 用户后续把 `junniData.ts` 的 `image` 换成自己项目图。
-9. **【可选】gooey 黄绿光标** —— 原站全屏 WebGL canvas（`data-gooey-color`），可后补近似。
-
-拟改的关键值（落地时参考）：
-```css
-.junni-works__title-echo{
-  font-size: clamp(7rem,16vw,15rem);
-  -webkit-text-stroke: 1.5px #dcff46;
-  -webkit-text-fill-color: #1c1d21;   /* 主字不再做白色 */
-  transform: translate3d(0, var(--ty-percent), 0);  /* 用 %，非 px */
-}
-/* 删除 .junni-works__title-echo[data-rep-txt-item="main"]{...白色...} */
-.junni-works__image{ opacity:.18; filter:brightness(.45) saturate(.7); }
-```
-```ts
-const radius = Math.min(388, vw * 0.35)
-const y = -radius * Math.sin(rad)
-const z =  radius * Math.cos(rad) - radius
-// transform: translate3d(-50%, y, z) rotateX(angleDeg)
-```
+1. **【高】鼓面贴真实素材**（当前最大差距）：原站圆柱面不是纯文字，而是**每个作品的视觉图/Logo/标语组合**。应把 `buildDrumTexture` 改成**按作品分段贴图**：每段绘入对应 work 的项目图 + 标题 + Logo（用户后续提供素材，先用 `/works/shiyuan/0X.png` 占位）。可能需要按作品生成多块纹理或一张大图分区。
+2. **【中】正前方作品高亮**：原站正前方作品更突出（更亮/更大/描边），其余偏灰。可在纹理或叠加层做 active 强调。
+3. **【中】gooey 黄绿光标**：原站全屏 WebGL 着色器光标（`data-gooey-color="yellow"`），可后补近似（跟随鼠标的黄绿不规则线框/果冻效果）。
+4. **【中】进场/退场动效细化**：圆柱进入时的旋入、作品切换时副标题逐字（已具备）、Logo 淡入等。
+5. **【低】滚动行程标定**：原站 ≈2.15vh，当前 `min-height:320vh`，可按手感微调每个作品停留时长。
+6. **【低】包体拆分**：three.js 让 bundle ~950kB，可对 `JunniWorks` 做 `React.lazy` + 动态 import 降低首屏。
+7. **【低】移动端**：当前有 `max-width:768px` 基础适配，three.js 场景在小屏需再校半径/相机。
 
 ---
 
-## 7. 原站 WORKS 数据（home_works，6 项，已写入 junniData.ts）
+## 7. 原站 WORKS 数据（已写入 `junniData.ts` 的 `junniWorks`）
 
-| slug | title | description（日文，1:1） | href | data-size |
+| slug | title | description（日文，1:1） | href | titleSize |
 |---|---|---|---|---|
 | basica | BaSICA | 株式会社BaSICA コーポレートサイトリニューアル | /works/basica | normal |
 | alche-studio | Alche, Inc | Alche株式会社 コーポレートサイトリニューアル | /works/alche-studio | normal |
@@ -172,18 +127,29 @@ const z =  radius * Math.cos(rad) - radius
 | master-expo | M@STER EXPO | THE IDOLM@STER M@STER EXPO 公式ブース出展 | /works/master-expo | middle |
 | and_more | and more... | WORKS - 制作実績一覧ページ | /works | (default) |
 
-> 转鼓副标题在原站是逐字 span（每字带 `--transition-delay` +0.03s）；中文标题（巴西卡/Alche公司/第二明星制作公司/一体式底座…）是浏览器翻译插件结果，复刻用原文 title 即可。
+> `JunniWork` 类型：`{ slug, title, description, href, image, titleSize? }`。图片暂用 `/works/shiyuan/01–06.png` 占位，待替换为自己的项目素材。
 
 ---
 
 ## 8. 浏览器实测/调试备忘（环境）
 
-- 浏览器 MCP：`cursor-ide-browser`（`browser_navigate` / `browser_cdp` / `browser_lock` / `browser_take_screenshot`）。**仅 Agent 模式可用**。
-- 抓参数方法：`browser_cdp` → `Runtime.evaluate`（`awaitPromise:true`），滚动后 `requestAnimationFrame + setTimeout(180ms)` 等动画稳定再读 `getComputedStyle(...).transform`。大响应会落盘到 `C:\Users\...\.cursor\browser-logs\`，用 Read/Grep 读关键行。
-- 本地预览：`http://127.0.0.1:5173/`，首页向下滚到 PERFORMANCE 板块下方即 `.junni-works`。
+- 浏览器 MCP：`cursor-ide-browser`（`browser_navigate` / `browser_cdp` / `browser_lock` / `browser_take_screenshot` / `browser_tabs`）。**仅 Agent 模式可用**。
+- 本地预览用 **`http://localhost:5173/`**（注意：`127.0.0.1` 那个标签曾报 chrome-error，dev server `--open` 默认 localhost）。
+- 调试套路：`browser_cdp` → `Runtime.evaluate(awaitPromise:true)`，`window.scrollTo(sec.offsetTop + sec.offsetHeight*0.42)` 滚到圆柱主体段，`await wait(~900ms)` 等动画稳定后 `browser_take_screenshot` 截图肉眼对照原站。
+- 改 three.js 参数后需 **navigate 重载页面**（HMR 对 useEffect 内一次性场景不一定干净），再滚动截图。
+- 原站参考标签：`https://junni.co.jp/`（CDP 实测得 three.js / webgl2 / `home_works` 2.15vh 等）。
 
 ---
 
-## 9. 新对话快速启动指令（复制即用）
+## 9. Git / 版本
 
-> 继续 junni.co.jp 首页 `home_works` 复刻。已读 `docs/junni-works-复刻交接.md`。组件 `src/components/junni/JunniWorks.{tsx,css}` + `junniData.ts` 的 `junniWorks` 已落地并接入 `GunzeTransition`（在 `<JunniService />` 正下方），`npm run build` 通过。3D 转鼓几何已按原站实测公式（R≈388、Y=-R·sin α、Z=R·cos α-R、rotateX α、步进 25°）实现。下一步按第 6 节"待调整项"优先级修正：①标题全部副本改 `#1c1d21 填充 + #dcff46 描边`（去掉主字白色）②标题放大到 ≈72vw ③副本偏移改百分比 ④去掉/压暗中间大图、背景纯 #1c1d21 ⑤半径改 388。改完用浏览器 CDP 抓本地截图与原站（image 1 / image 2）对照微调，并 `npm run build` 验证。
+- 仓库：`https://github.com/ifu321123-ui/ifuyun.git`，分支 `main`。
+- 版本命名沿用 `云N.0`（历史 云3.0…云7.0）。**本版本 = `云8.0`，commit `8e7ba84`，已 push。**
+- 本次提交含：`JunniWorks.tsx/.css`、`junniData.ts`、`GunzeTransition.tsx`、`package.json`、`package-lock.json`、本交接文档。
+- 注意：`docs/junni-service-复刻交接.md` 有未提交的本地改动（与本任务无关，未纳入 云8.0）。
+
+---
+
+## 10. 新对话快速启动指令（复制即用）
+
+> 继续 junni.co.jp 首页 `home_works` 复刻。已读 `docs/junni-works-复刻交接.md`。现状：已用 **three.js** 实现横置纸卷圆柱（`src/components/junni/JunniWorks.{tsx,css}` + `junniData.ts`），接入 `GunzeTransition`（`<JunniService/>` 正下方），`npm run build` 通过，已提交 `云8.0`(8e7ba84)。圆柱方向/对齐/比例/光照已修对（见第 5 节），关键参数见第 4 节。下一步按第 6 节优先级继续：①鼓面改"按作品分段贴真实素材/Logo"（当前最大差距，先用 `/works/shiyuan/0X.png` 占位）②正前方作品高亮 ③gooey 黄绿光标。每步用浏览器（localhost:5173，滚到 sec 42% 处）截图与原站对照微调，并 `npm run build` 验证。
