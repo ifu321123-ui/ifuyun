@@ -90,9 +90,6 @@ export default function JunniAbout() {
         </div>
         <button type="button" className="junni-about__cta" aria-label={junniHero.aboutCta}>
           <span className="junni-about__cta-text">{junniHero.aboutCta}</span>
-          <svg className="junni-about__cta-icon" viewBox="0 0 15.77 24.93" aria-hidden="true">
-            <path d="m2,2l11.77,10.47L2,22.93" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" />
-          </svg>
         </button>
       </div>
     </section>

@@ -112,7 +112,32 @@ export default function JunniService() {
 
               <div className="junni-service__panel">
                 <div className="junni-service__panel-inner">
-                  <p className="junni-service__text">{item.text}</p>
+                  {item.body ? (
+                    <div className="junni-service__body">
+                      {item.body.groups.map((group) => (
+                        <div key={group.subtitle} className="junni-service__group">
+                          <div className="junni-service__group-head">
+                            <h4 className="junni-service__group-title">{group.subtitle}</h4>
+                            {group.period && (
+                              <span className="junni-service__group-period">{group.period}</span>
+                            )}
+                          </div>
+                          <ul className="junni-service__points">
+                            {group.points.map((point) => (
+                              <li key={point.value} className="junni-service__point">
+                                {point.label && (
+                                  <span className="junni-service__point-label">{point.label}</span>
+                                )}
+                                <span className="junni-service__point-text">{point.value}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="junni-service__text">{item.text}</p>
+                  )}
                   <div className="junni-service__image">
                     <img src={item.image} alt={item.alt} loading="lazy" />
                   </div>

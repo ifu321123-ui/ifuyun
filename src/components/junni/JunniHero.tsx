@@ -59,9 +59,9 @@ function BackKV() {
       <span className="junni-kv__menu junni-kv__menu--back">{junniHero.menu}</span>
       <div className="junni-kv__back-center">
         <p className="junni-kv__back-title">
-          <span>ASOBIGOKORO</span>
+          <span>PRODUCT</span>
           <span className="junni-kv__back-cross">×</span>
-          <span>TECHNOLOGY</span>
+          <span>UI / UX</span>
         </p>
         {/* KV 背面副标题（原站 kv_back 主视觉）。注意：这是 KV 自己的文案，
             与 manifesto（わたしたちジュニは…）不同——manifesto 只在下方普通流

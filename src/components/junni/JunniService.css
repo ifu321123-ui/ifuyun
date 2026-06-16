@@ -324,6 +324,99 @@
   line-height: 2;
   color: rgba(247, 247, 247, 0.72);
 }
+
+/* —— 结构化排版（图2「教育背景」式：分块小标题 + 标签条目）—— */
+.junni-service__body {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.4rem, 2.6vw, 2.1rem);
+  max-width: 38rem;
+}
+.junni-service__group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+.junni-service__group-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid rgba(220, 255, 70, 0.22);
+}
+.junni-service__group-title {
+  margin: 0;
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  font-weight: 800;
+  color: var(--svc-green);
+}
+.junni-service__group-period {
+  flex: none;
+  font-size: clamp(0.72rem, 1.3vw, 0.85rem);
+  font-weight: 600;
+  color: var(--svc-green);
+  opacity: 0.85;
+}
+.junni-service__points {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+.junni-service__point {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.5rem 0.9rem;
+  align-items: baseline;
+  font-size: clamp(0.82rem, 1.45vw, 0.98rem);
+  line-height: 1.85;
+}
+.junni-service__point-label {
+  position: relative;
+  padding-left: 1rem;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+}
+.junni-service__point-label::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.72em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--svc-green);
+}
+.junni-service__point-text {
+  color: rgba(247, 247, 247, 0.72);
+}
+.junni-service__point:not(:has(.junni-service__point-label)) {
+  grid-template-columns: 1fr;
+}
+.junni-service__point:not(:has(.junni-service__point-label)) .junni-service__point-text {
+  position: relative;
+  padding-left: 1rem;
+}
+.junni-service__point:not(:has(.junni-service__point-label)) .junni-service__point-text::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.72em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--svc-green);
+}
+@media (max-width: 560px) {
+  .junni-service__point {
+    grid-template-columns: 1fr;
+    gap: 0.15rem;
+  }
+}
 /* 右侧图片：居中横向图、带留白、不铺满整列（对齐原站） */
 .junni-service__image {
   justify-self: center;
