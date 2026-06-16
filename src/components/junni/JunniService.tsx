@@ -31,13 +31,7 @@ export default function JunniService() {
     return () => io.disconnect()
   }, [])
 
-  const toggle = (i: number) =>
-    setOpen((prev) => {
-      const next = new Set(prev)
-      if (next.has(i)) next.delete(i)
-      else next.add(i)
-      return next
-    })
+  const toggle = (i: number) => setOpen((prev) => (prev.has(i) ? new Set() : new Set([i])))
 
   const renderRowContent = (item: (typeof junniSolutions)[number]) => (
     <span className="junni-service__row-inner">
