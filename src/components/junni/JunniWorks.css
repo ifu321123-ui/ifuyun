@@ -1,0 +1,222 @@
+.junni-works {
+  --works-dark: #1c1d21;
+  --works-green: #dcff46;
+  --works-white: #f5f5f5;
+  --works-muted: rgba(245, 245, 245, 0.74);
+  --works-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  z-index: 4;
+  min-height: 320vh;
+  min-height: 320dvh;
+  margin: 0;
+  background: var(--works-dark);
+  color: var(--works-white);
+  overflow: clip;
+  font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+.junni-works__pin {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--works-dark);
+  isolation: isolate;
+}
+
+.junni-works__canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.junni-works__title {
+  position: absolute;
+  left: 50%;
+  top: clamp(1.6rem, 5.5vh, 3.25rem);
+  z-index: 1;
+  width: min(86vw, 70rem);
+  margin: 0;
+  opacity: var(--junni-works-title-opacity, 1);
+  transform: translateX(-50%);
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+
+.junni-works__title-wrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: clamp(8rem, 20vw, 16.5rem);
+  padding-bottom: clamp(1.8rem, 4.8vw, 3.25rem);
+  margin-top: clamp(0.8rem, 2.3vw, 1.65rem);
+}
+
+.junni-works__title-echo {
+  grid-area: 1 / 1;
+  color: transparent;
+  font-size: clamp(7rem, 16vw, 15rem);
+  font-weight: 900;
+  line-height: 0.78;
+  letter-spacing: -0.075em;
+  -webkit-text-stroke: 1.5px var(--works-green);
+  -webkit-text-fill-color: var(--works-dark);
+  opacity: 0.95;
+  transform: translate3d(0, var(--junni-works-title-y), 0);
+  transition: transform 0.65s var(--works-ease) var(--junni-works-title-delay);
+  white-space: nowrap;
+}
+
+.junni-works__title-echo[data-rep-txt-item="main"] {
+  opacity: 1;
+}
+
+.junni-works__ghost-title {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  opacity: var(--junni-works-ghost-opacity, 0);
+  color: rgba(245, 245, 245, 0.9);
+  font-size: clamp(5rem, 15vw, 14rem);
+  font-weight: 900;
+  line-height: 0.78;
+  letter-spacing: -0.09em;
+  text-align: center;
+  text-transform: uppercase;
+  filter: blur(0.8px);
+  transform: translateY(-7vh);
+  transition: opacity 0.28s ease;
+  pointer-events: none;
+}
+
+.junni-works__ghost-title span {
+  max-width: 92vw;
+}
+
+.junni-works__overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: clamp(7rem, 18vh, 12rem);
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.junni-works__active-link {
+  display: block;
+  max-width: min(80vw, 46rem);
+  color: inherit;
+  text-decoration: none;
+  text-align: center;
+  pointer-events: auto;
+}
+
+.junni-works__active-desc {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  color: var(--works-muted);
+  font-size: clamp(0.74rem, 1.25vw, 1.05rem);
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: 0.05em;
+}
+
+.junni-works__active-desc-char {
+  display: inline-block;
+  opacity: 0;
+  transform: translate3d(0, 0.7em, 0);
+  animation: junniWorksCharIn 0.46s cubic-bezier(0, 0, 0.2, 1) forwards;
+  animation-delay: var(--transition-delay);
+}
+
+@keyframes junniWorksCharIn {
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.junni-works__shift {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 4;
+  display: grid;
+  gap: clamp(0.6rem, 1.8vh, 1.1rem);
+  padding-bottom: clamp(1.25rem, 3.2vh, 2.2rem);
+  opacity: var(--junni-works-shift-opacity, 0.9);
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.junni-works__shift-layer {
+  display: block;
+  height: clamp(0.45rem, 1.35vw, 1rem);
+  background: var(--works-green);
+  transform-origin: 0 50%;
+  animation: junniWorksShift 2.4s var(--works-ease) infinite alternate;
+}
+
+.junni-works__shift-layer:nth-child(2n) {
+  background: #111217;
+  animation-delay: -0.35s;
+}
+
+.junni-works__shift-layer:nth-child(3) {
+  animation-delay: -0.7s;
+}
+
+.junni-works__shift-layer:nth-child(4) {
+  animation-delay: -1.05s;
+}
+
+@keyframes junniWorksShift {
+  0%,
+  22% {
+    transform: translateX(-9vw) scaleX(1.08);
+  }
+
+  100% {
+    transform: translateX(8vw) scaleX(0.92);
+  }
+}
+
+@media (max-width: 768px) {
+  .junni-works {
+    min-height: 280vh;
+    min-height: 280dvh;
+  }
+
+  .junni-works__active-desc {
+    max-width: 82vw;
+    font-size: 0.74rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .junni-works {
+    min-height: auto;
+  }
+
+  .junni-works__pin {
+    position: relative;
+    min-height: 100vh;
+  }
+
+  .junni-works__active-desc-char,
+  .junni-works__shift-layer {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

@@ -274,3 +274,63 @@ export const junniSolutions: JunniSolution[] = [
 /** 标题：逐字描边 + transition-delay 入场 */
 export const junniServiceTitle = "PERFORMANCE"
 export const junniServiceSub = "我的在校 · 实习 · 项目与获奖记录"
+
+export type JunniWork = {
+  slug: string
+  title: string
+  description: string
+  href: string
+  image: string
+  titleSize?: "small" | "middle" | "normal"
+}
+
+/** junni.co.jp home_works：先保留原站文案与链接，图片后续可替换为自己的项目素材 */
+export const junniWorks: JunniWork[] = [
+  {
+    slug: "basica",
+    title: "BaSICA",
+    description: "株式会社BaSICA コーポレートサイトリニューアル",
+    href: "/works/basica",
+    image: "/works/shiyuan/01.png",
+    titleSize: "normal",
+  },
+  {
+    slug: "alche-studio",
+    title: "Alche, Inc",
+    description: "Alche株式会社 コーポレートサイトリニューアル",
+    href: "/works/alche-studio",
+    image: "/works/shiyuan/02.png",
+    titleSize: "normal",
+  },
+  {
+    slug: "2nd-star-production",
+    title: "2nd STAR PRODUCTION",
+    description: "「2nd STAR PRODUCTION」コーポレートサイト制作",
+    href: "/works/2nd-star-production",
+    image: "/works/shiyuan/03.png",
+    titleSize: "small",
+  },
+  {
+    slug: "opb_app",
+    title: "ONE PIECE BASE",
+    description: "ONE PIECE BASEアプリ開発／制作",
+    href: "/works/opb_app",
+    image: "/works/shiyuan/04.png",
+    titleSize: "middle",
+  },
+  {
+    slug: "master-expo",
+    title: "M@STER EXPO",
+    description: "THE IDOLM@STER M@STER EXPO 公式ブース出展",
+    href: "/works/master-expo",
+    image: "/works/shiyuan/05.png",
+    titleSize: "middle",
+  },
+  {
+    slug: "and_more",
+    title: "and more...",
+    description: "WORKS - 制作実績一覧ページ",
+    href: "/works",
+    image: "/works/shiyuan/06.png",
+  },
+]
