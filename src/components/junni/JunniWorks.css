@@ -6,13 +6,13 @@
   --works-ease: cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
   z-index: 4;
-  min-height: 320vh;
-  min-height: 320dvh;
+  min-height: 300vh;
+  min-height: 300dvh;
   margin: 0;
   background: var(--works-dark);
   color: var(--works-white);
   overflow: clip;
-  font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+  font-family: "Montserrat", "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
 .junni-works__pin {
@@ -25,20 +25,12 @@
   isolation: isolate;
 }
 
-.junni-works__canvas {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
+/* ── 巨型层叠 WORKS 标题 ─────────────────────────────── */
 .junni-works__title {
   position: absolute;
   left: 50%;
   top: clamp(1.6rem, 5.5vh, 3.25rem);
-  z-index: 1;
+  z-index: 2;
   width: min(86vw, 70rem);
   margin: 0;
   opacity: var(--junni-works-title-opacity, 1);
@@ -75,76 +67,144 @@
   opacity: 1;
 }
 
-.junni-works__ghost-title {
+/* ── WebGL 曲面图片层（开放圆筒弧，背面无几何=纯深底） ──── */
+.junni-works__webgl {
   position: absolute;
   inset: 0;
   z-index: 1;
-  display: grid;
-  place-items: center;
-  opacity: var(--junni-works-ghost-opacity, 0);
-  color: rgba(245, 245, 245, 0.9);
-  font-size: clamp(5rem, 15vw, 14rem);
-  font-weight: 900;
-  line-height: 0.78;
-  letter-spacing: -0.09em;
-  text-align: center;
-  text-transform: uppercase;
-  filter: blur(0.8px);
-  transform: translateY(-7vh);
-  transition: opacity 0.28s ease;
+  display: block;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
 }
 
-.junni-works__ghost-title span {
-  max-width: 92vw;
+/* 柔和暗罩：边缘融入深底 + 轻压中心，保证白标题在亮图上可读 */
+.junni-works__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(
+    72% 58% at 50% 47%,
+    rgba(20, 21, 25, 0.18) 0%,
+    rgba(20, 21, 25, 0.05) 46%,
+    rgba(20, 21, 25, 0) 70%
+  );
 }
 
-.junni-works__overlay {
+/* ── 3D 卡片轮播 ────────────────────────────────────── */
+.junni-works__slider {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: clamp(7rem, 18vh, 12rem);
+  inset: 0;
   z-index: 3;
   display: grid;
   place-items: center;
   pointer-events: none;
 }
 
-.junni-works__active-link {
-  display: block;
-  max-width: min(80vw, 46rem);
+.junni-works__list {
+  position: relative;
+  width: min(92vw, 1100px);
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  perspective: 500px;
+  perspective-origin: 50% 44%;
+  transform-style: preserve-3d;
+}
+
+.junni-works__item {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max-content;
+  max-width: 92vw;
+  transform-origin: 50% 50%;
+  backface-visibility: hidden;
+  will-change: transform, opacity;
+  text-align: center;
+}
+
+.junni-works__item-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(0.5rem, 1.4vw, 1rem);
   color: inherit;
   text-decoration: none;
-  text-align: center;
+  pointer-events: none;
+}
+
+.junni-works__item[data-active="true"] .junni-works__item-link {
   pointer-events: auto;
 }
 
-.junni-works__active-desc {
+.junni-works__item-title {
+  display: block;
+  font-family: "Montserrat", "Inter", ui-sans-serif, sans-serif;
+  font-weight: 700;
+  line-height: 0.94;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  /* 非当前项：暗灰幽灵（实测原站 #262626，几乎隐入深底）*/
+  color: #313238;
+  text-shadow: none;
+  transition: color 0.45s ease, text-shadow 0.45s ease;
+}
+
+/* 当前项：纯白、加阴影独占视觉 */
+.junni-works__item[data-active="true"] .junni-works__item-title {
+  color: var(--works-white);
+  text-shadow: 0 2px 30px rgba(0, 0, 0, 0.6), 0 0 2px rgba(0, 0, 0, 0.45);
+}
+
+.junni-works__item-title[data-size="normal"] {
+  font-size: clamp(2.6rem, 6.6vw, 5.4rem);
+}
+
+.junni-works__item-title[data-size="middle"] {
+  font-size: clamp(2.2rem, 5.6vw, 4.6rem);
+}
+
+.junni-works__item-title[data-size="small"] {
+  font-size: clamp(1.7rem, 4.3vw, 3.6rem);
+}
+
+.junni-works__item-desc {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+  max-width: min(80vw, 40rem);
   color: var(--works-muted);
-  font-size: clamp(0.74rem, 1.25vw, 1.05rem);
-  font-weight: 700;
+  font-family: "Inter", ui-sans-serif, sans-serif;
+  font-size: clamp(0.66rem, 1.05vw, 0.82rem);
+  font-weight: 600;
   line-height: 1.5;
-  letter-spacing: 0.05em;
-}
-
-.junni-works__active-desc-char {
-  display: inline-block;
+  letter-spacing: 0.16em;
   opacity: 0;
-  transform: translate3d(0, 0.7em, 0);
-  animation: junniWorksCharIn 0.46s cubic-bezier(0, 0, 0.2, 1) forwards;
-  animation-delay: var(--transition-delay);
+  transition: opacity 0.4s ease;
 }
 
-@keyframes junniWorksCharIn {
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
+.junni-works__item[data-active="true"] .junni-works__item-desc {
+  opacity: 1;
 }
 
+.junni-works__item-desc-char {
+  display: inline-block;
+  transform: translate3d(0, 0.6em, 0);
+  opacity: 0;
+  transition: transform 0.4s cubic-bezier(0, 0, 0.2, 1), opacity 0.4s ease;
+  transition-delay: 0s;
+}
+
+.junni-works__item[data-active="true"] .junni-works__item-desc-char {
+  transform: translate3d(0, 0, 0);
+  opacity: 1;
+  transition-delay: var(--transition-delay);
+}
+
+/* ── 底部 shift 擦除条 ──────────────────────────────── */
 .junni-works__shift {
   position: absolute;
   left: 0;
@@ -154,14 +214,14 @@
   display: grid;
   gap: clamp(0.6rem, 1.8vh, 1.1rem);
   padding-bottom: clamp(1.25rem, 3.2vh, 2.2rem);
-  opacity: var(--junni-works-shift-opacity, 0.9);
+  opacity: var(--junni-works-shift-opacity, 0.85);
   transition: opacity 0.25s ease;
   pointer-events: none;
 }
 
 .junni-works__shift-layer {
   display: block;
-  height: clamp(0.45rem, 1.35vw, 1rem);
+  height: clamp(0.4rem, 1.2vw, 0.85rem);
   background: var(--works-green);
   transform-origin: 0 50%;
   animation: junniWorksShift 2.4s var(--works-ease) infinite alternate;
@@ -191,15 +251,29 @@
   }
 }
 
+.junni-works__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
 @media (max-width: 768px) {
   .junni-works {
     min-height: 280vh;
     min-height: 280dvh;
   }
 
-  .junni-works__active-desc {
-    max-width: 82vw;
-    font-size: 0.74rem;
+  .junni-works__image-layer,
+  .junni-works__image::after {
+    width: 82vw;
+  }
+
+  .junni-works__item-desc {
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
   }
 }
 
@@ -213,10 +287,11 @@
     min-height: 100vh;
   }
 
-  .junni-works__active-desc-char,
   .junni-works__shift-layer {
     animation: none;
-    opacity: 1;
-    transform: none;
+  }
+
+  .junni-works__item-desc-char {
+    transition: none;
   }
 }
