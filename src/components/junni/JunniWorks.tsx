@@ -36,8 +36,10 @@ const STEP_RAD = STEP_DEG * DEG2RAD
 
 /** WebGL 曲面参数（可调） */
 const PERSPECTIVE = 500 // 与 DOM perspective 对齐
-const PANEL_DEG = 25 // 单张图片在圆周方向张角：与 STEP 接近，避免正面实体卡片互相挤压
+const PANEL_DEG = 51.1 // 原站 573×626 视口实测 .home_works_image≈516×290px
 const PANEL_RAD = PANEL_DEG * DEG2RAD
+const PANEL_FADE_DEG = 18 // 放大图片后，相邻图要更快压暗，避免曲面互相糊叠
+const PANEL_VISIBLE_DEG = 58
 const SPIN_SIGN = 1 // 旋转方向：让图片随滚动与 DOM 标题同向
 const TEX_ROTATION = -Math.PI / 2 // 贴图旋正（圆周→屏幕竖直，需转 90°）
 
@@ -178,12 +180,12 @@ export default function JunniWorks() {
         const eff = (active - index) * STEP_DEG // 该图相对正前方的角度（度）
         const a = Math.abs(eff)
         // 图片是实体曲面：靠深度遮挡解决重叠，偏离正面的图片只做暗化，不再半透明互叠。
-        const t = clamp(1 - a / 25, 0, 1)
+        const t = clamp(1 - a / PANEL_FADE_DEG, 0, 1)
         const b = 0.1 + t * t * 0.9
         mat.color.setScalar(b)
         mesh.scale.setScalar(1 + clamp(1 - a / 44, 0, 1) * 0.012)
         mesh.renderOrder = Math.round(1000 - a)
-        mesh.visible = a < 64
+        mesh.visible = a < PANEL_VISIBLE_DEG
       })
       renderer.render(refs.scene, refs.camera)
       if (refs.running) refs.raf = requestAnimationFrame(renderFrame)
