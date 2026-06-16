@@ -11,7 +11,6 @@ import "./JunniService.css"
  */
 export default function JunniService() {
   const sectionRef = useRef<HTMLElement>(null)
-  const cursorRef = useRef<HTMLDivElement>(null)
   const [open, setOpen] = useState<Set<number>>(new Set())
 
   useEffect(() => {
@@ -31,59 +30,6 @@ export default function JunniService() {
     io.observe(el)
     return () => io.disconnect()
   }, [])
-
-  // —— gooey 圆角方块光标：仅在「可悬停 + 精确指针」设备启用，缓动跟随 —— //
-  useEffect(() => {
-    const section = sectionRef.current
-    const cursor = cursorRef.current
-    if (!section || !cursor) return
-    const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    if (!fine || reduce) return
-
-    section.dataset.cursor = "custom"
-    let raf = 0
-    let tx = 0
-    let ty = 0
-    let cx = 0
-    let cy = 0
-    let started = false
-
-    const onMove = (e: MouseEvent) => {
-      tx = e.clientX
-      ty = e.clientY
-      if (!started) {
-        started = true
-        cx = tx
-        cy = ty
-        cursor.dataset.visible = "true"
-      }
-    }
-    const onLeave = () => {
-      cursor.dataset.visible = "false"
-    }
-    const tick = () => {
-      cx += (tx - cx) * 0.2
-      cy += (ty - cy) * 0.2
-      cursor.style.transform = `translate(${cx}px, ${cy}px) translate(-50%, -50%)`
-      raf = requestAnimationFrame(tick)
-    }
-
-    section.addEventListener("mousemove", onMove)
-    section.addEventListener("mouseleave", onLeave)
-    raf = requestAnimationFrame(tick)
-
-    return () => {
-      cancelAnimationFrame(raf)
-      section.removeEventListener("mousemove", onMove)
-      section.removeEventListener("mouseleave", onLeave)
-      delete section.dataset.cursor
-    }
-  }, [])
-
-  const setCursorHover = (on: boolean) => {
-    if (cursorRef.current) cursorRef.current.dataset.hover = on ? "true" : "false"
-  }
 
   const toggle = (i: number) =>
     setOpen((prev) => {
@@ -108,24 +54,21 @@ export default function JunniService() {
 
   return (
     <section ref={sectionRef} className="junni-service" aria-label="SERVICE PERFORMANCE">
-      {/* gooey 滤镜定义：模糊 + 提升 alpha 对比，使相邻色块融合出液体边缘 */}
+      {/* gooey 滤镜：模糊 + 提升 alpha 对比，让相邻黄绿圆球黏连成液体（只作用于液体层） */}
       <svg className="junni-service__goo-defs" width="0" height="0" aria-hidden="true" focusable="false">
         <defs>
           <filter id="junniGoo">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="9" result="blur" />
+            <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
             <feColorMatrix
               in="blur"
               mode="matrix"
-              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -10"
+              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -9"
               result="goo"
             />
-            <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+            <feBlend in="SourceGraphic" in2="goo" />
           </filter>
         </defs>
       </svg>
-
-      {/* 自定义圆角方块光标（缓动跟随，悬停行时变实心黄） */}
-      <div ref={cursorRef} className="junni-service__cursor" data-visible="false" data-hover="false" aria-hidden="true" />
 
       <div className="junni-service__head">
         <h2 className="junni-service__title" aria-label={junniServiceTitle}>
@@ -158,11 +101,15 @@ export default function JunniService() {
                 className="junni-service__row"
                 aria-expanded={isOpen}
                 onClick={() => toggle(i)}
-                onMouseEnter={() => setCursorHover(true)}
-                onMouseLeave={() => setCursorHover(false)}
               >
                 <span className="junni-service__row-layer" data-hover="before">
                   {renderRowContent(item)}
+                </span>
+                {/* 黄绿液体层：hover 时多颗圆球错峰涨大，经 goo 滤镜黏连成液体铺满整行 */}
+                <span className="junni-service__row-goo" aria-hidden="true">
+                  {Array.from({ length: 9 }).map((_, b) => (
+                    <i key={b} />
+                  ))}
                 </span>
                 <span className="junni-service__row-layer" data-hover="after" aria-hidden="true">
                   {renderRowContent(item)}

@@ -2,8 +2,8 @@
 .junni-service {
   --svc-bg: #f7f7f7;
   --svc-ink: #111111;
-  --svc-dark: #212121;
-  --svc-green: #cbea41;
+  --svc-dark: #1c1d21;
+  --svc-green: #dcff46;
   --svc-line: rgba(17, 17, 17, 0.14);
   --svc-ease: cubic-bezier(0.16, 1, 0.3, 1);
   /* 行内统一度量：左右内边距 / 编号列宽 / 列间距，供面板正文与名称对齐复用 */
@@ -121,21 +121,82 @@
   position: relative;
   z-index: 1;
 }
-.junni-service__row-layer[data-hover="after"] {
+/* 黄绿液体层（z-index:2，夹在 before 之上、after 之下）：
+   hover 时 9 颗圆球从中心向两侧错峰涨大，经 goo 滤镜黏连成液体明显涨开铺满整行；
+   随后暗层延迟覆盖，最终只留暗底 + 黄绿编号。 */
+.junni-service__goo-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.junni-service__row-goo {
   position: absolute;
   inset: 0 auto 0 50%;
   z-index: 2;
   width: 100vw;
   margin-left: -50vw;
   overflow: hidden;
-  background: var(--svc-dark);
-  color: var(--svc-bg);
-  clip-path: inset(100% 0 0 0);
-  transition: clip-path 0.58s cubic-bezier(0.76, 0, 0.24, 1);
+  pointer-events: none;
+  filter: url(#junniGoo);
 }
-.junni-service__item:not([data-open="true"]) .junni-service__row:hover .junni-service__row-layer[data-hover="after"],
+.junni-service__row-goo i {
+  position: absolute;
+  top: 50%;
+  width: 13%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--svc-green);
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.46s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.junni-service__row-goo i:nth-child(1) { left: 0%; }
+.junni-service__row-goo i:nth-child(2) { left: 12.5%; }
+.junni-service__row-goo i:nth-child(3) { left: 25%; }
+.junni-service__row-goo i:nth-child(4) { left: 37.5%; }
+.junni-service__row-goo i:nth-child(5) { left: 50%; }
+.junni-service__row-goo i:nth-child(6) { left: 62.5%; }
+.junni-service__row-goo i:nth-child(7) { left: 75%; }
+.junni-service__row-goo i:nth-child(8) { left: 87.5%; }
+.junni-service__row-goo i:nth-child(9) { left: 100%; }
+/* 涨开：从中心球先起、向两端错峰，液体感更「涌」 */
+.junni-service__item:not([data-open="true"]) .junni-service__row:hover .junni-service__row-goo i {
+  transform: translate(-50%, -50%) scale(3.4);
+}
+.junni-service__item:not([data-open="true"]) .junni-service__row:hover .junni-service__row-goo i:nth-child(5) { transition-delay: 0s; }
+.junni-service__item:not([data-open="true"]) .junni-service__row:hover .junni-service__row-goo i:nth-child(4),
+.junni-service__item:not([data-open="true"]) .junni-service__row:hover .junni-service__row-goo i:nth-child(6) { transition-delay: 0.04s; }
+.junni-service__item:not([data-open="true"]) .junni-service__row:hover .junni-service__row-goo i:nth-child(3),
+.junni-service__item:not([data-open="true"]) .junni-service__row:hover .junni-service__row-goo i:nth-child(7) { transition-delay: 0.08s; }
+.junni-service__item:not([data-open="true"]) .junni-service__row:hover .junni-service__row-goo i:nth-child(2),
+.junni-service__item:not([data-open="true"]) .junni-service__row:hover .junni-service__row-goo i:nth-child(8) { transition-delay: 0.12s; }
+.junni-service__item:not([data-open="true"]) .junni-service__row:hover .junni-service__row-goo i:nth-child(1),
+.junni-service__item:not([data-open="true"]) .junni-service__row:hover .junni-service__row-goo i:nth-child(9) { transition-delay: 0.16s; }
+.junni-service__item[data-open="true"] .junni-service__row-goo {
+  display: none;
+}
+
+/* after 层：暗底覆盖，clip-path 从水平中线向上下裂开。z-index:3 在液体层之上，
+   过渡带 0.2s 延迟 → 先看到黄绿液体明显涨开，暗层随后像幕布盖上，最终暗底 + 黄绿编号。 */
+.junni-service__row-layer[data-hover="after"] {
+  position: absolute;
+  inset: 0 auto 0 50%;
+  z-index: 3;
+  width: 100vw;
+  margin-left: -50vw;
+  overflow: hidden;
+  background: var(--svc-dark);
+  color: #fff;
+  clip-path: polygon(0 50%, 100% 50%, 100% 50%, 0 50%);
+  transition: clip-path 0.3s ease 0.2s;
+}
+.junni-service__item:not([data-open="true"]) .junni-service__row:hover .junni-service__row-layer[data-hover="after"] {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+}
+/* 点击展开（open）走暗面板逻辑，不需要延迟，立即覆盖 */
 .junni-service__item[data-open="true"] .junni-service__row-layer[data-hover="after"] {
-  clip-path: inset(0 0 0 0);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  transition: clip-path 0.3s ease;
 }
 .junni-service__item[data-open="true"] .junni-service__row-layer[data-hover="before"] {
   opacity: 0;
@@ -316,48 +377,6 @@
 }
 .junni-service.is-in .junni-service__shift-layer {
   transform: scaleY(0);
-}
-
-/* —— gooey 滤镜定义占位：后续可只作用于覆盖层边缘，避免文字被模糊 —— */
-.junni-service__goo-defs {
-  position: absolute;
-  width: 0;
-  height: 0;
-  pointer-events: none;
-}
-
-/* —— 自定义圆角方块光标已停用：保留原生箭头，避免进入该区域后鼠标消失 —— */
-.junni-service__cursor {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 60;
-  width: 2.75rem;
-  height: 2.75rem;
-  border: 2px solid var(--svc-ink);
-  border-radius: 0.85rem;
-  background: transparent;
-  opacity: 0;
-  display: none;
-  pointer-events: none;
-  will-change: transform;
-  transition:
-    width 0.35s var(--svc-ease),
-    height 0.35s var(--svc-ease),
-    border-radius 0.35s var(--svc-ease),
-    background-color 0.35s var(--svc-ease),
-    opacity 0.3s var(--svc-ease);
-}
-.junni-service__cursor[data-visible="true"] {
-  opacity: 1;
-}
-.junni-service__cursor[data-hover="true"] {
-  width: 4.25rem;
-  height: 4.25rem;
-  border-radius: 1.6rem;
-  border-color: transparent;
-  background: var(--svc-green);
-  mix-blend-mode: multiply;
 }
 
 @media (prefers-reduced-motion: reduce) {
