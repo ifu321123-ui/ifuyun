@@ -1,0 +1,374 @@
+/* ===== junni.co.jp SERVICE / PERFORMANCE 手风琴（自包含样式） ===== */
+.junni-service {
+  --svc-bg: #f7f7f7;
+  --svc-ink: #111111;
+  --svc-dark: #212121;
+  --svc-green: #cbea41;
+  --svc-line: rgba(17, 17, 17, 0.14);
+  --svc-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  /* 行内统一度量：左右内边距 / 编号列宽 / 列间距，供面板正文与名称对齐复用 */
+  --svc-pad: clamp(1rem, 3vw, 2.5rem);
+  --svc-num-w: clamp(3rem, 7vw, 5.25rem);
+  --svc-col-gap: clamp(1rem, 3vw, 2.5rem);
+  position: relative;
+  width: 100%;
+  padding: min(130px, 8.125%) 0;
+  background: var(--svc-bg);
+  color: var(--svc-ink);
+  overflow: hidden;
+  font-family:
+    "Inter", "Noto Sans SC", system-ui, -apple-system, sans-serif;
+}
+
+/* —— 标题 —— */
+.junni-service__head {
+  text-align: center;
+  margin-bottom: clamp(2.5rem, 6vw, 5rem);
+}
+.junni-service__title {
+  margin: 0;
+  font-size: clamp(2.6rem, 8vw, 6.5rem);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1;
+}
+.junni-service__title-char {
+  display: inline-block;
+  color: transparent;
+  -webkit-text-stroke: clamp(1px, 0.12vw, 1.5px) var(--svc-ink);
+  opacity: 0;
+  transform: translateY(0.4em);
+  transition:
+    opacity 0.6s var(--svc-ease),
+    transform 0.6s var(--svc-ease);
+}
+.junni-service.is-in .junni-service__title-char {
+  opacity: 1;
+  transform: translateY(0);
+}
+.junni-service__sub {
+  margin: clamp(0.6rem, 1.5vw, 1.1rem) 0 0;
+  font-size: clamp(0.8rem, 1.4vw, 1rem);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+/* —— 列表 —— */
+.junni-service__list {
+  list-style: none;
+  margin: 0 auto;
+  padding: 0;
+  width: min(92vw, 1180px);
+}
+.junni-service__item {
+  position: relative;
+  isolation: isolate;
+  border-top: 1px solid var(--svc-line);
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.7s var(--svc-ease),
+    transform 0.7s var(--svc-ease),
+    color 0.45s var(--svc-ease),
+    border-color 0.45s var(--svc-ease);
+}
+/* 展开时深色背景整屏左右出血（edge-to-edge），内容仍居中对齐容器 */
+.junni-service__item::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
+  margin-left: -50vw;
+  z-index: -1;
+  background: var(--svc-dark);
+  opacity: 0;
+  transition: opacity 0.45s var(--svc-ease);
+}
+.junni-service__item:last-child {
+  border-bottom: 1px solid var(--svc-line);
+}
+.junni-service.is-in .junni-service__item {
+  opacity: 1;
+  transform: translateY(0);
+}
+.junni-service__item[data-open="true"] {
+  color: var(--svc-bg);
+  border-color: transparent;
+}
+.junni-service__item[data-open="true"]::before {
+  opacity: 1;
+}
+
+/* —— 头部行（可点击） —— */
+.junni-service__row {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+.junni-service__row-layer {
+  display: block;
+}
+.junni-service__row-layer[data-hover="before"] {
+  position: relative;
+  z-index: 1;
+}
+.junni-service__row-layer[data-hover="after"] {
+  position: absolute;
+  inset: 0 auto 0 50%;
+  z-index: 2;
+  width: 100vw;
+  margin-left: -50vw;
+  overflow: hidden;
+  background: var(--svc-dark);
+  color: var(--svc-bg);
+  clip-path: inset(100% 0 0 0);
+  transition: clip-path 0.58s cubic-bezier(0.76, 0, 0.24, 1);
+}
+.junni-service__item:not([data-open="true"]) .junni-service__row:hover .junni-service__row-layer[data-hover="after"],
+.junni-service__item[data-open="true"] .junni-service__row-layer[data-hover="after"] {
+  clip-path: inset(0 0 0 0);
+}
+.junni-service__item[data-open="true"] .junni-service__row-layer[data-hover="before"] {
+  opacity: 0;
+}
+.junni-service__row-inner {
+  display: grid;
+  grid-template-columns: var(--svc-num-w) 1fr auto;
+  align-items: center;
+  gap: var(--svc-col-gap);
+  width: 100%;
+  min-height: 100%;
+  padding: clamp(1.4rem, 3vw, 2.4rem) var(--svc-pad);
+  box-sizing: border-box;
+}
+.junni-service__row-layer[data-hover="after"] .junni-service__row-inner {
+  width: min(92vw, 1180px);
+  height: 100%;
+  margin: 0 auto;
+}
+.junni-service__num {
+  font-size: clamp(1.6rem, 4vw, 3rem);
+  font-weight: 800;
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(17, 17, 17, 0.35);
+  transition:
+    -webkit-text-stroke-color 0.4s var(--svc-ease),
+    color 0.4s var(--svc-ease);
+}
+.junni-service__item[data-open="true"] .junni-service__num {
+  color: var(--svc-green);
+  -webkit-text-stroke: 0;
+}
+.junni-service__row-layer[data-hover="after"] .junni-service__num {
+  color: var(--svc-green);
+  -webkit-text-stroke: 0;
+}
+.junni-service__block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+.junni-service__name {
+  font-size: clamp(1.5rem, 4.5vw, 2.6rem);
+  font-weight: 800;
+  line-height: 1.05;
+}
+.junni-service__detail {
+  font-size: clamp(0.78rem, 1.4vw, 0.95rem);
+  font-weight: 500;
+  opacity: 0.75;
+}
+
+/* —— +/× 切换 —— */
+.junni-service__toggle {
+  position: relative;
+  width: clamp(1.6rem, 3vw, 2.2rem);
+  height: clamp(1.6rem, 3vw, 2.2rem);
+  flex: none;
+  color: var(--svc-ink);
+  transition:
+    transform 0.45s var(--svc-ease),
+    color 0.45s var(--svc-ease);
+}
+.junni-service__toggle::before,
+.junni-service__toggle::after {
+  content: "";
+  position: absolute;
+  background: currentColor;
+}
+.junni-service__toggle::before {
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1.5px;
+  transform: translateY(-50%);
+}
+.junni-service__toggle::after {
+  left: 50%;
+  top: 0;
+  width: 1.5px;
+  height: 100%;
+  transform: translateX(-50%);
+}
+.junni-service__item[data-open="true"] .junni-service__toggle {
+  transform: rotate(45deg); /* + → × */
+  color: var(--svc-green);
+}
+.junni-service__row-layer[data-hover="after"] .junni-service__toggle {
+  color: var(--svc-green);
+}
+
+/* —— 展开面板（grid-rows 0fr→1fr 平滑高度） —— */
+.junni-service__panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.55s var(--svc-ease);
+}
+.junni-service__item[data-open="true"] .junni-service__panel {
+  grid-template-rows: 1fr;
+}
+.junni-service__panel-inner {
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  /* 正文左缘与「名称」对齐：左 = 行内边距 + 编号列宽 + 列间距 */
+  padding: 0 var(--svc-pad) 0
+    calc(var(--svc-pad) + var(--svc-num-w) + var(--svc-col-gap));
+}
+.junni-service__item[data-open="true"] .junni-service__panel-inner {
+  padding-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+@media (min-width: 768px) {
+  .junni-service__panel-inner {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    align-items: center;
+  }
+}
+.junni-service__text {
+  margin: 0;
+  max-width: 34rem;
+  font-size: clamp(0.85rem, 1.5vw, 1rem);
+  line-height: 2;
+  color: rgba(247, 247, 247, 0.72);
+}
+/* 右侧图片：居中横向图、带留白、不铺满整列（对齐原站） */
+.junni-service__image {
+  justify-self: center;
+  align-self: center;
+  width: min(100%, 30rem);
+  aspect-ratio: 4 / 3;
+  border-radius: 0.4rem;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, 0.35);
+}
+.junni-service__image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* —— 进场擦除层 —— */
+.junni-service__shift {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  pointer-events: none;
+}
+.junni-service__shift-layer {
+  background: var(--svc-dark);
+  transform: scaleY(1);
+  transform-origin: top;
+  transition: transform 0.7s var(--svc-ease);
+}
+.junni-service__shift-layer:nth-child(2) {
+  transition-delay: 0.06s;
+}
+.junni-service__shift-layer:nth-child(3) {
+  transition-delay: 0.12s;
+}
+.junni-service__shift-layer:nth-child(4) {
+  transition-delay: 0.18s;
+}
+.junni-service__shift-layer:nth-child(5) {
+  transition-delay: 0.24s;
+}
+.junni-service__shift-layer:nth-child(6) {
+  transition-delay: 0.3s;
+}
+.junni-service__shift-layer:nth-child(7) {
+  transition-delay: 0.36s;
+}
+.junni-service.is-in .junni-service__shift-layer {
+  transform: scaleY(0);
+}
+
+/* —— gooey 滤镜定义占位：后续可只作用于覆盖层边缘，避免文字被模糊 —— */
+.junni-service__goo-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+/* —— 自定义圆角方块光标已停用：保留原生箭头，避免进入该区域后鼠标消失 —— */
+.junni-service__cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 60;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 2px solid var(--svc-ink);
+  border-radius: 0.85rem;
+  background: transparent;
+  opacity: 0;
+  display: none;
+  pointer-events: none;
+  will-change: transform;
+  transition:
+    width 0.35s var(--svc-ease),
+    height 0.35s var(--svc-ease),
+    border-radius 0.35s var(--svc-ease),
+    background-color 0.35s var(--svc-ease),
+    opacity 0.3s var(--svc-ease);
+}
+.junni-service__cursor[data-visible="true"] {
+  opacity: 1;
+}
+.junni-service__cursor[data-hover="true"] {
+  width: 4.25rem;
+  height: 4.25rem;
+  border-radius: 1.6rem;
+  border-color: transparent;
+  background: var(--svc-green);
+  mix-blend-mode: multiply;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .junni-service__title-char,
+  .junni-service__item {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .junni-service__shift-layer {
+    transform: scaleY(0);
+    transition: none;
+  }
+}

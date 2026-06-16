@@ -4,6 +4,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { useLenis } from "lenis/react"
 import { navigate } from "@/hooks/useRoute"
 import ProfileSwitcher from "./ProfileSwitcher"
+import JunniService from "./junni/JunniService"
 
 const ASSET = "/gunze/"
 const MOVIE_TOTAL = 5
@@ -474,6 +475,7 @@ export default function GunzeTransition() {
           </div>
         </div>
       </section>
+      <JunniService />
       <ProfileSwitcher />
       <MovieSection />
       <CeoSection />
