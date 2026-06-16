@@ -2247,7 +2247,7 @@
     min-height: 100vh;
     min-height: 100dvh;
     display: grid;
-    place-items: center;
+    place-items: start center;
     padding: clamp(4rem, 8vw, 7rem) clamp(1.25rem, 5vw, 5rem);
     overflow: hidden;
     background: var(--gunze-bg);
