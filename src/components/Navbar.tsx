@@ -51,7 +51,7 @@ export default function Navbar({ hidden = false }: NavbarProps) {
         style={{ fontFamily: '"Figtree", sans-serif' }}
       >
         {notebookNav.map((item) => {
-          const isActive = active === ROUTE_BY_NAV[item.id]
+          const isActive = active.page === ROUTE_BY_NAV[item.id]
           return (
             <button
               key={item.id}

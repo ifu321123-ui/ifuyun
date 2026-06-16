@@ -10,7 +10,7 @@ const INK = "#0b0713"
 const YELLOW = "#f2ff00"
 
 function RevealImage({ src, title, index }: { src: string; title: string; index: number }) {
-  const { ref, inView } = useInView<HTMLFigureElement>(0.08)
+  const { ref, inView } = useInView<HTMLElement>(0.08)
   const [failed, setFailed] = useState(false)
 
   return (
