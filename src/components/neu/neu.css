@@ -10,10 +10,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Zen+Kaku+Gothic+Antique:wght@400;500;700;900&family=DotGothic16&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;0,900;1,700&display=swap");
 
 .neu-root {
-  --neu-blue: #1d01fe;
-  --neu-blue-soft: #614dff;
-  --neu-blue-deep: #1400ab;
-  --neu-blue-ink: #0100c4;
+  --neu-blue: #cbea41; /* 改为站点主题绿（原电光蓝 #1d01fe） */
+  --neu-blue-soft: #dcf06f;
+  --neu-blue-deep: #9cbd1f;
+  --neu-blue-ink: #b3d633;
   --neu-ink: #0f0f0f;
   --neu-paper: #ffffff;
   --neu-lilac: #dcdceb;
@@ -292,7 +292,7 @@ html:has(.neu-embed) {
   padding: clamp(1.4rem, 2.6vw, 2.4rem) clamp(1.6rem, 3vw, 3rem) clamp(1.1rem, 2.2vw, 1.8rem);
   border-radius: clamp(1.4rem, 2.6vw, 2.4rem);
   background: var(--neu-blue);
-  color: #fff;
+  color: #1c1d21;
   box-shadow: 0 30px 60px -30px rgba(29, 1, 254, 0.7);
   animation: neu-fade-up 0.8s var(--neu-ease-framer) both 0.7s;
 }
@@ -317,7 +317,7 @@ html:has(.neu-embed) {
 .neu-hero__copy .neu-eyebrow {
   display: block;
   margin-top: 0.9rem;
-  color: rgba(255, 255, 255, 0.92);
+  color: #1c1d21;
   letter-spacing: 0.04em;
 }
 
@@ -443,7 +443,7 @@ html:has(.neu-embed) {
   padding-block: clamp(2rem, 6vw, 5rem);
 }
 .neu-about .neu-eyebrow {
-  color: rgba(255, 255, 255, 0.82);
+  color: #1c1d21;
 }
 .neu-about__title {
   margin: clamp(1.2rem, 2.4vw, 2rem) 0 clamp(1.6rem, 3vw, 2.6rem);
@@ -451,7 +451,7 @@ html:has(.neu-embed) {
   font-weight: 700;
   font-size: clamp(2.4rem, 4.8vw, 4.8rem);
   line-height: 1.2;
-  color: #fff;
+  color: #1c1d21;
 }
 .neu-about__body {
   font-family: "Zen Kaku Gothic Antique", sans-serif;
@@ -459,7 +459,7 @@ html:has(.neu-embed) {
   font-size: clamp(1.4rem, 1.8vw, 2.4rem);
   line-height: 2;
   max-width: 62ch;
-  color: rgba(255, 255, 255, 0.94);
+  color: #1c1d21;
 }
 .neu-about__cta {
   margin-top: clamp(1.8rem, 4vw, 3rem);
@@ -514,7 +514,7 @@ html:has(.neu-embed) {
   font-size: clamp(5rem, 17vw, 18rem);
   line-height: 0.9;
   letter-spacing: 0.02em;
-  color: #fff;
+  color: #1c1d21;
   text-align: center;
   will-change: transform, opacity;
 }

@@ -35,16 +35,14 @@ const REVEAL_END = 0.34
 // 圆点放大段：从自然尺寸一路长到盖满视口
 // 区间 0.34→0.64（约占整段 30%，宽度基本不变，放大速度不受影响），用较长滚动距离慢慢长大
 const FLOOD_START = 0.34
-const FLOOD_END = 0.64
+const FLOOD_END = 0.58
 // 盖满后再留一点余量，保证大圆边缘完全滚出视口、不露出弧线缺口
 const FLOOD_MARGIN = 1.12
 // 文字与圆点放大同步起步：圆点还小时（FLOOD_START 附近）标题与正文就开始淡入上浮，
 // 与原站「小圆点阶段文案已浮现」的节奏一致，而非等圆几乎铺满才出现
 const MSG_START = 0.34
-const MSG_END = 0.68
-// 退场段：大圆整体上移，露出「圆底」弧线，下方衔接深色简介区块
-// 退场大幅拉长（0.68→1.0，占整段约 32%，是原来 18% 的近两倍），让圆底弧线随滚动慢慢升出、不再「一弹就走」
-const EXIT_START = 0.68
+// 文案在圆点铺满前后完成显现；pin 末段只留短停留，避免「动画已结束还在空滚」的卡顿感。
+const MSG_END = 0.72
 
 const MESSAGE_TITLE = "Message"
 
@@ -266,11 +264,6 @@ export default function GunzeTransition() {
     // 放大末段减速：用 power1.out。线性缩放时铺满速度随面积(scale²)越来越快、收尾发急；
     // ease-out 让缩放在接近铺满时减速，抵消面积加速，收尾更从容
     const easeFlood = gsap.parseEase("power1.out")
-    // 退场专用缓动：改用线性匀速。原先 power2.out 是「先快后慢」(ease-out)，
-    // 大圆在退场前 1/3 就几乎冲出视口，剩下的 pin 行程全是静止白屏（即「离场后一大段空白」）。
-    // 线性匀速让大圆贯穿整个退场区间持续上升、直到接近 progress=1.0 才完全滚出，填满原来的空白尾段，
-    // 且匀速上升本身不存在「突然弹走」的急冲感。
-    const easeExit = gsap.parseEase("none")
 
     const stagger = (
       els: HTMLElement[],
@@ -324,14 +317,10 @@ export default function GunzeTransition() {
       // 在此之前保持透明，让放大过程纯粹由「圆的边缘弧线」推进
       const covered = dotScale * dotH >= diag
 
-      // 退场段：把大圆整体向上推，让它的「圆底」从视口外升入画面再滑出顶部，
-      // 露出下方深色场景底色，形成下凸弧形交界（而非矩形直切）
-    const exit = easeExit(map(p, EXIT_START, 1, 0, 1))
-    const dotRadius = (dotH * dotScale) / 2
-    // 行程 = 圆心到顶 + 半径（恰好让圆底滚出视口顶部）+ 极小余量（0.04vh）确保完全清场不留弧线缝。
-    // 余量收得很小：余量越大，匀速下大圆越早离场、空白越多；0.04vh 让大圆约在 progress≈0.99 才离场。
-    const exitRise = exit * (centerY + dotRadius + vh * 0.04)
-      const dotCenterY = p <= REVEAL_END ? qY + offsetToTail : centerY - exitRise
+      // 圆点铺满后固定在视口中心，后续不再单独上移退场。
+      // 离场由 sticky 释放后整个 .gunze-scene 随自然滚动移走，文字和绿色背景保持同一个坐标系。
+      const dotRadius = (dotH * dotScale) / 2
+      const dotCenterY = p <= REVEAL_END ? qY + offsetToTail : centerY
 
       const msg = map(p, MSG_START, MSG_END, 0, 1)
       stagger(letters, msg, 0.3, 0, 0.05, 70, easeBack)
@@ -347,17 +336,16 @@ export default function GunzeTransition() {
       root.style.setProperty("--gunze-dot-top", `${dotCenterY.toFixed(2)}px`)
       root.style.setProperty("--gunze-dot-rx", `${dotRx.toFixed(2)}px`)
       root.style.setProperty("--gunze-dot-ry", `${dotRadius.toFixed(2)}px`)
-      // 退场一开始就撤掉整屏矩形实底，避免它的直边底盖住圆底弧线，改由大圆独自顶住上半屏
-      root.style.setProperty("--gunze-flood-alpha", covered && exit <= 0 ? "1" : "0")
-      root.style.setProperty("--gunze-scene-dark-alpha", map(p, EXIT_START - 0.04, EXIT_START + 0.08, 0, 1).toFixed(4))
-      // 文案在退场弧线成形前就快速淡出，避免白字残留在已露出的深色交界上
-      const msgFade = 1 - map(p, EXIT_START - 0.02, EXIT_START + 0.02, 0, 1)
+      // 铺满后保留同色实底，作为静止绿色背景；渐变圆点层关闭以减轻滚动重绘。
+      root.style.setProperty("--gunze-flood-alpha", covered ? "1" : "0")
+      root.style.setProperty("--gunze-dot-alpha", covered ? "0" : "1")
+      root.style.setProperty("--gunze-scene-dark-alpha", "0")
       root.style.setProperty(
         "--gunze-message-alpha",
-        (map(p, MSG_START, MSG_START + 0.03, 0, 1) * msgFade).toFixed(4),
+        map(p, MSG_START, MSG_START + 0.03, 0, 1).toFixed(4),
       )
-      // 行程加大：让最后一段在停留窗口内升到视口中部，而非卡在底边后就淡出
-      root.style.setProperty("--gunze-message-y", `${map(p, MSG_START, 1, 58, -110).toFixed(2)}vh`)
+      // 文案容器由 flex 垂直居中，不再用 translateY 偏移。
+      root.style.setProperty("--gunze-message-y", "0vh")
       root.style.setProperty("--gunze-mv-alpha", (1 - map(p, 0.08, REVEAL_END, 0, 1)).toFixed(4))
       root.style.setProperty("--gunze-mv-y", `${map(p, 0, REVEAL_END, 0, -120).toFixed(2)}px`)
     }
@@ -371,7 +359,7 @@ export default function GunzeTransition() {
         trigger: stage,
         start: "top top",
         end: "bottom bottom",
-        scrub: 1,
+        scrub: true,
         invalidateOnRefresh: true,
         onRefresh: (self) => apply(self.progress),
       },
@@ -396,6 +384,7 @@ export default function GunzeTransition() {
         "--gunze-dot-rx",
         "--gunze-dot-ry",
         "--gunze-flood-alpha",
+        "--gunze-dot-alpha",
         "--gunze-scene-dark-alpha",
         "--gunze-message-alpha",
         "--gunze-message-y",

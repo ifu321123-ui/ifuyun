@@ -1176,9 +1176,10 @@
     --gunze-dot-left: 50vw;
     --gunze-dot-top: 130vh;
     --gunze-flood-alpha: 0;
+    --gunze-dot-alpha: 1;
     --gunze-scene-dark-alpha: 0;
     --gunze-message-alpha: 0;
-    --gunze-message-y: 80px;
+    --gunze-message-y: 0vh;
     --gunze-mv-alpha: 1;
     --gunze-mv-y: 0px;
   }
@@ -1234,7 +1235,7 @@
 
   .business-intro__word {
     margin: clamp(0.4rem, 1.4vw, 1.2rem) 0 0;
-    color: var(--gunze-blue);
+    color: #cbea41;
     font-size: clamp(3.4rem, 14.5vw, 14rem);
     font-weight: 950;
     line-height: 0.86;
@@ -1258,7 +1259,7 @@
   .gunze-stage {
     position: relative;
     z-index: 1;
-    height: 300vh;
+    height: 320vh;
     background: var(--gunze-bg);
   }
 
@@ -1555,7 +1556,7 @@
   .gunze-message-fill {
     position: absolute;
     inset: 0;
-    background: var(--gunze-blue);
+    background: #cbea41;
     opacity: var(--gunze-flood-alpha);
     will-change: opacity;
   }
@@ -1563,12 +1564,13 @@
   .gunze-message-dot {
     position: absolute;
     inset: 0;
+    opacity: var(--gunze-dot-alpha, 1);
     /* 用 radial-gradient 实时绘制椭圆：每帧按像素分辨率重栅格化，边缘永远清晰（无 transform:scale 的位图重采样糊边）。
        rx/ry 半轴、圆心 cx/cy 全部由 JS 写入 CSS 变量；末端 1.2px 软边做抗锯齿。 */
     background: radial-gradient(
       var(--gunze-dot-rx, 74px) var(--gunze-dot-ry, 52px) at var(--gunze-dot-left, 50%) var(--gunze-dot-top, 50%),
-      var(--gunze-blue) 0,
-      var(--gunze-blue) calc(100% - 1.2px),
+      #cbea41 0,
+      #cbea41 calc(100% - 1.2px),
       transparent 100%
     );
     will-change: background;
@@ -1578,16 +1580,40 @@
     position: absolute;
     inset: 0;
     z-index: 20;
-    padding-top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(1rem, 4vh, 2.5rem) clamp(1rem, 4vw, 2rem);
     overflow: hidden;
-    color: #fff;
+    color: #1c1d21;
     opacity: var(--gunze-message-alpha);
     will-change: opacity;
   }
 
   .gunze-message-preview__inner {
+    width: min(88vw, 760px);
+    margin: 0 auto;
+    text-align: center;
     transform: translateY(var(--gunze-message-y));
     will-change: transform;
+  }
+
+  .gunze-message-preview .gunze-message-title {
+    text-align: center;
+  }
+
+  .gunze-message-preview .gunze-section-title {
+    font-size: clamp(4rem, 12vw, 10rem);
+  }
+
+  .gunze-message-preview .gunze-message-text {
+    margin-top: clamp(1rem, 2.5vw, 2rem);
+    font-size: clamp(0.95rem, 1.85vw, 1.55rem);
+    line-height: 1.65;
+  }
+
+  .gunze-message-preview .gunze-message-text p {
+    margin: 0 0 1.15em;
   }
 
   .gunze-message-block::after {
@@ -1721,10 +1747,15 @@
     font-weight: 900;
     line-height: 1.72;
     letter-spacing: -0.05em;
+    text-align: center;
   }
 
   .gunze-message-text p {
     margin: 0 0 2.2em;
+  }
+
+  .gunze-message-title {
+    white-space: nowrap;
   }
 
   .gunze-message-title .gunze-letter {
@@ -2602,6 +2633,10 @@
 
     .gunze-section-title {
       font-size: clamp(4rem, 18vw, 6.5rem);
+    }
+
+    .gunze-message-preview .gunze-section-title {
+      font-size: clamp(3.2rem, 15vw, 7.5rem);
     }
 
     .gunze-message-text {

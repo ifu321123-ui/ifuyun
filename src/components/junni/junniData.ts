@@ -3,7 +3,7 @@ export const junniHero = {
   logo: "IFUYUN",
   menu: "MENU",
   // 首屏 JUNNI 下方的手写体标语（原站 home_kv 唯一文案）
-  tagline: "自由に、ユニークに。",
+  tagline: "自由地、独特地。",
   // KV 背面副标题（PRODUCT × UI / UX 标题下方那句，
   // 与 manifesto 是两段不同文案——manifesto 属于下方 home_about）
   kvLead: [
