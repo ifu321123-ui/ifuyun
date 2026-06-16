@@ -1171,7 +1171,8 @@
     --gunze-body-opacity: 1;
     --gunze-q-height: 120vh;
     --gunze-q-y: 0px;
-    --gunze-dot-scale: 1;
+    --gunze-dot-rx: 74px;
+    --gunze-dot-ry: 52px;
     --gunze-dot-left: 50vw;
     --gunze-dot-top: 130vh;
     --gunze-flood-alpha: 0;
@@ -1257,7 +1258,7 @@
   .gunze-stage {
     position: relative;
     z-index: 1;
-    height: 215vh;
+    height: 300vh;
     background: var(--gunze-bg);
   }
 
@@ -1561,15 +1562,16 @@
 
   .gunze-message-dot {
     position: absolute;
-    left: var(--gunze-dot-left);
-    top: var(--gunze-dot-top);
-    width: 146px;
-    height: 103px;
-    border-radius: 50%;
-    background-color: var(--gunze-blue);
-    transform: translate(-50%, -50%) scale(var(--gunze-dot-scale));
-    transform-origin: 50% 50%;
-    will-change: transform;
+    inset: 0;
+    /* 用 radial-gradient 实时绘制椭圆：每帧按像素分辨率重栅格化，边缘永远清晰（无 transform:scale 的位图重采样糊边）。
+       rx/ry 半轴、圆心 cx/cy 全部由 JS 写入 CSS 变量；末端 1.2px 软边做抗锯齿。 */
+    background: radial-gradient(
+      var(--gunze-dot-rx, 74px) var(--gunze-dot-ry, 52px) at var(--gunze-dot-left, 50%) var(--gunze-dot-top, 50%),
+      var(--gunze-blue) 0,
+      var(--gunze-blue) calc(100% - 1.2px),
+      transparent 100%
+    );
+    will-change: background;
   }
 
   .gunze-message-preview {

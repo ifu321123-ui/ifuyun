@@ -29,21 +29,21 @@ const TIP_Y_RATIO = 0.998
 const TIP_X_RATIO = 0.492
 const GAP_RATIO = 0.05
 
-const REVEAL_END = 0.46
-// 圆点放大段：从自然尺寸一路长到盖满视口，区间拉长让放大更从容
-// 区间放宽到 0.46→0.72（约占整段滚动 26%），让小圆点用更长的滚动距离慢慢长大，
-// 避免「一闪而过」铺满全屏的突兀感
-const FLOOD_START = 0.46
-const FLOOD_END = 0.72
+// 问号上升段压缩：从 0.46 收到 0.34，把省下的进度让给退场，避免退场区间过短导致「一弹就走」
+const REVEAL_END = 0.34
+// 圆点放大段：从自然尺寸一路长到盖满视口
+// 区间 0.34→0.64（约占整段 30%，宽度基本不变，放大速度不受影响），用较长滚动距离慢慢长大
+const FLOOD_START = 0.34
+const FLOOD_END = 0.64
 // 盖满后再留一点余量，保证大圆边缘完全滚出视口、不露出弧线缺口
 const FLOOD_MARGIN = 1.12
 // 文字与圆点放大同步起步：圆点还小时（FLOOD_START 附近）标题与正文就开始淡入上浮，
 // 与原站「小圆点阶段文案已浮现」的节奏一致，而非等圆几乎铺满才出现
-const MSG_START = 0.46
-const MSG_END = 0.8
+const MSG_START = 0.34
+const MSG_END = 0.68
 // 退场段：大圆整体上移，露出「圆底」弧线，下方衔接深色简介区块
-// 退场提前，避免缩短区块间距后滚动到下一屏时蓝底与文案仍残留
-const EXIT_START = 0.86
+// 退场大幅拉长（0.68→1.0，占整段约 32%，是原来 18% 的近两倍），让圆底弧线随滚动慢慢升出、不再「一弹就走」
+const EXIT_START = 0.68
 
 const MESSAGE_TITLE = "Message"
 
@@ -250,12 +250,10 @@ function CeoSection() {
 
 export default function GunzeTransition() {
   const stageRef = useRef<HTMLElement>(null)
-  const dotRef = useRef<HTMLDivElement>(null)
   const lenis = useLenis()
 
   useEffect(() => {
     const stage = stageRef.current
-    const dot = dotRef.current
     if (!stage) return
 
     const root = document.documentElement
@@ -264,8 +262,14 @@ export default function GunzeTransition() {
 
     const easeBack = gsap.parseEase("back.out(1.7)")
     const easeFade = gsap.parseEase("power2.out")
-    // 放大更匀速：早期圆点像问号的「点」缓缓变大，收尾不再急剧加速，减弱「一闪铺满」的突兀感
-    const easeFlood = gsap.parseEase("power1.in")
+    // 放大末段减速：用 power1.out。线性缩放时铺满速度随面积(scale²)越来越快、收尾发急；
+    // ease-out 让缩放在接近铺满时减速，抵消面积加速，收尾更从容
+    const easeFlood = gsap.parseEase("power1.out")
+    // 退场专用缓动：改用线性匀速。原先 power2.out 是「先快后慢」(ease-out)，
+    // 大圆在退场前 1/3 就几乎冲出视口，剩下的 pin 行程全是静止白屏（即「离场后一大段空白」）。
+    // 线性匀速让大圆贯穿整个退场区间持续上升、直到接近 progress=1.0 才完全滚出，填满原来的空白尾段，
+    // 且匀速上升本身不存在「突然弹走」的急冲感。
+    const easeExit = gsap.parseEase("none")
 
     const stagger = (
       els: HTMLElement[],
@@ -311,21 +315,22 @@ export default function GunzeTransition() {
       const coverScale = (diag / dotH) * FLOOD_MARGIN
       const flood = easeFlood(map(p, FLOOD_START, FLOOD_END, 0, 1))
       const dotScale = 1 + flood * (coverScale - 1)
+      // 抗锯齿根治：圆点改用 radial-gradient 实时绘制（见 .gunze-message-dot），
+      // 浏览器按当前像素分辨率重绘渐变，边缘恒为矢量级清晰，彻底告别 transform:scale 的位图重采样糊边。
+      // rx/ry 为椭圆半轴，随 dotScale 增长，几何量与原先 dotH*dotScale 完全一致。
+      const dotRx = (dotW * dotScale) / 2
       // 圆已经完全盖住视口后，才把同色实底瞬切到位垫在圆背后（消除亚像素缝隙），
       // 在此之前保持透明，让放大过程纯粹由「圆的边缘弧线」推进
       const covered = dotScale * dotH >= diag
 
       // 退场段：把大圆整体向上推，让它的「圆底」从视口外升入画面再滑出顶部，
       // 露出下方深色场景底色，形成下凸弧形交界（而非矩形直切）
-      const exit = easeFade(map(p, EXIT_START, 1, 0, 1))
-      const dotRadius = (dotH * dotScale) / 2
-      const exitRise = exit * (centerY + dotRadius + vh * 0.12)
+    const exit = easeExit(map(p, EXIT_START, 1, 0, 1))
+    const dotRadius = (dotH * dotScale) / 2
+    // 行程 = 圆心到顶 + 半径（恰好让圆底滚出视口顶部）+ 极小余量（0.04vh）确保完全清场不留弧线缝。
+    // 余量收得很小：余量越大，匀速下大圆越早离场、空白越多；0.04vh 让大圆约在 progress≈0.99 才离场。
+    const exitRise = exit * (centerY + dotRadius + vh * 0.04)
       const dotCenterY = p <= REVEAL_END ? qY + offsetToTail : centerY - exitRise
-
-      if (dot) {
-        dot.style.width = `${dotW.toFixed(1)}px`
-        dot.style.height = `${dotH.toFixed(1)}px`
-      }
 
       const msg = map(p, MSG_START, MSG_END, 0, 1)
       stagger(letters, msg, 0.3, 0, 0.05, 70, easeBack)
@@ -339,7 +344,8 @@ export default function GunzeTransition() {
       const dotLeft = p <= REVEAL_END ? tailX : centerX
       root.style.setProperty("--gunze-dot-left", `${dotLeft.toFixed(2)}px`)
       root.style.setProperty("--gunze-dot-top", `${dotCenterY.toFixed(2)}px`)
-      root.style.setProperty("--gunze-dot-scale", dotScale.toFixed(4))
+      root.style.setProperty("--gunze-dot-rx", `${dotRx.toFixed(2)}px`)
+      root.style.setProperty("--gunze-dot-ry", `${dotRadius.toFixed(2)}px`)
       // 退场一开始就撤掉整屏矩形实底，避免它的直边底盖住圆底弧线，改由大圆独自顶住上半屏
       root.style.setProperty("--gunze-flood-alpha", covered && exit <= 0 ? "1" : "0")
       root.style.setProperty("--gunze-scene-dark-alpha", map(p, EXIT_START - 0.04, EXIT_START + 0.08, 0, 1).toFixed(4))
@@ -364,7 +370,7 @@ export default function GunzeTransition() {
         trigger: stage,
         start: "top top",
         end: "bottom bottom",
-        scrub: 0.4,
+        scrub: 1,
         invalidateOnRefresh: true,
         onRefresh: (self) => apply(self.progress),
       },
@@ -386,7 +392,8 @@ export default function GunzeTransition() {
         "--gunze-body-opacity",
         "--gunze-dot-left",
         "--gunze-dot-top",
-        "--gunze-dot-scale",
+        "--gunze-dot-rx",
+        "--gunze-dot-ry",
         "--gunze-flood-alpha",
         "--gunze-scene-dark-alpha",
         "--gunze-message-alpha",
@@ -419,7 +426,7 @@ export default function GunzeTransition() {
 
           <div className="gunze-message-bg" aria-hidden>
             <div className="gunze-message-fill" />
-            <div ref={dotRef} className="gunze-message-dot" />
+            <div className="gunze-message-dot" />
           </div>
 
           <div className="gunze-message-preview">
