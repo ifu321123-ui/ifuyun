@@ -1,8 +1,13 @@
 # JUNNI home_works 复刻 · 对话交接文档
 
 > 用途：在新对话里继续 1:1 复刻 [junni.co.jp](https://junni.co.jp/) 首页 **home_works**（WORKS 作品轮播）。把本文件喂给新会话即可无缝接力。
-> 当前版本：**椒1.0**（2026-06-16）。架构 = **WebGL 曲面图片圆筒（开放弧）** + **DOM 3D 文字标题层** 叠加，`npm run build` 通过。
-> 历史命名沿用 `云N.0`（云3.0…云9.0=`5708bbb`），自本版起改用 `椒N.0`。
+> 当前版本：**椒2.0**（2026-06-16）。架构 = **WebGL 曲面图片圆筒（开放弧，不透明深度遮挡）** + **DOM 3D 文字标题层** 叠加，**图文同一 rAF 驱动**，`npm run build` 通过。
+> 历史命名沿用 `云N.0`（云3.0…云9.0=`5708bbb`），自椒系列起改用 `椒N.0`（椒1.0 → 椒2.0）。
+
+> **椒2.0 相对椒1.0 的核心变更（本轮重点，解决"不丝滑 / 图文不同向 / 图片重叠"）：**
+> 1. **图文同帧**：文字层不再用 React `setProgress` 每帧重渲，改为在 WebGL 的 `requestAnimationFrame` 里**命令式**直接写 `<li>` 的 transform/opacity（`updateDomItems`），图片与文字严格同帧、丝滑同步。
+> 2. **方向校正**：`SPIN_SIGN` 由 `-1` 改为 `1`，让图片与 DOM 标题**竖直同向**滚动（椒1.0 文档里"-1 同向"是误判）。
+> 3. **去重叠**：图片材质由"半透明交叉淡入"改为**不透明 + 深度遮挡**（`transparent:false` / `depthTest:true` / `depthWrite:true`），前图靠深度干净盖住后图；相邻图片只做**强暗化**只剩暗边，不再半透明糊叠。`PANEL_DEG` 回到 `25`。
 
 ---
 
@@ -12,7 +17,7 @@
 
 ---
 
-## 1. 当前架构（椒1.0）★
+## 1. 当前架构（椒2.0）★
 
 原站这块是 **WebGL**（`__THREE__` + 全屏 webgl2 canvas），图片弯曲贴在圆柱面上随滚动转；DOM 里另有 pin 住的 `home_works_item`（标题/逐字副标题，带内联 `translate3d/rotateX`）。本站对应实现为**两层叠加**，共用同一套角度/半径/透视：
 
@@ -27,9 +32,9 @@ section.junni-works (min-height 300vh，深底，提供滚动行程)
    └ div.junni-works__shift (×4)      # z4  底部黄绿擦除条
 ```
 
-- **WebGL 曲面图片层**：每个有图的作品 = 一个**单位半径的局部圆柱弧段**，贴该作品图。背面/间隙**无几何 = 纯深底**（不是闭罐，这点是相对最早"实心圆筒"版的关键纠正）。
+- **WebGL 曲面图片层**：每个有图的作品 = 一个**单位半径的局部圆柱弧段**，贴该作品图。背面/间隙**无几何 = 纯深底**（不是闭罐，这点是相对最早"实心圆筒"版的关键纠正）。**椒2.0：材质改为不透明 + 深度遮挡**，前图盖后图靠 z-buffer，相邻图片只做强暗化（只露暗边），不再半透明互叠。
 - **DOM 文字标题层**：当前项纯白居中独占，其余压成 `#313238` 暗灰幽灵（实测原站 `#262626`），副标题逐字浮现。
-- 两层用**同一 `progress`** 驱动旋转，且半径/透视对齐 → 文字标题正好压在对应曲面图片上。
+- 两层用**同一 `progress`** 驱动旋转，且半径/透视对齐 → 文字标题正好压在对应曲面图片上。**椒2.0：两层都在 WebGL 的 rAF 内同帧更新**——`progressRef`（GSAP onUpdate 写）→ rAF 内 `updateDomItems(active)` 命令式写 DOM transform + 同帧转 WebGL，去掉了 React 每帧重渲，丝滑且不脱节。只有"当前项标题文本"用一个 `activeTitle` state 在 activeIndex 变化时更新（无障碍 `aria-live`）。
 
 ---
 
@@ -53,9 +58,10 @@ DOM 容器 perspective: 500px（实测 .home_works_list）
 **WebGL 与 DOM 对齐**（让曲面图片与文字同位同深）：
 - px 对齐相机：`camera.position.z = PERSPECTIVE(=500)`，`camera.fov = 2·atan(h/2/500)` → 1 world unit = 1px@z=0，深度衰减与 CSS `perspective:500px` 一致。
 - `drum.scale = R`、`drum.position.z = −R`（单位半径几何放大到 R，前表面落 z=0）。
-- 外层 `drum.rotation.z = π/2`（圆柱轴→屏幕水平 X）；内层 `spinner.rotation.y = SPIN_SIGN × active × STEP_RAD` 随滚动自转；每个 mesh `rotation.y = −SPIN_SIGN × i × STEP_RAD`（基准角）。
+- 外层 `drum.rotation.z = π/2`（圆柱轴→屏幕水平 X）；内层 `spinner.rotation.y = SPIN_SIGN × active × STEP_RAD` 随滚动自转；每个 mesh `rotation.y = −SPIN_SIGN × i × STEP_RAD`（基准角）。**椒2.0：`SPIN_SIGN = 1`**（椒1.0 的 `-1` 会让图片与文字竖直反向，已纠正为同向）。
 - 每张图弧段：`CylinderGeometry(1, 1, aspect×PANEL_RAD, 64, 1, true, −PANEL_RAD/2, PANEL_RAD)`，`axial = aspect×PANEL_RAD` 保证不变形；贴图 `tex.rotation = −π/2`（圆周→屏幕竖直需转 90°）。
-- 材质 `MeshBasicMaterial({transparent, side:FrontSide, depthWrite:false, toneMapped:false})`；每帧按 `eff=(active−i)×25°` 调 `opacity`、亮度 `color.setScalar`、`renderOrder=round(300−|eff|)`（前图盖后图），`|eff|>96°` 隐藏。
+- **椒2.0 材质（关键改动）**：`MeshBasicMaterial({transparent:false, side:FrontSide, depthTest:true, depthWrite:true, toneMapped:false})` —— **不透明 + 写深度**，前图靠 z-buffer 干净遮挡后图，彻底消除半透明卡片互相糊叠。每帧按 `eff=(active−i)×25°`：用 `t=clamp(1−|eff|/25,0,1)`、亮度 `b=0.1+t²×0.9`（相邻图迅速压暗到只剩暗边），`color.setScalar(b)`；`renderOrder=round(1000−|eff|)`、正前方轻微放大 `scale=1+clamp(1−|eff|/44,0,1)×0.012` 防共面闪烁；`|eff|>64°` 隐藏。
+  - 椒1.0 旧逻辑（已废弃）：`transparent:true / depthWrite:false`，`opacity=1−(a−6)/78` 交叉淡入 → 多张半透明弧片叠加发糊（即用户截图里的"卡片重叠"）。
 
 ---
 
@@ -80,7 +86,7 @@ DOM 容器 perspective: 500px（实测 .home_works_list）
 
 ```
 src/components/junni/
-├─ JunniWorks.tsx   # ★椒1.0：WebGL 曲面图片圆筒(three.js) + DOM 3D 文字标题 + WORKS 标题 + shift
+├─ JunniWorks.tsx   # ★椒2.0：WebGL 曲面图片圆筒(three.js,不透明深度遮挡) + DOM 3D 文字标题(rAF 命令式) + WORKS 标题 + shift
 ├─ JunniWorks.css   # ★自包含样式（webgl canvas / scrim / list+item / 标题幽灵态 / shift）
 └─ junniData.ts     # junniWorks 数组（6 项原站文案 + slug + 占位图 + titleSize），未改
 
@@ -94,7 +100,7 @@ index.html           # 已加 Google Fonts: Montserrat:wght@600;700;800
 - 依赖：`three@^0.184` + `@types/three@^0.184`（在 package.json）。bundle 因 three.js ≈ **945kB（gzip ~277kB）**，build 有 chunk>500kB warning（仅提示）。
 - 接入点：`src/components/GunzeTransition.tsx` 内，`<JunniService/>`（PERFORMANCE 手风琴）**正下方**渲染 `<JunniWorks/>`。
   首页流：`Hero → … → GunzeTransition(message) → <JunniService/> → <JunniWorks/> → MovieSection → CeoSection`。
-- 滚动：`SmoothScroll.tsx`(Lenis) 外层包裹；GSAP ScrollTrigger(scrub) → `progressRef`(WebGL rAF 读) + `progress` state(DOM 标题)。
+- 滚动：`SmoothScroll.tsx`(Lenis) 外层包裹；GSAP ScrollTrigger(scrub) → `progressRef`（rAF 读，**同帧同时驱动 WebGL 旋转 + DOM 标题 transform**，见 `updateDomItems`）。椒2.0 已移除 `progress` state（避免每帧 React 重渲）。
 - dev：`npm run dev`（端口 5173，strictPort）。**PowerShell 不支持 `&&`，命令分开或用 `;`**。
 
 ---
@@ -106,10 +112,12 @@ index.html           # 已加 Google Fonts: Montserrat:wght@600;700;800
 | `STEP_DEG` | 25 | 作品间隔角 |
 | `FRONT_DEG` | 0 | 当前项在正前方 θ |
 | `PERSPECTIVE` | 500 | 透视（DOM/WebGL 共用，越大越平）|
-| `PANEL_DEG` | 46 | 单张图圆周张角 = 屏幕高度/曲率；>STEP 故相邻图重叠、前遮后。调大=图更高更弯 |
-| `SPIN_SIGN` | −1 | 旋转方向（让图随滚动与文字同向）|
+| `PANEL_DEG` | 25 | 单张图圆周张角=屏幕高度/曲率；椒2.0 与 STEP 接近避免实体卡片互挤。调大=图更高更弯（不透明深度遮挡下可放心调大）|
+| `SPIN_SIGN` | 1 | 旋转方向（椒2.0 改为 1，让图随滚动与文字**竖直同向**）|
 | `TEX_ROTATION` | −π/2 | 贴图旋正 |
 | `computeRadius` | `clamp(vh×0.52,220,520)` | 半径 |
+
+椒2.0 渲染调参（在 `renderFrame` 里，非顶部常量）：相邻图暗化曲线 `b=0.1+t²×0.9`（`t=1−|eff|/25`，调小分母=相邻图更暗更快消失）；可见阈值 `|eff|<64°`；`renderOrder=1000−|eff|`。
 
 CSS 侧：`.junni-works__item-title` 非当前色 `#313238` / 当前 `#fff`；`.junni-works__scrim` 暗罩强度；`.junni-works__title-echo` 的 WORKS 描边（现 `#dcff46` 描边，原站此屏其实是纯白实心，可按需切换）。
 
@@ -120,9 +128,11 @@ CSS 侧：`.junni-works__item-title` 非当前色 `#313238` / 当前 `#fff`；`.
 1. **云9.0 及更早**：用 three.js **实心圆柱** + 6 图烘焙成一张贴图裹满 360° → 看着像**封闭罐头**。被用户否定（"原站不是完整圆筒"）。
 2. **云10.0（架构重做）**：CDP 实测 + 反推确认原站文字是 **纯 CSS 3D DOM 卡片**（25°/perspective500/开放弧）。弃用 three.js，纯 DOM 文字层落地，bundle 950→436kB。
 3. **椒1.0 调优①**：DOM 版初版"灰字一堆+图压暗+半径太小"显得又乱又空。按实测改：**R=vh×0.52**（之前误用 vw×0.352 太小）、非当前项 → 暗灰幽灵、当前项纯白独占、图片放大显眼。
-4. **椒1.0 调优②（plan A，本次重点）**：用户指出原站作品图是**弯曲贴在圆筒面**上的（平面 div 做不出凸弧）。于是在 DOM 文字层下加回 **WebGL 曲面图片层**，但做成**开放弧**（背面无几何=空）、与 DOM 共用角度/半径/透视。`PANEL_DEG` 从 52→46 软化曲率。✅ 当前形态。
+4. **椒1.0 调优②（plan A）**：用户指出原站作品图是**弯曲贴在圆筒面**上的（平面 div 做不出凸弧）。于是在 DOM 文字层下加回 **WebGL 曲面图片层**，但做成**开放弧**（背面无几何=空）、与 DOM 共用角度/半径/透视。`PANEL_DEG` 从 52→46 软化曲率。
+5. **椒2.0 调优①（丝滑 + 同向）**：用户反馈"没原站丝滑、图文不同方向滚"。定位到两套时钟（WebGL 走 rAF、DOM 走 React setState）导致脱节，且 `SPIN_SIGN=-1` 让图文竖直反向。→ 文字改 **rAF 内命令式更新**（去掉 setProgress），`SPIN_SIGN` 改 **1**。
+6. **椒2.0 调优②（去重叠，本轮重点）**：用户截图指出"卡片重叠发糊"。**先误判**为"原站是单图层只显示一张图"（建议改单图层）；用户又补 4 张原站不同滚动位置截图，证明原站是**真·多图滚筒**（相邻作品图确实存在，只是被推到边缘、强烈变暗、只露暗边，且彼此不糊叠）。**纠正方案**：保留多图滚筒，把材质从"半透明交叉淡入"改为**不透明 + 深度遮挡**，相邻图强暗化。一次过头（`PANEL_DEG=44` + 暗化太弱→实体大图互挤），再收 `PANEL_DEG→25` + 暗化曲线 `b=0.1+t²×0.9`（`t=1−|eff|/25`）。✅ 当前形态。
 
-> 教训：① 原站半径由 **vh** 驱动，不是 vw；② 非当前标题靠**暗色**（非透明）做层次；③ 图要"弯"必须真曲面(WebGL)，`rotateX` 只能倾斜；④ 改 three.js 参数后浏览器要 **navigate 重载**再截图（HMR 对一次性 useEffect 场景不干净）。
+> 教训：① 原站半径由 **vh** 驱动，不是 vw；② 非当前标题靠**暗色**（非透明）做层次；③ 图要"弯"必须真曲面(WebGL)，`rotateX` 只能倾斜；④ 改 three.js 参数后浏览器要 **navigate 重载**再截图（HMR 对一次性 useEffect 场景不干净）；⑤ **图文必须同一时钟**（同一 rAF）才丝滑、不脱节，别让 WebGL 走 rAF、DOM 走 React state；⑥ **多曲面图片去重叠靠"不透明+深度遮挡"，不是靠半透明淡入**（半透明叠加=糊）；⑦ 判断原站机制前**多要几张不同滚动位置的截图**，单帧容易误判（本轮"单图层"误判教训）；⑧ 截图验证时滚到的位置可能正处于**两作品过渡中点**，会天然看到两图相接，别误当 bug。
 
 ---
 
@@ -155,11 +165,11 @@ CSS 侧：`.junni-works__item-title` 非当前色 `#313238` / 当前 `#fff`；`.
 ## 9. Git / 版本
 
 - 仓库：`https://github.com/ifu321123-ui/ifuyun.git`，分支 `main`。
-- **本版本 = 椒1.0**，提交含：`JunniWorks.tsx`（WebGL 曲面图层 + DOM 文字层重写）、`JunniWorks.css`、`index.html`（Montserrat）、本交接文档。
-- 上一里程碑：`云9.0`=`5708bbb`（实心圆柱贴图版，已被取代）。
+- **本版本 = 椒2.0**，提交含：`JunniWorks.tsx`（图文同 rAF 命令式驱动 + `SPIN_SIGN=1` + 不透明深度遮挡材质 + 暗化曲线 + `PANEL_DEG=25`）、本交接文档更新。
+- 上一里程碑：`椒1.0`（WebGL 曲面图层 + DOM 文字层，半透明交叉淡入版，已被椒2.0 取代）；`云9.0`=`5708bbb`（实心圆柱贴图版）。
 
 ---
 
 ## 10. 新对话快速启动指令（复制即用）
 
-> 继续 junni.co.jp 首页 `home_works` 复刻。已读 `docs/junni-works-复刻交接.md`，当前版本 **椒1.0**。现状：`src/components/junni/JunniWorks.{tsx,css}` 用 **WebGL 曲面图片圆筒（three.js 开放弧，背面空）+ DOM 3D 文字标题层** 两层叠加，共用 `θ_i=(active−i)×25° / R=vh×0.52 / perspective500` 一套几何（见第 1、2 节），接入 `GunzeTransition`（`<JunniService/>` 下方），`npm run build` 通过。调参常量见第 5 节，历程/坑见第 6 节。下一步按第 7 节：①换自己作品图 ②WORKS 标题白/绿 ③曲率微调 ④gooey 光标。改后用浏览器（localhost:5173 滚到 WORKS 段，套路见第 8 节）截图对照原站，并 `npm run build` 验证。
+> 继续 junni.co.jp 首页 `home_works` 复刻。已读 `docs/junni-works-复刻交接.md`，当前版本 **椒2.0**。现状：`src/components/junni/JunniWorks.{tsx,css}` 用 **WebGL 曲面图片圆筒（three.js 开放弧，背面空，不透明+深度遮挡）+ DOM 3D 文字标题层** 两层叠加，**图文同一 rAF 命令式驱动**（`updateDomItems`，无 React 每帧重渲），`SPIN_SIGN=1` 图文同向，共用 `θ_i=(active−i)×25° / R=vh×0.52 / perspective500` 一套几何（见第 1、2 节），接入 `GunzeTransition`（`<JunniService/>` 下方），`npm run build` 通过。重叠靠不透明深度遮挡 + 相邻图强暗化解决（非半透明淡入）。调参见第 5 节，历程/坑见第 6 节（注意"单图层"是已纠正的误判，原站是多图滚筒）。下一步按第 7 节：①换自己作品图 ②WORKS 标题白/绿 ③曲率微调 ④gooey 光标。改后用浏览器（localhost:5173 滚到 WORKS 段，套路见第 8 节）截图对照原站，并 `npm run build` 验证。

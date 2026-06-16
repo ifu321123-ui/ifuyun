@@ -1,4 +1,4 @@
-import { CSSProperties, useEffect, useMemo, useRef, useState } from "react"
+import { CSSProperties, useEffect, useRef, useState } from "react"
 import * as THREE from "three"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
@@ -36,9 +36,9 @@ const STEP_RAD = STEP_DEG * DEG2RAD
 
 /** WebGL 曲面参数（可调） */
 const PERSPECTIVE = 500 // 与 DOM perspective 对齐
-const PANEL_DEG = 46 // 单张图片在圆周方向张角（决定屏幕上的高度；与原站一致会与相邻图重叠、前图遮后图）
+const PANEL_DEG = 25 // 单张图片在圆周方向张角：与 STEP 接近，避免正面实体卡片互相挤压
 const PANEL_RAD = PANEL_DEG * DEG2RAD
-const SPIN_SIGN = -1 // 旋转方向：让图片随滚动「自下而上」与文字标题同向（按截图校准）
+const SPIN_SIGN = 1 // 旋转方向：让图片随滚动与 DOM 标题同向
 const TEX_ROTATION = -Math.PI / 2 // 贴图旋正（圆周→屏幕竖直，需转 90°）
 
 function clamp(value: number, min: number, max: number) {
@@ -70,20 +70,55 @@ export default function JunniWorks() {
   const sectionRef = useRef<HTMLElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const sceneRef = useRef<SceneRefs | null>(null)
+  const itemRefs = useRef<(HTMLLIElement | null)[]>([])
   const progressRef = useRef(0)
+  const radiusRef = useRef(typeof window === "undefined" ? 360 : computeRadius(window.innerHeight))
+  const activeIndexRef = useRef(0)
   const lenis = useLenis()
 
-  const [progress, setProgress] = useState(0)
-  const [radius, setRadius] = useState(() =>
-    typeof window === "undefined" ? 360 : computeRadius(window.innerHeight),
-  )
+  const [activeTitle, setActiveTitle] = useState(junniWorks[0]?.title ?? "")
 
   // 视口变化时重算 DOM 标题半径
   useEffect(() => {
-    const onResize = () => setRadius(computeRadius(window.innerHeight))
+    const onResize = () => {
+      radiusRef.current = computeRadius(window.innerHeight)
+    }
     window.addEventListener("resize", onResize)
     return () => window.removeEventListener("resize", onResize)
   }, [])
+
+  const updateDomItems = (active: number) => {
+    const radius = radiusRef.current
+    const progress = clamp(active / (N - 1), 0, 1)
+    sectionRef.current?.style.setProperty("--junni-works-title-opacity", `${clamp(1 - progress * 3.4, 0, 1)}`)
+    sectionRef.current?.style.setProperty("--junni-works-shift-opacity", `${clamp(1 - progress * 3.2, 0, 0.85)}`)
+
+    const activeIndex = clamp(Math.round(active), 0, N - 1)
+    if (activeIndex !== activeIndexRef.current) {
+      activeIndexRef.current = activeIndex
+      setActiveTitle(junniWorks[activeIndex]?.title ?? "")
+    }
+
+    itemRefs.current.forEach((item, i) => {
+      if (!item) return
+      const theta = FRONT_DEG + (active - i) * STEP_DEG
+      const rad = theta * DEG2RAD
+      const y = -radius * Math.sin(rad)
+      const z = radius * (Math.cos(rad) - 1)
+      const opacity = clamp(1 - (Math.abs(theta) - 46) / 14, 0, 1)
+      const isActive = i === activeIndex
+
+      item.style.transform = `translate(-50%, -50%) translateY(${y.toFixed(2)}px) translateZ(${z.toFixed(
+        2,
+      )}px) rotateX(${theta.toFixed(3)}deg)`
+      item.style.opacity = `${opacity}`
+      item.style.zIndex = `${Math.round(1000 - Math.abs(theta))}`
+      item.dataset.active = String(isActive)
+      item
+        .querySelector<HTMLAnchorElement>(".junni-works__item-link")
+        ?.setAttribute("tabindex", isActive ? "0" : "-1")
+    })
+  }
 
   // ── WebGL：开放圆筒弧的曲面图片层（仅初始化一次） ──────────────
   useEffect(() => {
@@ -128,23 +163,27 @@ export default function JunniWorks() {
       camera.fov = (2 * Math.atan(h / 2 / PERSPECTIVE) * 180) / Math.PI
       camera.updateProjectionMatrix()
       const R = computeRadius(h)
+      radiusRef.current = R
       drum.scale.setScalar(R) // 单位半径几何 → R（与 DOM 同半径）
       drum.position.z = -R // 圆筒前表面落在 z=0 → 与 DOM perspective 对齐
+      updateDomItems(progressRef.current * (N - 1))
     }
 
     const renderFrame = () => {
       const p = progressRef.current
       const active = p * (N - 1)
+      updateDomItems(active)
       refs.spinner.rotation.y = SPIN_SIGN * active * STEP_RAD
       refs.panels.forEach(({ mat, mesh, index }) => {
         const eff = (active - index) * STEP_DEG // 该图相对正前方的角度（度）
         const a = Math.abs(eff)
-        // 正前方最亮，越偏越暗、越偏越淡（>~75° 基本消失）
-        mat.opacity = clamp(1 - (a - 6) / 78, 0, 1)
-        const b = clamp(0.34 + (1 - a / 92) * 0.66, 0.3, 1)
+        // 图片是实体曲面：靠深度遮挡解决重叠，偏离正面的图片只做暗化，不再半透明互叠。
+        const t = clamp(1 - a / 25, 0, 1)
+        const b = 0.1 + t * t * 0.9
         mat.color.setScalar(b)
-        mesh.renderOrder = Math.round(300 - a) // 前图后绘制=盖住后图
-        mesh.visible = a < 96
+        mesh.scale.setScalar(1 + clamp(1 - a / 44, 0, 1) * 0.012)
+        mesh.renderOrder = Math.round(1000 - a)
+        mesh.visible = a < 64
       })
       renderer.render(refs.scene, refs.camera)
       if (refs.running) refs.raf = requestAnimationFrame(renderFrame)
@@ -194,9 +233,10 @@ export default function JunniWorks() {
         const geo = new THREE.CylinderGeometry(1, 1, axial, 64, 1, true, -PANEL_RAD / 2, PANEL_RAD)
         const mat = new THREE.MeshBasicMaterial({
           map: tex,
-          transparent: true,
+          transparent: false,
           side: THREE.FrontSide,
-          depthWrite: false,
+          depthTest: true,
+          depthWrite: true,
           toneMapped: false,
         })
         const mesh = new THREE.Mesh(geo, mat)
@@ -256,7 +296,7 @@ export default function JunniWorks() {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
     if (reduce) {
       progressRef.current = 0
-      setProgress(0)
+      updateDomItems(0)
       return
     }
 
@@ -268,7 +308,6 @@ export default function JunniWorks() {
       invalidateOnRefresh: true,
       onUpdate: (self) => {
         progressRef.current = self.progress
-        setProgress(self.progress)
       },
     })
 
@@ -282,26 +321,9 @@ export default function JunniWorks() {
     }
   }, [lenis])
 
-  const active = progress * (N - 1)
-  const activeIndex = clamp(Math.round(active), 0, N - 1)
-  const activeWork = junniWorks[activeIndex] ?? junniWorks[0]
-
-  // 每个文字标题的 3D 摆位（与曲面图片同一套公式）
-  const items = useMemo(() => {
-    return junniWorks.map((work, i) => {
-      const theta = FRONT_DEG + (active - i) * STEP_DEG
-      const rad = theta * DEG2RAD
-      const y = -radius * Math.sin(rad)
-      const z = radius * (Math.cos(rad) - 1)
-      const opacity = clamp(1 - (Math.abs(theta) - 52) / 18, 0, 1)
-      const isActive = i === activeIndex
-      return { work, i, theta, y, z, opacity, isActive }
-    })
-  }, [active, activeIndex, radius])
-
   const stageVars = {
-    "--junni-works-title-opacity": clamp(1 - progress * 3.4, 0, 1),
-    "--junni-works-shift-opacity": clamp(1 - progress * 3.2, 0, 0.85),
+    "--junni-works-title-opacity": 1,
+    "--junni-works-shift-opacity": 0.85,
   } as CSSProperties
 
   return (
@@ -340,23 +362,18 @@ export default function JunniWorks() {
         {/* 3D 文字标题层：与曲面共用角度/半径/透视，叠在最前 */}
         <div className="junni-works__slider">
           <ul className="junni-works__list">
-            {items.map(({ work, i, y, z, theta, opacity, isActive }) => {
+            {junniWorks.map((work, i) => {
               const descChars = splitText(work.description)
+              const isActive = i === 0
               return (
                 <li
                   key={work.slug}
+                  ref={(node) => {
+                    itemRefs.current[i] = node
+                  }}
                   className="junni-works__item"
                   data-works={work.slug}
                   data-active={isActive}
-                  style={
-                    {
-                      transform: `translate(-50%, -50%) translateY(${y.toFixed(2)}px) translateZ(${z.toFixed(
-                        2,
-                      )}px) rotateX(${theta.toFixed(3)}deg)`,
-                      opacity,
-                      zIndex: Math.round(1000 - Math.abs(theta)),
-                    } as CSSProperties
-                  }
                 >
                   <a
                     href={work.href}
@@ -395,7 +412,7 @@ export default function JunniWorks() {
       </div>
 
       <span className="junni-works__sr" aria-live="polite">
-        {activeWork.title}
+        {activeTitle}
       </span>
     </section>
   )
