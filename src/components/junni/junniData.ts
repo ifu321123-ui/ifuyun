@@ -291,7 +291,7 @@ export const junniWorks: JunniWork[] = [
     title: "BaSICA",
     description: "株式会社BaSICA コーポレートサイトリニューアル",
     href: "/works/basica",
-    image: "/works/shiyuan/01.png",
+    image: "/works/junni/basica.jpg",
     titleSize: "normal",
   },
   {
@@ -299,7 +299,7 @@ export const junniWorks: JunniWork[] = [
     title: "Alche, Inc",
     description: "Alche株式会社 コーポレートサイトリニューアル",
     href: "/works/alche-studio",
-    image: "/works/shiyuan/02.png",
+    image: "/works/junni/alche-studio.png",
     titleSize: "normal",
   },
   {
@@ -307,7 +307,7 @@ export const junniWorks: JunniWork[] = [
     title: "2nd STAR PRODUCTION",
     description: "「2nd STAR PRODUCTION」コーポレートサイト制作",
     href: "/works/2nd-star-production",
-    image: "/works/shiyuan/03.png",
+    image: "/works/junni/2nd-star-production.jpg",
     titleSize: "small",
   },
   {
@@ -315,7 +315,7 @@ export const junniWorks: JunniWork[] = [
     title: "ONE PIECE BASE",
     description: "ONE PIECE BASEアプリ開発／制作",
     href: "/works/opb_app",
-    image: "/works/shiyuan/04.png",
+    image: "/works/junni/opb_app.png",
     titleSize: "middle",
   },
   {
@@ -323,7 +323,7 @@ export const junniWorks: JunniWork[] = [
     title: "M@STER EXPO",
     description: "THE IDOLM@STER M@STER EXPO 公式ブース出展",
     href: "/works/master-expo",
-    image: "/works/shiyuan/05.png",
+    image: "/works/junni/master-expo.png",
     titleSize: "middle",
   },
   {
@@ -331,6 +331,6 @@ export const junniWorks: JunniWork[] = [
     title: "and more...",
     description: "WORKS - 制作実績一覧ページ",
     href: "/works",
-    image: "/works/shiyuan/06.png",
+    image: "",
   },
 ]

@@ -25,6 +25,12 @@ const SECTOR = TWO_PI / N
 /** 滚动 0→1 时鼓体转过的总角度：让 6 个作品依次转到正前方 */
 const SPAN = (N - 1) * SECTOR
 
+/** 鼓体几何尺寸（与 CylinderGeometry 保持一致，用于纹理比例补偿） */
+const DRUM_RADIUS = 1.58
+const DRUM_HEIGHT = 7.35
+/** canvas 各向异性补偿：圆周方向 world/px ÷ 轴向 world/px */
+const ASPECT_COMP = (TWO_PI * DRUM_RADIUS) / DRUM_HEIGHT
+
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value))
 }
@@ -33,39 +39,102 @@ function splitText(text: string) {
   return Array.from(text).map((char) => (char === " " ? "\u00A0" : char))
 }
 
-/** 把 6 个作品名画到一张 canvas 上，作为圆柱（鼓）的表面纹理 */
-function buildDrumTexture() {
+function loadImage(src: string): Promise<HTMLImageElement | null> {
+  return new Promise((resolve) => {
+    if (!src) {
+      resolve(null)
+      return
+    }
+    const img = new Image()
+    img.decoding = "async"
+    img.onload = () => resolve(img)
+    img.onerror = () => resolve(null)
+    img.src = src
+  })
+}
+
+/** 预加载所有作品占位图，供 buildDrumTexture 直接绘制 */
+function loadDrumImages() {
+  return Promise.all(junniWorks.map((work) => loadImage(work.image)))
+}
+
+/**
+ * 把 6 个作品的视觉图（占位）+ 标题分段画到一张 canvas，作为圆柱表面纹理。
+ * 映射：canvas X = 圆周方向（堆叠 6 段，每段一作品），canvas Y = 圆柱轴向（屏幕水平）。
+ * 每段：深底 → 居中铺作品图（cover 裁切，按 ASPECT_COMP 校正不变形）→ 暗化渐变 → 白色标题/Logo。
+ */
+function buildDrumTexture(images: (HTMLImageElement | null)[]) {
   const size = 2048
   const canvas = document.createElement("canvas")
   canvas.width = size
   canvas.height = size
   const ctx = canvas.getContext("2d")!
 
-  // 纸张底色（米白）+ 细微噪点，贴近原站纸卷质感
-  ctx.fillStyle = "#f1f1ef"
+  // 整张深底：段与段之间、面板四周露出的鼓面与深色舞台融为一体
+  ctx.fillStyle = "#101116"
   ctx.fillRect(0, 0, size, size)
-  for (let i = 0; i < 9000; i++) {
-    const v = 215 + Math.floor(Math.random() * 35)
-    ctx.fillStyle = `rgba(${v},${v},${v},0.25)`
-    ctx.fillRect(Math.random() * size, Math.random() * size, 1.5, 1.5)
-  }
 
-  // canvas X = 圆周方向（堆叠 6 个作品），canvas Y = 圆柱轴向（屏幕水平）
-  // 因此每个作品名竖排绘制（旋转 90°），并按需镜像以保证正面朝向可读
   const band = size / N
+  // 面板尺寸（local 坐标，旋转后 x=轴向/屏幕横向，y=圆周/屏幕纵向）
+  const panelAxialPx = size * 0.64 // 屏幕横向（轴向）占比
+  const panelCircPx = band * 0.84 // 屏幕纵向（圆周）占比，留出段间深色缝隙
+
   ctx.textAlign = "center"
   ctx.textBaseline = "middle"
 
   junniWorks.forEach((work, index) => {
     const cx = (index + 0.5) * band
-    const title = work.title.toUpperCase()
-    const fontSize = work.titleSize === "small" ? 92 : work.titleSize === "middle" ? 110 : 128
+    const img = images[index]
     ctx.save()
     ctx.translate(cx, size / 2)
-    ctx.rotate(Math.PI / 2)
-    ctx.fillStyle = "#15171c"
+    ctx.rotate(Math.PI / 2) // 与文字同一套朝向：local 正向 = 屏幕可读方向
+
+    const halfX = panelAxialPx / 2
+    const halfY = panelCircPx / 2
+
+    ctx.save()
+    ctx.beginPath()
+    ctx.rect(-halfX, -halfY, panelAxialPx, panelCircPx)
+    ctx.clip()
+
+    // 面板深底（无图时也有质感）
+    ctx.fillStyle = work.slug === "and_more" ? "#15171c" : "#0c0d10"
+    ctx.fillRect(-halfX, -halfY, panelAxialPx, panelCircPx)
+
+    if (img) {
+      // cover：按屏幕比例铺满面板并裁切（ASPECT_COMP 校正 canvas 各向异性）
+      const imgAspect = img.width / img.height
+      const panelScreenAspect = panelAxialPx / panelCircPx / ASPECT_COMP
+      let drawX: number
+      let drawY: number
+      if (imgAspect > panelScreenAspect) {
+        drawY = panelCircPx
+        drawX = drawY * imgAspect * ASPECT_COMP
+      } else {
+        drawX = panelAxialPx
+        drawY = drawX / (imgAspect * ASPECT_COMP)
+      }
+      ctx.drawImage(img, -drawX / 2, -drawY / 2, drawX, drawY)
+
+      // 暗化叠层：仅上下边缘略加深，让白色标题更突出、又保留正面画面的鲜亮
+      const grad = ctx.createLinearGradient(0, -halfY, 0, halfY)
+      grad.addColorStop(0, "rgba(8,9,12,0.42)")
+      grad.addColorStop(0.5, "rgba(8,9,12,0.05)")
+      grad.addColorStop(1, "rgba(8,9,12,0.5)")
+      ctx.fillStyle = grad
+      ctx.fillRect(-halfX, -halfY, panelAxialPx, panelCircPx)
+    }
+    ctx.restore()
+
+    // 标题 / Logo（白色，居中，带柔和阴影）
+    const title = work.title.toUpperCase()
+    const fontSize = work.titleSize === "small" ? 96 : work.titleSize === "middle" ? 128 : 150
     ctx.font = `900 ${fontSize}px "Inter", system-ui, sans-serif`
-    ctx.fillText(title, 0, -6)
+    ctx.shadowColor = "rgba(0,0,0,0.45)"
+    ctx.shadowBlur = 24
+    ctx.shadowOffsetY = 4
+    ctx.fillStyle = work.slug === "and_more" ? "#dcff46" : "#ffffff"
+    ctx.fillText(title, 0, 0)
     ctx.restore()
   })
 
@@ -119,21 +188,25 @@ export default function JunniWorks() {
     const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 100)
     camera.position.set(0, 0, 16)
 
-    scene.add(new THREE.AmbientLight(0xffffff, 1.15))
-    const key = new THREE.DirectionalLight(0xffffff, 0.55)
-    key.position.set(-3, 6, 5)
+    // 低环境光 → 让圆周侧面/背面自然压暗；正面 key 光从相机方向打亮当前作品
+    scene.add(new THREE.AmbientLight(0xffffff, 0.7))
+    const key = new THREE.DirectionalLight(0xffffff, 1.65)
+    key.position.set(0, 2.5, 9)
     scene.add(key)
-    const rim = new THREE.DirectionalLight(0xdcff46, 0.24)
+    const fill = new THREE.DirectionalLight(0xffffff, 0.28)
+    fill.position.set(-4, 5, 4)
+    scene.add(fill)
+    const rim = new THREE.DirectionalLight(0xdcff46, 0.22)
     rim.position.set(4, -3, 2)
     scene.add(rim)
 
-    // 鼓体（横置圆柱）
-    const texture = buildDrumTexture()
-    const geometry = new THREE.CylinderGeometry(1.58, 1.58, 7.35, 128, 1, true)
+    // 鼓体（横置圆柱）：初始用纯文字纹理（深底+标题），图片异步加载后重建
+    const texture = buildDrumTexture(junniWorks.map(() => null))
+    const geometry = new THREE.CylinderGeometry(DRUM_RADIUS, DRUM_RADIUS, DRUM_HEIGHT, 160, 1, true)
     const material = new THREE.MeshStandardMaterial({
       map: texture,
-      roughness: 0.82,
-      metalness: 0.04,
+      roughness: 0.66,
+      metalness: 0.05,
       side: THREE.DoubleSide,
     })
     const tube = new THREE.Mesh(geometry, material)
@@ -217,17 +290,18 @@ export default function JunniWorks() {
       cancelAnimationFrame(refs.raf)
     }
 
-    // 字体就绪后重建纹理，避免首帧用 fallback 字体
-    if (document.fonts?.ready) {
-      document.fonts.ready.then(() => {
-        const fresh = buildDrumTexture()
-        material.map = fresh
-        material.needsUpdate = true
-        refs.texture.dispose()
-        refs.texture = fresh
-        renderer.render(scene, camera)
-      })
-    }
+    // 字体就绪 + 占位图加载完成后重建纹理（首帧用 fallback 字体 / 无图，随后替换）
+    let disposed = false
+    const fontsReady = document.fonts?.ready ?? Promise.resolve()
+    Promise.all([fontsReady, loadDrumImages()]).then(([, imgs]) => {
+      if (disposed) return
+      const fresh = buildDrumTexture(imgs)
+      material.map = fresh
+      material.needsUpdate = true
+      refs.texture.dispose()
+      refs.texture = fresh
+      renderer.render(scene, camera)
+    })
 
     if (reduce) {
       renderFrame() // 渲染一帧静态画面
@@ -241,6 +315,7 @@ export default function JunniWorks() {
       io.observe(section)
 
       return () => {
+        disposed = true
         io.disconnect()
         stop()
         window.removeEventListener("resize", resize)
@@ -255,6 +330,7 @@ export default function JunniWorks() {
     }
 
     return () => {
+      disposed = true
       stop()
       window.removeEventListener("resize", resize)
       geometry.dispose()
