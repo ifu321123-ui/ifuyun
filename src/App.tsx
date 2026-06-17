@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import Navbar from "./components/Navbar"
+import JunniMenu from "./components/junni/JunniMenu"
 import Hero from "./components/Hero"
 import JunniTop from "./components/junni/JunniTop"
 import Experience from "./components/Experience"
@@ -66,6 +66,7 @@ export default function App() {
   if (page === "work") {
     return (
       <SmoothScroll>
+        <JunniMenu />
         <ProjectDetail slug={route.slug} />
       </SmoothScroll>
     )
@@ -73,6 +74,7 @@ export default function App() {
 
   return (
     <SmoothScroll>
+      <JunniMenu inJunniZone={isNotebookHome && inJunniZone} />
       <div
         className={cn(
           "relative min-h-screen",
@@ -80,7 +82,6 @@ export default function App() {
           isExperience && "neu-host-scale",
         )}
       >
-        <Navbar hidden={(isNotebookHome && inJunniZone) || isPortfolio} />
         <main key={page} className="min-h-screen animate-fade-up">
           {renderPage(page, onJunniZoneChange)}
         </main>

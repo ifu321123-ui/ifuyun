@@ -39,7 +39,6 @@ function map(p: number, inMin: number, inMax: number, outMin: number, outMax: nu
 function HeroKV() {
   return (
     <div className="junni-kv junni-kv--front">
-      <span className="junni-kv__menu">{junniHero.menu}</span>
       <span className="junni-kv__scroll">{junniHero.marquee}</span>
       <div className="junni-kv__center">
         <h1 className="junni-kv__logo">{junniHero.logo}</h1>
@@ -56,7 +55,6 @@ function HeroKV() {
 function BackKV() {
   return (
     <div className="junni-kv junni-kv--back">
-      <span className="junni-kv__menu junni-kv__menu--back">{junniHero.menu}</span>
       <div className="junni-kv__back-center">
         <p className="junni-kv__back-title">
           <span>PRODUCT</span>
