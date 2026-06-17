@@ -600,6 +600,21 @@
 
   pointer-events: none;
 
+  transition: opacity 0.35s ease, visibility 0.35s ease;
+
+}
+
+
+
+.jwp__drumroll-wrap[data-images-gone="true"] .jwp__drumroll-scrim,
+.jwp__drumroll-wrap[data-images-gone="true"] .jwp__drumroll-slider {
+
+  opacity: 0;
+
+  visibility: hidden;
+
+  pointer-events: none;
+
 }
 
 @media (max-width: 949px) {
@@ -864,19 +879,80 @@
 
 
 
-/* PREV / NEXT nav in drumroll */
+/* PREV / NEXT nav overlay — fixed after drum images exit (not on cylinder) */
+
+.jwp__drumroll-nav-overlay {
+
+  position: absolute;
+  inset: 0;
+
+  z-index: 4;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: min(90vw, 900px);
+  margin: 0 auto;
+  padding: 0 clamp(12px, 3vw, 28px);
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+}
+
+
+
+.jwp__drumroll-nav-spacer {
+
+  flex: 0 0 clamp(80px, 12vw, 140px);
+
+}
+
+
+
+.jwp__drumroll-nav--prev {
+
+  align-items: flex-start;
+  text-align: left;
+  color: #777777;
+
+}
+
+
+
+.jwp__drumroll-nav--prev .jwp__drumroll-nav-arrow path {
+
+  stroke: #777777;
+
+}
+
+
+
+.jwp__drumroll-nav--next {
+
+  align-items: flex-end;
+  text-align: right;
+  margin-left: auto;
+
+}
+
+
+
+.jwp__drumroll-nav--next .jwp__drumroll-nav-en {
+
+  font-size: clamp(28px, 4.5vw, 52px);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+
+}
+
+
 
 .jwp__drumroll-item--nav {
 
-  display: flex;
-
-  flex-direction: column;
-
-  align-items: center;
-
-  gap: 1rem;
-
-  pointer-events: auto;
+  display: none;
 
 }
 

@@ -2,11 +2,16 @@ import { CSSProperties, useCallback, useEffect, useRef, useState } from "react"
 
 import { createPortal } from "react-dom"
 
+import gsap from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { useLenis } from "lenis/react"
 
 import { navigate } from "@/hooks/useRoute"
 
-import JunniWorksDrumroll, { getDrumrollPhaseMax } from "./JunniWorksDrumroll"
+import JunniWorksDrumroll, {
+  getDrumrollImagesGonePhase,
+  getDrumrollPhaseMax,
+} from "./JunniWorksDrumroll"
 
 import {
 
@@ -21,6 +26,26 @@ import {
 } from "./junniWorksPageData"
 
 import "./JunniWorksPage.css"
+
+gsap.registerPlugin(ScrollTrigger)
+
+/** Map drumroll scroll progress → phase (browse → exit → nav hold). */
+function scrollProgressToPhase(progress: number, itemCount: number) {
+  const p = Math.min(1, Math.max(0, progress))
+  const worksEnd = Math.max(0, itemCount - 1)
+  const imagesGone = getDrumrollImagesGonePhase(itemCount)
+  const phaseMax = getDrumrollPhaseMax(itemCount)
+  const browseEnd = 0.68
+  const exitEnd = 0.88
+
+  if (p <= browseEnd) return (p / browseEnd) * worksEnd
+  if (p <= exitEnd) {
+    const t = (p - browseEnd) / (exitEnd - browseEnd)
+    return worksEnd + t * (imagesGone - worksEnd)
+  }
+  const t = (p - exitEnd) / (1 - exitEnd)
+  return imagesGone + t * (phaseMax - imagesGone)
+}
 
 
 
@@ -232,38 +257,37 @@ export default function JunniWorksPage() {
   }, [drumrollActive])
 
   useEffect(() => {
-    const onWindowWheel = (e: WheelEvent) => {
-      if (view !== "drumroll") return
+    if (view !== "drumroll") return
 
-      const drumrollEl = drumrollSectionRef.current
-      if (!drumrollEl) return
+    const section = drumrollSectionRef.current
+    if (!section) return
 
-      const rect = drumrollEl.getBoundingClientRect()
-      const viewportH = window.innerHeight
-      const isInDrumrollZone = rect.top < viewportH * 0.2 && rect.bottom > viewportH * 0.8
-      if (!isInDrumrollZone) return
-
-      const normalizedDelta = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY
-      const phaseMax = getDrumrollPhaseMax(items.length)
-      const current = drumrollActiveRef.current
-      const sensitivity = 0.0032
-      let next = current + normalizedDelta * sensitivity
-
-      const releasingUp = normalizedDelta < 0 && current <= 0.02
-      const releasingDown = normalizedDelta > 0 && current >= phaseMax - 0.02
-      if (releasingUp || releasingDown) return
-
-      e.preventDefault()
-
-      if (next < 0) next *= 0.22
-      if (next > phaseMax) next = phaseMax + (next - phaseMax) * 0.22
-
-      setDrumrollPhase(next)
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    if (reduce) {
+      setDrumrollPhase(0)
+      return
     }
 
-    window.addEventListener("wheel", onWindowWheel, { passive: false, capture: true })
-    return () => window.removeEventListener("wheel", onWindowWheel, true)
-  }, [items.length, setDrumrollPhase, view])
+    const trigger = ScrollTrigger.create({
+      trigger: section,
+      start: "top top",
+      end: "bottom bottom",
+      scrub: 0.45,
+      invalidateOnRefresh: true,
+      onUpdate: (self) => {
+        setDrumrollPhase(scrollProgressToPhase(self.progress, items.length))
+      },
+    })
+
+    const onScroll = () => ScrollTrigger.update()
+    lenis?.on("scroll", onScroll)
+    ScrollTrigger.refresh()
+
+    return () => {
+      lenis?.off("scroll", onScroll)
+      trigger.kill()
+    }
+  }, [view, items.length, lenis, setDrumrollPhase])
 
 
 
@@ -290,6 +314,7 @@ export default function JunniWorksPage() {
   useEffect(() => {
 
     setDrumrollPhase(0)
+    requestAnimationFrame(() => ScrollTrigger.refresh())
 
   }, [page, setDrumrollPhase])
 

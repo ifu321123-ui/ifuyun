@@ -18,12 +18,25 @@ const PANEL_MAX_WIDTH = 900
 const SPIN_SIGN = 1
 const TEX_ROTATION = -Math.PI / 2
 
-/** Extra phase past the nav item so every panel leaves the visible arc before page scroll continues. */
-export const DRUMROLL_EXIT_MARGIN = 2.8
+/** Phase past last work item until every WebGL panel leaves the visible arc (|Δ|×25° ≥ 58°). */
+export const DRUMROLL_EXIT_WORK_MARGIN = 2.5
+/** Hold on empty nav screen before page scroll continues to footer. */
+export const DRUMROLL_NAV_HOLD_MARGIN = 1.2
+
+export function getDrumrollImagesGonePhase(itemCount: number) {
+  return Math.max(0, itemCount - 1) + DRUMROLL_EXIT_WORK_MARGIN
+}
+
+export function getDrumrollNavStartPhase(itemCount: number) {
+  return getDrumrollImagesGonePhase(itemCount)
+}
 
 export function getDrumrollPhaseMax(itemCount: number) {
-  return itemCount + DRUMROLL_EXIT_MARGIN
+  return getDrumrollImagesGonePhase(itemCount) + DRUMROLL_NAV_HOLD_MARGIN
 }
+
+/** @deprecated Use getDrumrollPhaseMax — kept for grep compatibility */
+export const DRUMROLL_EXIT_MARGIN = DRUMROLL_EXIT_WORK_MARGIN + DRUMROLL_NAV_HOLD_MARGIN
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value))
@@ -100,20 +113,52 @@ export default function JunniWorksDrumroll({
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const sceneRef = useRef<SceneRefs | null>(null)
   const itemRefs = useRef<(HTMLLIElement | null)[]>([])
-  const navRef = useRef<HTMLLIElement | null>(null)
+  const navOverlayRef = useRef<HTMLElement | null>(null)
+  const viewportRef = useRef<HTMLDivElement | null>(null)
   const targetActiveRef = useRef(active)
   const smoothActiveRef = useRef(active)
   const radiusRef = useRef(360)
   const activeIndexRef = useRef(Math.round(active))
 
   const n = items.length
-  const navIndex = n
+  const imagesGonePhase = getDrumrollImagesGonePhase(n)
+  const navStartPhase = getDrumrollNavStartPhase(n)
 
   targetActiveRef.current = active
 
+  const updateStageChrome = useCallback(
+    (activeFloat: number) => {
+      const wrap = wrapRef.current
+      const viewport = viewportRef.current
+      const navOverlay = navOverlayRef.current
+      if (!wrap) return
+
+      const fadeStart = imagesGonePhase - 0.55
+      const imagesFade = clamp((activeFloat - fadeStart) / 0.55, 0, 1)
+      const imagesGone = activeFloat >= imagesGonePhase - 0.04
+      const navFade = clamp((activeFloat - navStartPhase) / 0.45, 0, 1)
+      const navVisible = activeFloat >= navStartPhase - 0.02
+
+      wrap.dataset.imagesGone = String(imagesGone)
+      wrap.dataset.navVisible = String(navVisible)
+      wrap.dataset.stage = imagesGone ? "nav" : activeFloat > n - 1 + 0.08 ? "exit" : "works"
+
+      if (viewport) {
+        viewport.style.opacity = `${1 - imagesFade}`
+        viewport.style.visibility = imagesFade >= 0.98 ? "hidden" : "visible"
+      }
+      if (navOverlay) {
+        navOverlay.style.opacity = `${navFade}`
+        navOverlay.style.visibility = navFade > 0.02 ? "visible" : "hidden"
+        navOverlay.style.pointerEvents = navFade > 0.85 ? "auto" : "none"
+      }
+    },
+    [imagesGonePhase, navStartPhase, n],
+  )
+
   const emitActiveIndex = useCallback(
     (activeFloat: number) => {
-      const index = clamp(Math.round(activeFloat), 0, n - 1)
+      const index = clamp(Math.round(Math.min(activeFloat, n - 1)), 0, n - 1)
       if (index !== activeIndexRef.current) {
         activeIndexRef.current = index
         onActiveIndexChange?.(index)
@@ -125,44 +170,34 @@ export default function JunniWorksDrumroll({
   const updateDomItems = useCallback(
     (activeFloat: number) => {
       const radius = radiusRef.current
-      const activeIndex = clamp(Math.round(activeFloat), 0, n - 1)
+      const spinPhase = Math.min(activeFloat, imagesGonePhase)
+      const activeIndex = clamp(Math.round(spinPhase), 0, n - 1)
+      const titleFadeStart = imagesGonePhase - 0.65
+      const titleFade =
+        activeFloat < titleFadeStart ? 1 : clamp(1 - (activeFloat - titleFadeStart) / 0.35, 0, 1)
 
       itemRefs.current.forEach((item, i) => {
         if (!item) return
-        const theta = FRONT_DEG + (activeFloat - i) * STEP_DEG
+        const theta = FRONT_DEG + (spinPhase - i) * STEP_DEG
         const absTheta = Math.abs(theta)
         const rad = theta * DEG2RAD
         const y = -radius * Math.sin(rad)
         const z = radius * (Math.cos(rad) - 1)
         const isActive = i === activeIndex
-        const isVisible = absTheta < VISIBLE_THETA_DEG
-        const opacity = isVisible ? clamp(1 - (absTheta - 46) / 14, 0, 1) : 0
+        const isVisible = absTheta < VISIBLE_THETA_DEG && titleFade > 0.02
+        const opacity = isVisible ? clamp(1 - (absTheta - 46) / 14, 0, 1) * titleFade : 0
 
         item.style.transform = `translate(-50%, -50%) translateY(${y.toFixed(2)}px) translateZ(${z.toFixed(2)}px) rotateX(${theta.toFixed(3)}deg)`
         item.style.opacity = `${opacity}`
-        item.style.visibility = isVisible ? "visible" : "hidden"
+        item.style.visibility = isVisible && opacity > 0.02 ? "visible" : "hidden"
         item.style.zIndex = `${Math.round(1000 - absTheta)}`
         item.dataset.active = String(isActive)
-        item.dataset.visible = String(isVisible)
+        item.dataset.visible = String(isVisible && opacity > 0.02)
       })
 
-      const navItem = navRef.current
-      if (navItem) {
-        const navTheta = FRONT_DEG + (activeFloat - navIndex) * STEP_DEG
-        const navAbs = Math.abs(navTheta)
-        const navRad = navTheta * DEG2RAD
-        const navY = -radius * Math.sin(navRad)
-        const navZ = radius * (Math.cos(navRad) - 1)
-        const navVisible = navAbs < VISIBLE_THETA_DEG
-        const navOpacity = navVisible ? clamp(1 - (navAbs - 46) / 14, 0, 1) : 0
-
-        navItem.style.transform = `translate(-50%, -50%) translateY(${navY.toFixed(2)}px) translateZ(${navZ.toFixed(2)}px) rotateX(${navTheta.toFixed(3)}deg)`
-        navItem.style.opacity = `${navOpacity}`
-        navItem.style.visibility = navVisible ? "visible" : "hidden"
-        navItem.dataset.visible = String(navVisible)
-      }
+      updateStageChrome(activeFloat)
     },
-    [n, navIndex],
+    [imagesGonePhase, n, updateStageChrome],
   )
 
   useEffect(() => {
@@ -223,6 +258,8 @@ export default function JunniWorksDrumroll({
       updateDomItems(smoothActiveRef.current)
     }
 
+    const imagesGone = getDrumrollImagesGonePhase(n)
+
     const renderFrame = () => {
       const phaseMax = getDrumrollPhaseMax(n)
       const target = clamp(targetActiveRef.current, 0, phaseMax)
@@ -235,20 +272,25 @@ export default function JunniWorksDrumroll({
       const next = current + diff * damping
       smoothActiveRef.current = next
 
+      const spinPhase = Math.min(next, imagesGone)
+      const canvasFade = clamp((next - (imagesGone - 0.55)) / 0.55, 0, 1)
+
       emitActiveIndex(next)
       updateDomItems(next)
-      refs.spinner.rotation.y = SPIN_SIGN * next * STEP_RAD
+      refs.spinner.rotation.y = SPIN_SIGN * spinPhase * STEP_RAD
       refs.panels.forEach(({ mat, mesh, index }) => {
-        const eff = (next - index) * STEP_DEG
+        const eff = (spinPhase - index) * STEP_DEG
         const abs = Math.abs(eff)
         const t = clamp(1 - abs / PANEL_FADE_DEG, 0, 1)
-        const b = 0.1 + t * t * 0.9
+        const b = (0.1 + t * t * 0.9) * (1 - canvasFade)
         mat.color.setScalar(b)
         mesh.scale.setScalar(1 + clamp(1 - abs / 44, 0, 1) * 0.012)
         mesh.renderOrder = Math.round(1000 - abs)
-        mesh.visible = abs < PANEL_VISIBLE_DEG
+        mesh.visible = canvasFade < 0.98 && abs < PANEL_VISIBLE_DEG
       })
-      renderer.render(refs.scene, refs.camera)
+      if (canvasFade < 0.98) {
+        renderer.render(refs.scene, refs.camera)
+      }
       if (refs.running) refs.raf = requestAnimationFrame(renderFrame)
     }
 
@@ -338,8 +380,8 @@ export default function JunniWorksDrumroll({
   }, [active, updateDomItems])
 
   return (
-    <div className="jwp__drumroll-wrap" ref={wrapRef}>
-      <div className="jwp__drumroll-viewport" aria-hidden="true">
+    <div className="jwp__drumroll-wrap" ref={wrapRef} data-stage="works">
+      <div className="jwp__drumroll-viewport" ref={viewportRef} aria-hidden="true">
         <canvas ref={canvasRef} className="jwp__drumroll-canvas" />
       </div>
       <div className="jwp__drumroll-scrim" aria-hidden="true" />
@@ -376,48 +418,51 @@ export default function JunniWorksDrumroll({
               </li>
             )
           })}
-          <li
-            ref={navRef}
-            className="jwp__drumroll-item jwp__drumroll-item--nav"
-            data-nav=""
-            data-visible="false"
-          >
-            {page > 1 && (
-              <button
-                type="button"
-                className="jwp__drumroll-nav"
-                data-nav="prev"
-                onClick={() => onPageChange(page - 1)}
-              >
-                <i className="jwp__drumroll-nav-arrow" aria-hidden="true">
-                  <svg viewBox="0 0 37.77 66.93" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M34.77,3L3,32.57l31.77,31.36" />
-                  </svg>
-                </i>
-                <span className="jwp__drumroll-nav-en">PREV</span>
-                <span className="jwp__drumroll-nav-ja">前のページ</span>
-              </button>
-            )}
-            {page < totalPages && (
-              <button
-                type="button"
-                className="jwp__drumroll-nav"
-                data-nav="next"
-                data-active={page < totalPages}
-                onClick={() => onPageChange(page + 1)}
-              >
-                <i className="jwp__drumroll-nav-arrow" aria-hidden="true">
-                  <svg viewBox="0 0 37.77 66.93" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M3,3l31.77,29.57L3,63.93" />
-                  </svg>
-                </i>
-                <span className="jwp__drumroll-nav-en">NEXT</span>
-                <span className="jwp__drumroll-nav-ja">次のページ</span>
-              </button>
-            )}
-          </li>
         </ul>
       </div>
+      <nav
+        ref={navOverlayRef}
+        className="jwp__drumroll-nav-overlay"
+        aria-label="作品ページネーション"
+      >
+        {page > 1 ? (
+          <button
+            type="button"
+            className="jwp__drumroll-nav jwp__drumroll-nav--prev"
+            data-nav="prev"
+            onClick={() => onPageChange(page - 1)}
+          >
+            <i className="jwp__drumroll-nav-arrow" aria-hidden="true">
+              <svg viewBox="0 0 37.77 66.93" xmlns="http://www.w3.org/2000/svg">
+                <path d="M34.77,3L3,32.57l31.77,31.36" />
+              </svg>
+            </i>
+            <span className="jwp__drumroll-nav-en">PREV</span>
+            <span className="jwp__drumroll-nav-ja">前のページ</span>
+          </button>
+        ) : (
+          <span className="jwp__drumroll-nav-spacer" aria-hidden="true" />
+        )}
+        {page < totalPages ? (
+          <button
+            type="button"
+            className="jwp__drumroll-nav jwp__drumroll-nav--next"
+            data-nav="next"
+            data-active={page < totalPages}
+            onClick={() => onPageChange(page + 1)}
+          >
+            <i className="jwp__drumroll-nav-arrow" aria-hidden="true">
+              <svg viewBox="0 0 37.77 66.93" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3,3l31.77,29.57L3,63.93" />
+              </svg>
+            </i>
+            <span className="jwp__drumroll-nav-en">NEXT</span>
+            <span className="jwp__drumroll-nav-ja">次のページ</span>
+          </button>
+        ) : (
+          <span className="jwp__drumroll-nav-spacer" aria-hidden="true" />
+        )}
+      </nav>
     </div>
   )
 }
