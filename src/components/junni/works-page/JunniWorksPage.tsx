@@ -6,7 +6,7 @@ import { useLenis } from "lenis/react"
 
 import { navigate } from "@/hooks/useRoute"
 
-import JunniWorksDrumroll from "./JunniWorksDrumroll"
+import JunniWorksDrumroll, { getDrumrollPhaseMax } from "./JunniWorksDrumroll"
 
 import {
 
@@ -244,19 +244,19 @@ export default function JunniWorksPage() {
       if (!isInDrumrollZone) return
 
       const normalizedDelta = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY
-      const max = Math.max(0, items.length - 1)
+      const phaseMax = getDrumrollPhaseMax(items.length)
       const current = drumrollActiveRef.current
       const sensitivity = 0.0032
       let next = current + normalizedDelta * sensitivity
 
       const releasingUp = normalizedDelta < 0 && current <= 0.02
-      const releasingDown = normalizedDelta > 0 && current >= max - 0.02
+      const releasingDown = normalizedDelta > 0 && current >= phaseMax - 0.02
       if (releasingUp || releasingDown) return
 
       e.preventDefault()
 
       if (next < 0) next *= 0.22
-      if (next > max) next = max + (next - max) * 0.22
+      if (next > phaseMax) next = phaseMax + (next - phaseMax) * 0.22
 
       setDrumrollPhase(next)
     }

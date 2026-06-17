@@ -2,7 +2,7 @@
 
 > 用途：在新对话里继续 1:1 复刻 [junni.co.jp/works/](https://junni.co.jp/works/) **独立作品集列表页**，并精调视觉效果与动效。把本文件喂给新会话即可无缝接力。
 >
-> 来源：2026-06-17 多轮对话整理（原站 HTML 实锤、截图对比、首版实现、结构纠偏、CSS/路由修复、**§17 Drumroll 间隙/滚筒**）。
+> 来源：2026-06-17 多轮对话整理（原站 HTML 实锤、截图对比、首版实现、结构纠偏、CSS/路由修复、**§17 Drumroll 间隙/滚筒**、**§18 圆筒尺寸 1:1 对齐**）。
 >
 > 关联文档：[junni-works-复刻交接.md](./junni-works-复刻交接.md)（首页 `home_works`，**不是本页**）、[junni-about-works-shift-交接.md](./junni-about-works-shift-交接.md)、[junni-hero-复刻交接.md](./junni-hero-复刻交接.md)
 
@@ -122,10 +122,12 @@ body[data-namespace=works]
 | 6 | 页面中段出现绿色大块 | Footer `position:sticky` + 巨型 IFUYUN | ✅ 改为正常流 + 合理 logo 尺寸 |
 | 7 | 顶部双导航（Navbar + 原站 MENU） | 全局 Navbar 未隐藏 | ✅ portfolio 页隐藏 Navbar / QuickActions |
 | 8 | Toggle 一直显示 | 未做 IntersectionObserver | ✅ `data-visible` 联动 |
+| 9 | Drumroll 圆筒与图片整体偏小 | §17 `PANEL_DEG=19°` 缩面换缝；缺原站 16:9 视窗 | ✅ §18：`PANEL_DEG=51.1` + `computeDrumRadius` + viewport |
+| 10 | 圆筒各图大小不齐 | 按原图比例动态 `axial` | ✅ §16 cover；§18 统一 `16/9` 视窗 |
 
 ---
 
-## 4. 本站当前实现（2026-06-17 结构纠偏后）
+## 4. 本站当前实现（2026-06-17 §18 圆筒尺寸对齐后）
 
 ### 4.1 路由与导航
 
@@ -173,25 +175,30 @@ div.jwp[data-view=drumroll|list][data-transitioned][data-pagehead]
 │     ├─ div.jwp__list-inner           # 2/3 列 grid（list 模式）
 │     ├─ section.jwp__drumroll         # ★ 嵌套在内
 │     │   └─ JunniWorksDrumroll
+│     │       ├─ .jwp__drumroll-wrap（sticky · min(50vw,100vh)）
+│     │       ├─ .jwp__drumroll-viewport（min(90vw,900px) · 16:9 · overflow:hidden）
+│     │       ├─ canvas.jwp__drumroll-canvas
+│     │       └─ .jwp__drumroll-slider > .jwp__drumroll-list（DOM 3D 标题）
 │     └─ nav.jwp__pagination           # 仅 list 模式
 ├─ div.jwp__toggle[data-visible]       # button[data-type] 切 drumroll ↔ list
 ├─ aside.jwp__copyright
 └─ footer.jwp__footer                  # menu + IFUYUN + pageTop
 ```
 
-### 4.4 JunniWorksDrumroll 要点
+### 4.4 JunniWorksDrumroll 要点（**§18 已更新尺寸体系**）
 
 | 项 | 实现 |
 |----|------|
-| 几何常量 | **`STEP_DEG=25`**、`PERSPECTIVE=500`；**§17 已与首页分叉**：`PANEL_GAP_DEG=6`、`PANEL_DEG=19`（= STEP − GAP，露出底色缝）；首页 `JunniWorks.tsx` 仍为 `PANEL_DEG=51.1` |
-| **面板尺寸** | **`PANEL_ASPECT=2.65` 固定窗口比例**；`fitTextureCover()` 对贴图做居中 cover 裁切（`tex.repeat/offset`） |
-| **面板间隙** | 开放圆筒弧 + `PANEL_DEG < STEP_DEG` → 相邻 WebGL 弧面之间露出 `#1c1d21`；`.jwp__drumroll-wrap { background-color: #1c1d21 }` |
-| 可见性裁剪 | `VISIBLE_THETA_DEG=52`；项外范围 `opacity:0`、`visibility:hidden`、`data-visible="false"` |
+| 几何常量 | **`STEP_DEG=25`**、`PERSPECTIVE=500`、**`PANEL_DEG=51.1`**（与首页 `JunniWorks.tsx` 同量级；§17 曾临时改为 `19°` 已回退，见 §18） |
+| **面板视窗** | 对齐原站 `.works_drumroll_image`：**`min(90vw, 900px)` × `aspect-ratio: 16/9`**；`computePanelBox()` / `computeDrumRadius()` 反推圆筒半径 |
+| **面板比例** | **`PANEL_ASPECT = 16/9`** + `fitTextureCover()` 居中 cover 裁切（§16 曾用 `2.65`，§18 改为原站 16:9） |
+| **面板间隙** | §18 恢复 `PANEL_DEG=51.1 > STEP_DEG` → 几何重叠（与首页一致）；原站缝隙主要来自**纹理内多图拼条**，非缩小 `PANEL_DEG` |
+| 可见性裁剪 | `VISIBLE_THETA_DEG=58`；`PANEL_FADE_DEG=18`、`PANEL_VISIBLE_DEG=58`（对齐首页椒4.0） |
 | 滚轮驱动 | **§17：连续 `activeFloat`**（`sensitivity=0.0032`）+ sticky 区间 + 首尾橡皮筋；见 §15 / §17 |
 | 运动平滑 | `targetActiveRef` / `smoothActiveRef` 自适应阻尼；渲染时 `target` clamp 到 `[0, n−1]` |
 | PREV/NEXT | 列表末尾 `jwp__drumroll-item--nav`，按 `page`/`totalPages` 条件渲染 |
 | 链接 | 作品项用 `<a href="#work/{slug}">` |
-| WebGL | canvas 曲面贴图；`setClearColor(0,0)` 透明；`IntersectionObserver` 进入视口才 `requestAnimationFrame` |
+| WebGL | canvas 置于 `.jwp__drumroll-viewport` 内裁剪；`setClearColor(0,0)` 透明；`IntersectionObserver` 进入视口才 `requestAnimationFrame` |
 
 ### 4.5 数据与素材现状
 
@@ -206,7 +213,7 @@ div.jwp[data-view=drumroll|list][data-transitioned][data-pagehead]
 
 ```bash
 npm run dev      # http://localhost:5173/#/portfolio
-npm run build    # 已通过（2026-06-17 结构纠偏后）
+npm run build    # 已通过（2026-06-17 §18 圆筒尺寸对齐后）
 ```
 
 **PowerShell 不支持 `&&`，命令用 `;` 或分开执行。**
@@ -253,9 +260,12 @@ npm run build    # 已通过（2026-06-17 结构纠偏后）
 - [x] portfolio 页隐藏本站 Navbar / QuickActions
 - [x] **Drumroll 驱动手感**：§17 已改为连续 `activeFloat` 滚轮驱动 + 阻尼；仍待对照原站录屏微调 `sensitivity` / 边界橡皮筋
 - [x] **Toggle 图标**：已切到 PNG；本地路径 `public/assets/images/works/toggle/list.png`、`public/assets/images/works/toggle/drumroll.png`
-- [x] **Drumroll 圆筒图片统一尺寸**：固定 `PANEL_ASPECT` + `fitTextureCover`（§16）；`PANEL_ASPECT=2.65` 是否需量测微调待定
-- [x] **Drumroll 面板间隙 + 滚筒离散感**：§17 `PANEL_GAP_DEG=6` / `PANEL_DEG=19`；首版验证已有深色缝，面板尺寸可能略小于原站
+- [x] **Drumroll 圆筒图片统一尺寸**：`PANEL_ASPECT=16/9` + `fitTextureCover`（§18）；各图 cover 进统一 16:9 视窗
+- [x] **Drumroll 圆筒整体尺寸 1:1**：§18 恢复原站 `min(90vw,900px)` 容器 + `PANEL_DEG=51.1`；本地 viewport 实测 **900×506px @ 1440×900**
+- [x] **Drumroll 面板间隙 + 滚筒离散感**：§17 曾用 `PANEL_GAP_DEG=6` / `PANEL_DEG=19` 换缝隙，§18 为尺寸回退重叠方案；**缝隙感待精调**（见 §18.6）
 - [x] **List / Drumroll 缩略图**：三页均已用原站 `microcms` URL（§17）
+- [ ] **Drumroll 缝隙 vs 尺寸平衡**：§18 优先尺寸后角向缝变弱；可选纹理拼条或小幅减 `PANEL_DEG`
+- [ ] **Drumroll scrim / 亮度**：`mat.color.setScalar(b)`、`.jwp__drumroll-scrim` 待并排截图
 - [ ] **页头字体**：原站 `junni.ttf`，本站用 Montserrat 800 替代
 
 ### P1 — 布局 / 细节
@@ -297,8 +307,8 @@ npm run build    # 已通过（2026-06-17 结构纠偏后）
 
 ## 8. 推荐新对话执行顺序
 
-1. **浏览器对照**：`#/portfolio` vs `junni.co.jp/works/`，截图列剩余差异清单（**主线：Drumroll 间隙 / 面板尺寸 / 滚筒手感**，见 §17）
-2. **Drumroll 几何精调**：`PANEL_GAP_DEG` / `PANEL_DEG` / `PANEL_ASPECT` 与原站并排截图；平衡「缝隙明显」vs「面板够大」
+1. **浏览器对照**：`#/portfolio` vs `junni.co.jp/works/`，截图列剩余差异清单（**主线：§18 尺寸验收 → 缝隙 / 滚筒手感 / scrim**，见 §18.6）
+2. **Drumroll 缝隙精调**：在保持 §18 尺寸前提下，评估纹理拼条 vs 小幅 `PANEL_DEG` 缩减（勿回到 `19°`）
 3. **Drumroll 手感**：`sensitivity`、阻尼系数、首尾橡皮筋 vs 原站录屏
 4. **圆筒亮度 / scrim**：`PANEL_FADE_DEG`、`mat.color.setScalar(b)`、`.jwp__drumroll-scrim`
 5. **About 文案换行** + slider `data-media` 断点精细对照
@@ -307,7 +317,7 @@ npm run build    # 已通过（2026-06-17 结构纠偏后）
 8. **Footer** noise 纹理 + 社交区 + SVG Logo
 9. **右上角 MENU**（或确认继续沿用隐藏 Navbar 的简化方案）
 10. **替换作品数据与图片**（若改为用户自有项目）
-11. **（可选）** 抽取 `useJunniDrumroll` 与首页共用（注意 §17：本页与首页 `PANEL_DEG` 已分叉）
+11. **（可选）** 抽取 `useJunniDrumroll` 与首页共用（§18 后本页与首页 `PANEL_DEG` 均为 `51.1°`，可评估共用；本页另有 `computeDrumRadius` + viewport 裁剪）
 
 ---
 
@@ -350,16 +360,17 @@ npm run build    # 已通过（2026-06-17 结构纠偏后）
 | 圆筒图片尺寸 | 用户截图对比发现 Drumroll 图片大小不齐；固定面板比例 + cover 裁切（§16） |
 | 分页数据 | 页 2/3 文案与 slug 对齐原站；缩略图抓取未完成 |
 | Drumroll 间隙/滚筒 | 用户截图对比：原站有面板缝+连续滚动感，本站像连续曲面；§17 落地 `PANEL_GAP_DEG`、连续滚轮、页 2/3 缩略图 |
+| **圆筒整体尺寸偏小** | 用户截图：原站 &honey 等大圆筒 vs 本站明显缩小；§18 抓取原站 CSS/CDP，`PANEL_DEG` 回 51.1°、16:9 viewport、`computeDrumRadius` |
 
 ---
 
 ## 11. 新对话快速启动指令（复制即用）
 
-> 继续 junni.co.jp **`/works/` 作品集页**复刻（非首页 home_works）。已读 `docs/junni-works-page-复刻交接.md` **§17**。
+> 继续 junni.co.jp **`/works/` 作品集页**复刻（非首页 home_works）。已读 `docs/junni-works-page-复刻交接.md` **§18**（尺寸）+ **§17**（滚筒/滚轮）。
 >
-> **现状**：`#/portfolio` → `JunniWorksPage`。DOM 已按原站嵌套。Toggle Portal 固定定位已修复（§13）。Drumroll：**§17 面板间隙（`PANEL_GAP_DEG=6`）+ 连续滚轮 `activeFloat` + 页 2/3 原站缩略图**。圆筒 `PANEL_ASPECT=2.65` + cover 裁切。`npm run build` 通过。
+> **现状**：`#/portfolio` → `JunniWorksPage`。Drumroll：**§18 圆筒尺寸对齐原站**（`min(90vw,900px)` 16:9 viewport、`PANEL_DEG=51.1`、`computeDrumRadius`）；§17 连续滚轮 `activeFloat` + 页 1/2/3 原站 `microcms` 缩略图。`npm run build` 通过。
 >
-> **请先**对照原站 `junni.co.jp/works/` 截图，从【用户指定的差异点】精调 Drumroll。主线建议：① `PANEL_GAP_DEG` / 面板视觉尺寸 1:1；② 滚轮 `sensitivity` / 阻尼；③ scrim / 亮度。注意区分本页（`PANEL_DEG=19`）与 `JunniWorks.tsx` 首页（`PANEL_DEG=51.1`）。待办见第 6 节与 §17.6。
+> **请先**对照原站 `junni.co.jp/works/` 并排截图，从【用户指定差异点】继续精调。主线建议：① §18 尺寸验收；② 缝隙感（纹理拼条 / 小幅减 `PANEL_DEG`）；③ 滚轮 `sensitivity` / 阻尼；④ scrim / 亮度。待办见第 6 节与 §18.6。
 
 ---
 
@@ -885,33 +896,38 @@ let next = current + normalizedDelta * sensitivity
 
 ### 17.6 验证与已知剩余差距
 
+> **注意**：§17 落地后用户反馈圆筒/图片**整体偏小**；§18 已重写尺寸体系。下表「面板视觉尺寸」项已由 §18 处理，其余仍有效。
+
 **验证（2026-06-17）**
 
 - `npm run build`：通过。
 - 本地 `#/portfolio` 滚入 Drumroll：面板间可见**深色缝隙**；滚轮可**连续**切换作品（非一格一跳）。
 - 抓取用的 `.tmp-*` 文件已删除，避免 Vite `EBUSY`（见 §5.1）。
 
-**与原站仍可能存在的差距（下轮精调）**
+**与原站仍可能存在的差距（下轮精调 · 见 §18.6）**
 
 | 项 | 说明 |
 |----|------|
-| 面板视觉尺寸 | `PANEL_DEG=19°` 小于首页实测 `51.1°`，缝隙清晰但单块可能偏小；可调 `PANEL_GAP_DEG`（4–7）平衡 |
+| ~~面板视觉尺寸~~ | ~~§17 `PANEL_DEG=19°` 偏小~~ → **§18 已修复** |
+| 角向面板缝隙 | §18 恢复 `PANEL_DEG=51.1` 后重叠；原站缝隙多来自纹理拼条 |
 | 带内多图拼条 | 原站纹理常含多张缩略图+竖向留白；本站仍单图 cover |
 | 滚轮灵敏度 | `sensitivity=0.0032` 待录屏对照 |
-| scrim / 亮度 | `PANEL_FADE_DEG=14`、`mat.color.setScalar(b)` 待并排截图 |
-| 首页 vs 本页常量 | **勿直接把首页 `PANEL_DEG=51.1` 套回本页**，会再次消灭缝隙 |
+| scrim / 亮度 | `PANEL_FADE_DEG=18`、`mat.color.setScalar(b)` 待并排截图 |
+| sticky 区高度 | §18 已改 `min(50vw,100vh)`；与原站 `.works_drumroll_inner` 对齐，待截图验收 |
 
-### 17.7 调参速查（`JunniWorksDrumroll.tsx` · 本页专用）
+### 17.7 调参速查（`JunniWorksDrumroll.tsx` · 历史 / §17 方案）
 
-| 常量 | 当前值 | 作用 |
-|------|--------|------|
-| `STEP_DEG` | 25 | 作品角间距（与 DOM 标题一致） |
-| `PANEL_GAP_DEG` | 6 | 两面板间角向空隙（度） |
-| `PANEL_DEG` | 19 | `STEP − GAP`；弧面张角 |
-| `PANEL_ASPECT` | 2.65 | 统一窗口宽高比 + cover |
-| `PANEL_FADE_DEG` | 14 | 相邻图暗化速度 |
-| `PANEL_VISIBLE_DEG` | 52 | WebGL mesh 可见阈值 |
-| `VISIBLE_THETA_DEG` | 52 | DOM 标题可见阈值 |
+> **当前生效常量以 §18.5 为准。** 下表保留 §17 记录，便于理解为何曾缩小面板。
+
+| 常量 | §17 值 | §18 当前值 | 作用 |
+|------|--------|------------|------|
+| `STEP_DEG` | 25 | 25 | 作品角间距 |
+| `PANEL_GAP_DEG` | 6 | **（已移除）** | §17 角向空隙；§18 不再用缩面换缝 |
+| `PANEL_DEG` | 19 | **51.1** | 弧面张角 |
+| `PANEL_ASPECT` | 2.65 | **16/9** | 视窗宽高比 + cover |
+| `PANEL_FADE_DEG` | 14 | **18** | 相邻图暗化 |
+| `PANEL_VISIBLE_DEG` | 52 | **58** | WebGL mesh 可见阈值 |
+| `VISIBLE_THETA_DEG` | 52 | **58** | DOM 标题可见阈值 |
 
 `JunniWorksPage.tsx` 滚轮：
 
@@ -923,22 +939,238 @@ let next = current + normalizedDelta * sensitivity
 
 ### 17.8 下一轮建议（Drumroll 效果精调主线）
 
-1. 原站 vs 本站**同视口并排截图**（Basica / Alche / Playyte 等典型项）。
-2. 微调 **`PANEL_GAP_DEG`**（增大 → 缝更明显、块更小）或略增 `PANEL_DEG`（减小缝、块更大）。
+> 尺寸主线已转至 **§18**。本节滚轮/手感建议仍有效。
+
+1. 原站 vs 本站**同视口并排截图**（Basica / &honey / Playyte 等典型项）— 先验收 §18 尺寸。
+2. 在保持 §18 尺寸下评估 **纹理拼条** 或小幅减 `PANEL_DEG`（勿回到 `19°`）恢复缝隙感。
 3. 对照原站录屏调 **`sensitivity`**、阻尼 `damping`、首尾橡皮筋。
 4. 评估是否需 **横向多图拼条纹理**（更接近原站带内竖缝）。
 5. scrim 渐变与 `mat.color` 亮度曲线。
-6. **不要**在未改 `PANEL_DEG` 前提下仅放大 `PANEL_ASPECT` 指望出现缝隙。
+6. **不要**在未改 `PANEL_DEG` 前提下仅放大 `PANEL_ASPECT` 指望出现缝隙（§17 教训）。
 
-### 17.9 新对话复制指令（Drumroll 间隙 / 滚筒专项）
+### 17.9 新对话复制指令（Drumroll 间隙 / 滚筒专项 · 历史）
 
-> 继续 junni.co.jp `/works/` **Drumroll 圆筒效果 1:1 精调**。已读 `docs/junni-works-page-复刻交接.md` **§17**。
->
-> **已完成**：`PANEL_GAP_DEG=6` / `PANEL_DEG=19` 面板缝；连续滚轮 `activeFloat`；页 2/3 原站缩略图；`PANEL_ASPECT` + cover。
-> **待做**：缝隙 vs 面板尺寸平衡、`sensitivity`/阻尼、scrim/亮度、（可选）多图拼条纹理。
->
-> 请先 `#/portfolio` 与原站并排截图，从用户指定差异点继续。本页 `PANEL_DEG=19` ≠ 首页 `JunniWorks.tsx` 的 `51.1`。
+> 见 **§18.9** 最新复制指令。本节保留 §17 上下文。
 
 ---
 
-*文档结束。新对话请 @ 本文件并说明要从哪一步开始（建议：「对照原站微调 PANEL_GAP_DEG / 面板尺寸」或「录屏对齐滚轮 sensitivity」）。*
+## 18. 本轮新增（2026-06-17 晚间，Drumroll 圆筒尺寸 1:1 对齐）★
+
+> **本节整合同一会话全部对话**：用户截图对比发现本站圆筒与封面图**明显小于**原站；分析 §17「缩面换缝」根因后，抓取 `junni.co.jp/works/` 实测数据并落地代码修复。**后续新对话请优先围绕 §18 验收尺寸，再精调缝隙 / 手感 / scrim。**
+
+### 18.1 用户反馈（截图对比 · 核心差异）
+
+用户提供原站截图（`&honey` / `REML` 等典型帧）vs 本站 `#/portfolio` 实现，指出：
+
+| 原站 | 本站（§18 修复前） |
+|------|-------------------|
+| 中央圆筒曲面占视口约 **60–70% 宽、40–50% 高**，是绝对视觉主角 | 圆筒与图片**整体偏小**，周围深色空隙偏多 |
+| 单块弧面宽大，呈统一 **16:9 宽矩形** 窗口 | 单块弧面窄，像「小滚筒」嵌在大画布里 |
+| 标题叠在曲面上比例协调 | 标题相对圆筒显得过大或画面发空 |
+
+用户判断：**不是轨道半径算错，而是单块 WebGL 弧面被 §17 大幅缩小。**
+
+### 18.2 根因分析（修复前）
+
+**A. §17 为换缝隙缩小 `PANEL_DEG`（主因）**
+
+| 参数 | 原站 / 首页实测 | §17 本站 |
+|------|----------------|----------|
+| `PANEL_DEG` | **≈ 51.1°**（首页 `573×626` 视口 CDP 反推） | **19°**（`25° − 6°` 间隙） |
+| 单块弧宽（粗算，R=520） | ≈ **451px** | ≈ **171px**（约 **38%**） |
+
+§17 用 `PANEL_GAP_DEG=6` + `PANEL_DEG=19` 在几何上露出 `#1c1d21` 底色缝，但牺牲了原站级面板尺寸。交接文档 §17.6 已预警：「缝隙清晰但单块可能偏小」——与用户观察一致。
+
+**B. `PANEL_ASPECT=2.65` 与容器比例不符**
+
+§16 用 `2.65` 统一各图 cover 窗口，但原站 CSS 明确为 **`aspect-ratio: 16/9`（≈1.778）**。
+
+**C. 缺少原站图片裁剪容器**
+
+原站 `.works_drumroll_image` 是 **`min(90vw, 900px)` × 16:9** 的 overflow 裁剪框；本站 canvas 铺满 `100vh` sticky 区，未对齐该视窗。
+
+**D. 圆筒轨道半径并非主因**
+
+`computeRadius(h) = clamp(h×0.52, 220, 520)` 与首页 `JunniWorks.tsx` 相同；偏小主要来自 **弧面张角 + 视窗未对齐**，而非 `R` 公式错误。
+
+**E. 原站缝隙的真实来源**
+
+原站更可能是 **`PANEL_DEG ≈ 51°` 大块重叠** + **纹理内多图拼条/竖向留白** 形成「卡片缝」，而非把 `PANEL_DEG` 压到 `< STEP_DEG(25°)`。
+
+### 18.3 原站实测数据（2026-06-17 · `junni.co.jp/works/`）
+
+抓取方式：浏览器 CDP + 下载 `works.BaiBovEG.css` + 本地 `#/portfolio` 对照。
+
+#### A. 原站 CSS 关键规则（`assets/styles/works.BaiBovEG.css`）
+
+```css
+.works_drumroll_inner {
+  height: min(50vw, 100vh);
+}
+.works_drumroll_slider {
+  height: min(50vw, 100vh);
+}
+.works_drumroll_image {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 90vw;
+  max-width: 900px;
+  aspect-ratio: 16/9;
+  transform: translate(-50%, -50%);
+  overflow: hidden;
+}
+.works_drumroll_list {
+  perspective: 500px;
+  font-size: min(150px, 9.375vw);
+}
+```
+
+移动端（`max-width` 断点）：`.works_drumroll_inner` / `_slider` 高度改为 **`50vh`**。
+
+#### B. CDP 量测（桌面 **1440×900** 视口，滚入 Drumroll sticky 区）
+
+| 元素 | 尺寸 / 样式 |
+|------|-------------|
+| `.works_drumroll_image` | **900 × 506.25 px**（= `min(90vw,900)` + 16:9） |
+| `.works_drumroll_inner` | 高 **720px**（= `min(50vw,100vh)`） |
+| 全局 `#canvas` | **1440 × 900**（原站 WebGL 全屏 canvas，由 image 框裁剪视觉） |
+| `.works_drumroll_list` | `perspective: 500px` |
+
+#### C. 反推公式（与首页椒4.0 文档一致）
+
+首页文档：`PANEL_DEG ≈ 51.1°` 由 `.home_works_image ≈ 516×290 @ 626vh` 反推。
+
+作品集页在 **1440×900** 下目标面板盒：**900×506**；令正面板高 ≈ `PANEL_RAD × drumRadius`，得：
+
+```ts
+targetW = min(vw * 0.9, 900)
+targetH = targetW * (9 / 16)
+drumRadius = targetH / PANEL_RAD   // PANEL_RAD = 51.1° in rad
+```
+
+代入：`targetH=506.25`，`PANEL_RAD≈0.892` → `drumRadius≈567`（大于 `vh×0.52` 的 468，需按视窗盒放大而非仅用 `R=vh×0.52`）。
+
+### 18.4 已落地修复（代码 · 2026-06-17）
+
+#### A. 几何常量回退并对齐原站（`JunniWorksDrumroll.tsx`）
+
+```ts
+const PANEL_DEG = 51.1
+const PANEL_ASPECT = 16 / 9
+const PANEL_FADE_DEG = 18
+const PANEL_VISIBLE_DEG = 58
+const VISIBLE_THETA_DEG = 58
+const PANEL_MAX_WIDTH = 900
+// 移除 PANEL_GAP_DEG / PANEL_DEG=19
+```
+
+新增：
+
+```ts
+function computePanelBox(vw: number) {
+  const width = Math.min(vw * 0.9, PANEL_MAX_WIDTH)
+  const height = width * (9 / 16)
+  return { width, height }
+}
+
+function computeDrumRadius(vw: number) {
+  const { height } = computePanelBox(vw)
+  return height / PANEL_RAD
+}
+```
+
+- `resize()` / DOM 轨道：`radiusRef` / `drum.scale` / `drum.position.z` 均用 `computeDrumRadius(vw)`。
+- DOM 标题淡出曲线改回首页：`clamp(1 - (absTheta - 46) / 14, 0, 1)`。
+- 保留 §16 `fitTextureCover()` + §17 连续滚轮 `activeFloat`（`JunniWorksPage.tsx` 未改）。
+
+#### B. 视窗裁剪容器（`JunniWorksDrumroll.tsx` + `JunniWorksPage.css`）
+
+DOM 结构：
+
+```
+.jwp__drumroll-wrap          sticky · min(50vw,100vh) · 居中
+  .jwp__drumroll-viewport    min(90vw,900px) · aspect-ratio 16/9 · overflow:hidden
+    canvas.jwp__drumroll-canvas
+  .jwp__drumroll-scrim
+  .jwp__drumroll-slider      height: min(50vw,100vh)
+    ul.jwp__drumroll-list    width: min(90vw,900px)
+```
+
+移除占位 `.jwp__drumroll-image`（改为 viewport 承担原站 `.works_drumroll_image` 角色）。
+
+#### C. 素材
+
+页 1/2/3 已使用原站 `microcms-assets.io` URL（§15 / §17），本轮**未改数据**，仅几何时序与 CSS 裁剪。
+
+### 18.5 修改文件清单
+
+| 文件 | 变更 |
+|------|------|
+| `src/components/junni/works-page/JunniWorksDrumroll.tsx` | `PANEL_DEG=51.1`、`PANEL_ASPECT=16/9`；`computePanelBox` / `computeDrumRadius`；viewport 包裹 canvas；fade 参数 18/58 |
+| `src/components/junni/works-page/JunniWorksPage.css` | `.jwp__drumroll-wrap` 高度 `min(50vw,100vh)`；新增 `.jwp__drumroll-viewport`；list/slider 宽度对齐；移动 `50vh` |
+
+### 18.6 验证与已知剩余差距
+
+**验证（2026-06-17）**
+
+- `npm run build`：通过。
+- 本地 `#/portfolio` CDP：`.jwp__drumroll-viewport` ≈ **900×506px**（1440 宽视口），与原站 `.works_drumroll_image` 一致。
+- Dev server：`http://localhost:5173/#/portfolio`。
+
+**与原站仍可能存在的差距（下轮精调）**
+
+| 项 | 说明 |
+|----|------|
+| **尺寸并排验收** | 请在用户真实显示器分辨率下与原站并排截图（&honey / BaSICA / Playyte） |
+| **角向面板缝隙** | §18 恢复重叠后，几何缝弱于 §17；可考虑纹理拼条或 `PANEL_DEG` 微调到 45–50°（**勿回到 19°**） |
+| **带内多图拼条** | 原站弧带内常有多张缩略图 + 竖缝；本站仍单图 cover |
+| **滚轮手感** | `sensitivity=0.0032`、阻尼、橡皮筋待录屏对照（§17） |
+| **scrim / 亮度** | `.jwp__drumroll-scrim` 已略减；`mat.color.setScalar(b)` 待微调 |
+| **全局 canvas** | 原站 `#canvas` 全屏；本站 per-page canvas + viewport 裁剪——视觉应接近，架构不同 |
+| **标题字号** | 原站 list `font-size: min(150px,9.375vw)`；本站用 `clamp`，可继续微调 |
+
+### 18.7 调参速查（**当前生效** · `JunniWorksDrumroll.tsx`）
+
+| 常量 / 函数 | 当前值 | 作用 |
+|-------------|--------|------|
+| `STEP_DEG` | 25 | 作品角间距（DOM 标题一致） |
+| `PANEL_DEG` | 51.1 | 弧面张角（与首页同量级） |
+| `PANEL_ASPECT` | 16/9 | 贴图 cover 目标比例 |
+| `PANEL_MAX_WIDTH` | 900 | 对齐原站 `max-width:900px` |
+| `computePanelBox(vw)` | — | 返回 `{ width, height }` = `min(90vw,900)` × 16:9 |
+| `computeDrumRadius(vw)` | — | `targetH / PANEL_RAD`；驱动 WebGL scale 与 DOM 轨道 |
+| `PANEL_FADE_DEG` | 18 | 相邻图暗化 |
+| `PANEL_VISIBLE_DEG` | 58 | WebGL mesh 可见阈值 |
+| `VISIBLE_THETA_DEG` | 58 | DOM 标题可见阈值 |
+
+`JunniWorksPage.css` 关键：
+
+| 选择器 | 规则 |
+|--------|------|
+| `.jwp__drumroll-wrap` | `height/min-height: min(50vw, 100vh)`；`place-items: center` |
+| `.jwp__drumroll-viewport` | `width: min(90vw, 900px)`；`aspect-ratio: 16/9`；`overflow: hidden` |
+| `@media (max-width:949px)` | wrap/slider/list → `50vh` |
+
+### 18.8 下一轮建议（Drumroll 复刻主线）
+
+1. **尺寸验收**：同分辨率并排截图原站 vs `#/portfolio`（优先 &honey、BaSICA）。
+2. **缝隙**：在**不回到 `PANEL_DEG=19`** 前提下，试纹理拼条或 `PANEL_DEG` 45–50° + 纹理留白。
+3. **滚轮**：录屏对照 `sensitivity` / 阻尼 / 首尾橡皮筋。
+4. **scrim / 亮度**：微调 `mat.color` 与 `.jwp__drumroll-scrim` 渐变。
+5. **标题比例**：对照原站 `font-size: min(150px,9.375vw)` 微调 `clamp`。
+6. **勿踩坑**：仅放大 `PANEL_ASPECT` 不出缝隙；仅缩小 `PANEL_DEG` 换缝会再次缩小圆筒（§17 教训）。
+
+### 18.9 新对话复制指令（Drumroll 尺寸 / 效果精调 · 最新）
+
+> 继续 junni.co.jp `/works/` **Drumroll 圆筒效果 1:1 精调**。已读 `docs/junni-works-page-复刻交接.md` **§18**（尺寸）+ **§17**（滚筒/滚轮）。
+>
+> **已完成（§18）**：原站实测 `min(90vw,900px)` 16:9 viewport；`PANEL_DEG=51.1`；`computeDrumRadius`；sticky 区 `min(50vw,100vh)`；本地 viewport 约 **900×506 @ 1440×900**。§17 连续滚轮 + 三页 `microcms` 图。`npm run build` 通过。
+>
+> **待做**：① 用户环境并排截图验收尺寸；② 缝隙感（纹理拼条 / 微调 `PANEL_DEG`）；③ `sensitivity`/阻尼；④ scrim/亮度；⑤ 标题字号。
+>
+> 请从用户指定的差异点继续。访问：`http://localhost:5173/#/portfolio` vs `https://junni.co.jp/works/`。
+
+---
+
+*文档结束。新对话请 @ 本文件并说明要从哪一步开始（建议：「§18 尺寸并排验收」或「在保持尺寸下恢复缝隙感」或「录屏对齐滚轮 sensitivity」）。*

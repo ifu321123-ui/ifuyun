@@ -7,16 +7,23 @@ const FRONT_DEG = 0
 const DEG2RAD = Math.PI / 180
 const STEP_RAD = STEP_DEG * DEG2RAD
 const PERSPECTIVE = 500
-/** Angular gap between drum panels — must stay < STEP_DEG so #1c1d21 shows through. */
-const PANEL_GAP_DEG = 6
-const PANEL_DEG = STEP_DEG - PANEL_GAP_DEG
+/** junni.co.jp /works/ `.works_drumroll_image`: min(90vw,900px) × 16/9; PANEL_DEG≈51.1° @ home_works CDP. */
+const PANEL_DEG = 51.1
 const PANEL_RAD = PANEL_DEG * DEG2RAD
-const PANEL_ASPECT = 2.65
-const PANEL_FADE_DEG = 14
-const PANEL_VISIBLE_DEG = 52
-const VISIBLE_THETA_DEG = 52
+const PANEL_ASPECT = 16 / 9
+const PANEL_FADE_DEG = 18
+const PANEL_VISIBLE_DEG = 58
+const VISIBLE_THETA_DEG = 58
+const PANEL_MAX_WIDTH = 900
 const SPIN_SIGN = 1
 const TEX_ROTATION = -Math.PI / 2
+
+/** Extra phase past the nav item so every panel leaves the visible arc before page scroll continues. */
+export const DRUMROLL_EXIT_MARGIN = 2.8
+
+export function getDrumrollPhaseMax(itemCount: number) {
+  return itemCount + DRUMROLL_EXIT_MARGIN
+}
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value))
@@ -46,8 +53,17 @@ function fitTextureCover(tex: THREE.Texture, sourceAspect: number, targetAspect:
   tex.offset.set(offsetX, offsetY)
 }
 
-function computeRadius(h: number) {
-  return clamp(h * 0.52, 220, 520)
+/** Target panel box — mirrors `.works_drumroll_image { width:min(90vw,900px); aspect-ratio:16/9 }`. */
+function computePanelBox(vw: number) {
+  const width = Math.min(vw * 0.9, PANEL_MAX_WIDTH)
+  const height = width * (9 / 16)
+  return { width, height }
+}
+
+/** Cylinder orbit radius so front panel height matches the 16:9 viewport box. */
+function computeDrumRadius(vw: number) {
+  const { height } = computePanelBox(vw)
+  return height / PANEL_RAD
 }
 
 type PanelRef = { mesh: THREE.Mesh; mat: THREE.MeshBasicMaterial; index: number }
@@ -64,7 +80,7 @@ type SceneRefs = {
 
 type Props = {
   items: WorksPageItem[]
-  /** Continuous drum phase (0 … items.length − 1). */
+  /** Continuous drum phase (0 … getDrumrollPhaseMax(items.length)). */
   active: number
   onActiveIndexChange?: (index: number) => void
   page: number
@@ -120,7 +136,7 @@ export default function JunniWorksDrumroll({
         const z = radius * (Math.cos(rad) - 1)
         const isActive = i === activeIndex
         const isVisible = absTheta < VISIBLE_THETA_DEG
-        const opacity = isVisible ? clamp(1 - (absTheta - 38) / 14, 0, 1) : 0
+        const opacity = isVisible ? clamp(1 - (absTheta - 46) / 14, 0, 1) : 0
 
         item.style.transform = `translate(-50%, -50%) translateY(${y.toFixed(2)}px) translateZ(${z.toFixed(2)}px) rotateX(${theta.toFixed(3)}deg)`
         item.style.opacity = `${opacity}`
@@ -138,7 +154,7 @@ export default function JunniWorksDrumroll({
         const navY = -radius * Math.sin(navRad)
         const navZ = radius * (Math.cos(navRad) - 1)
         const navVisible = navAbs < VISIBLE_THETA_DEG
-        const navOpacity = navVisible ? clamp(1 - (navAbs - 38) / 14, 0, 1) : 0
+        const navOpacity = navVisible ? clamp(1 - (navAbs - 46) / 14, 0, 1) : 0
 
         navItem.style.transform = `translate(-50%, -50%) translateY(${navY.toFixed(2)}px) translateZ(${navZ.toFixed(2)}px) rotateX(${navTheta.toFixed(3)}deg)`
         navItem.style.opacity = `${navOpacity}`
@@ -151,7 +167,7 @@ export default function JunniWorksDrumroll({
 
   useEffect(() => {
     const onResize = () => {
-      radiusRef.current = computeRadius(window.innerHeight)
+      radiusRef.current = computeDrumRadius(window.innerWidth)
       updateDomItems(smoothActiveRef.current)
     }
     window.addEventListener("resize", onResize)
@@ -193,25 +209,27 @@ export default function JunniWorksDrumroll({
 
     const resize = () => {
       const rect = canvas.getBoundingClientRect()
-      const w = rect.width || window.innerWidth
-      const h = rect.height || window.innerHeight
+      const panelBox = computePanelBox(window.innerWidth)
+      const w = rect.width || panelBox.width
+      const h = rect.height || panelBox.height
       renderer.setSize(w, h, false)
       camera.aspect = w / h
       camera.fov = (2 * Math.atan(h / 2 / PERSPECTIVE) * 180) / Math.PI
       camera.updateProjectionMatrix()
-      const R = computeRadius(h)
-      radiusRef.current = R
-      drum.scale.setScalar(R)
-      drum.position.z = -R
+      const drumRadius = computeDrumRadius(window.innerWidth)
+      radiusRef.current = drumRadius
+      drum.scale.setScalar(drumRadius)
+      drum.position.z = -drumRadius
       updateDomItems(smoothActiveRef.current)
     }
 
     const renderFrame = () => {
-      const target = clamp(targetActiveRef.current, 0, n - 1)
+      const phaseMax = getDrumrollPhaseMax(n)
+      const target = clamp(targetActiveRef.current, 0, phaseMax)
       const current = smoothActiveRef.current
       const diff = target - current
       const absDiff = Math.abs(diff)
-      const edgeDistance = Math.min(target, n - 1 - target)
+      const edgeDistance = Math.min(target, phaseMax - target)
       const edgeDrag = edgeDistance <= 0.35 ? 0.78 : 1
       const damping = clamp((0.14 + absDiff * 0.1) * edgeDrag, 0.12, 0.34)
       const next = current + diff * damping
@@ -321,8 +339,9 @@ export default function JunniWorksDrumroll({
 
   return (
     <div className="jwp__drumroll-wrap" ref={wrapRef}>
-      <div className="jwp__drumroll-image" aria-hidden="true" />
-      <canvas ref={canvasRef} className="jwp__drumroll-canvas" aria-hidden="true" />
+      <div className="jwp__drumroll-viewport" aria-hidden="true">
+        <canvas ref={canvasRef} className="jwp__drumroll-canvas" />
+      </div>
       <div className="jwp__drumroll-scrim" aria-hidden="true" />
       <div className="jwp__drumroll-slider">
         <ul className="jwp__drumroll-list">
