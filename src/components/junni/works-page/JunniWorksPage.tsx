@@ -1,4 +1,6 @@
-import { CSSProperties, useEffect, useRef, useState } from "react"
+import { CSSProperties, useCallback, useEffect, useRef, useState } from "react"
+
+import { createPortal } from "react-dom"
 
 import { useLenis } from "lenis/react"
 
@@ -130,56 +132,6 @@ function AboutSliderMobile({ side, images }: { side: "left" | "right"; images: s
 
 
 
-function ToggleIcon({ type }: { type: "list" | "drumroll" }) {
-
-  if (type === "list") {
-
-    return (
-
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-
-        <circle cx="5" cy="5" r="2" fill="currentColor" />
-
-        <circle cx="12" cy="5" r="2" fill="currentColor" />
-
-        <circle cx="19" cy="5" r="2" fill="currentColor" />
-
-        <circle cx="5" cy="12" r="2" fill="currentColor" />
-
-        <circle cx="12" cy="12" r="2" fill="currentColor" />
-
-        <circle cx="19" cy="12" r="2" fill="currentColor" />
-
-        <circle cx="5" cy="19" r="2" fill="currentColor" />
-
-        <circle cx="12" cy="19" r="2" fill="currentColor" />
-
-        <circle cx="19" cy="19" r="2" fill="currentColor" />
-
-      </svg>
-
-    )
-
-  }
-
-  return (
-
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-
-      <rect x="4" y="6" width="16" height="2" rx="1" fill="currentColor" />
-
-      <rect x="4" y="11" width="16" height="2" rx="1" fill="currentColor" />
-
-      <rect x="4" y="16" width="16" height="2" rx="1" fill="currentColor" />
-
-    </svg>
-
-  )
-
-}
-
-
-
 const FOOTER_LINKS: { id: string; label: string; active?: boolean }[] = [
 
   { id: "home", label: "关于" },
@@ -198,9 +150,9 @@ const FOOTER_LINKS: { id: string; label: string; active?: boolean }[] = [
 
 export default function JunniWorksPage() {
 
-  const lenis = useLenis()
-
   const worksListRef = useRef<HTMLDivElement>(null)
+
+  const footerRef = useRef<HTMLElement>(null)
 
   const [ready, setReady] = useState(false)
 
@@ -213,6 +165,58 @@ export default function JunniWorksPage() {
   const [drumrollActive, setDrumrollActive] = useState(0)
 
   const [toggleVisible, setToggleVisible] = useState(false)
+
+  const [toggleMounted, setToggleMounted] = useState(false)
+
+  const updateToggleVisibility = useCallback(() => {
+
+    const worksListEl = worksListRef.current
+
+    const footerEl = footerRef.current
+
+    if (!worksListEl || !footerEl) return
+
+    const viewportH = window.innerHeight
+
+    const toggleOffset = window.innerWidth >= 769 ? 100 : 50
+
+    const toggleHeight = window.innerWidth >= 769 ? 80 : 50
+
+    const worksRect = worksListEl.getBoundingClientRect()
+
+    const footerRect = footerEl.getBoundingClientRect()
+
+    const worksInView = worksRect.top < viewportH * 0.85 && worksRect.bottom > viewportH * 0.2
+
+    const footerCoversToggle = footerRect.top < viewportH - toggleOffset - toggleHeight * 0.5
+
+    setToggleVisible(worksInView && !footerCoversToggle)
+
+  }, [])
+
+
+
+  const lenis = useLenis(updateToggleVisibility)
+
+
+
+  useEffect(() => {
+
+    updateToggleVisibility()
+
+    window.addEventListener("scroll", updateToggleVisibility, { passive: true })
+
+    window.addEventListener("resize", updateToggleVisibility)
+
+    return () => {
+
+      window.removeEventListener("scroll", updateToggleVisibility)
+
+      window.removeEventListener("resize", updateToggleVisibility)
+
+    }
+
+  }, [updateToggleVisibility])
 
 
 
@@ -234,33 +238,17 @@ export default function JunniWorksPage() {
 
   useEffect(() => {
 
-    setDrumrollActive(0)
+    setToggleMounted(true)
 
-  }, [page])
+  }, [])
 
 
 
   useEffect(() => {
 
-    const el = worksListRef.current
+    setDrumrollActive(0)
 
-    if (!el) return
-
-
-
-    const io = new IntersectionObserver(
-
-      ([entry]) => setToggleVisible(entry.isIntersecting),
-
-      { threshold: 0.12 },
-
-    )
-
-    io.observe(el)
-
-    return () => io.disconnect()
-
-  }, [])
+  }, [page])
 
 
 
@@ -279,6 +267,52 @@ export default function JunniWorksPage() {
     setPage(Math.max(1, Math.min(WORKS_PAGE_TOTAL, next)))
 
   }
+
+
+
+  const toggleNode = (
+
+    <div className="jwp__toggle" data-visible={toggleVisible ? "true" : "false"} aria-label="表示切替">
+
+      <div className="jwp__toggle-wrap">
+
+        <button
+
+          type="button"
+
+          className="jwp__toggle-checkbox"
+
+          id="jwp-view-toggle"
+
+          data-type={view}
+
+          onClick={() => setView((prev) => (prev === "list" ? "drumroll" : "list"))}
+
+          aria-label={view === "list" ? "リスト表示" : "ドラムロール表示"}
+
+        />
+
+        <div className="jwp__toggle-knobs">
+
+          <span className="jwp__toggle-icon" data-icon="list">
+
+            <img alt="" src="/assets/images/works/toggle/list.png" />
+
+          </span>
+
+          <span className="jwp__toggle-icon" data-icon="drumroll">
+
+            <img alt="" src="/assets/images/works/toggle/drumroll.png" />
+
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  )
 
 
 
@@ -426,81 +460,81 @@ export default function JunniWorksPage() {
 
           <nav className="jwp__pagination" aria-label="ページネーション">
 
-            <button
+              <button
 
-              type="button"
+                type="button"
 
-              className="jwp__pagination-arrow"
+                className="jwp__pagination-arrow"
 
-              disabled={page <= 1}
+                disabled={page <= 1}
 
-              aria-label="前のページ"
+                aria-label="前のページ"
 
-              onClick={() => goPage(page - 1)}
+                onClick={() => goPage(page - 1)}
 
-            >
+              >
 
-              <svg viewBox="0 0 37.77 66.93" xmlns="http://www.w3.org/2000/svg">
+                <svg viewBox="0 0 37.77 66.93" xmlns="http://www.w3.org/2000/svg">
 
-                <path d="M34.77,3L3,32.57l31.77,31.36" />
+                  <path d="M34.77,3L3,32.57l31.77,31.36" />
 
-              </svg>
+                </svg>
 
-            </button>
+              </button>
 
-            <div className="jwp__pagination-list">
+              <div className="jwp__pagination-list">
 
-              {Array.from({ length: WORKS_PAGE_TOTAL }, (_, i) => {
+                {Array.from({ length: WORKS_PAGE_TOTAL }, (_, i) => {
 
-                const n = i + 1
+                  const n = i + 1
 
-                return (
+                  return (
 
-                  <button
+                    <button
 
-                    key={n}
+                      key={n}
 
-                    type="button"
+                      type="button"
 
-                    className="jwp__pagination-item"
+                      className="jwp__pagination-item"
 
-                    data-current={page === n}
+                      data-current={page === n}
 
-                    onClick={() => goPage(n)}
+                      onClick={() => goPage(n)}
 
-                  >
+                    >
 
-                    {n}
+                      {n}
 
-                  </button>
+                    </button>
 
-                )
+                  )
 
-              })}
+                })}
 
-            </div>
+              </div>
 
-            <button
+              <button
 
-              type="button"
+                type="button"
 
-              className="jwp__pagination-arrow"
+                className="jwp__pagination-arrow"
 
-              disabled={page >= WORKS_PAGE_TOTAL}
+                disabled={page >= WORKS_PAGE_TOTAL}
 
-              aria-label="次のページ"
+                aria-label="次のページ"
 
-              onClick={() => goPage(page + 1)}
+                onClick={() => goPage(page + 1)}
 
-            >
+              >
 
-              <svg viewBox="0 0 37.77 66.93" xmlns="http://www.w3.org/2000/svg">
+                <svg viewBox="0 0 37.77 66.93" xmlns="http://www.w3.org/2000/svg">
 
-                <path d="M3,3l31.77,29.57L3,63.93" />
+                  <path d="M3,3l31.77,29.57L3,63.93" />
 
-              </svg>
+                </svg>
 
-            </button>
+              </button>
 
           </nav>
 
@@ -510,45 +544,7 @@ export default function JunniWorksPage() {
 
 
 
-      <div className="jwp__toggle" data-visible={toggleVisible} aria-label="表示切替">
-
-        <div className="jwp__toggle-wrap">
-
-          <input
-
-            id="jwp-view-toggle"
-
-            type="checkbox"
-
-            className="jwp__toggle-input"
-
-            checked={view === "list"}
-
-            onChange={(e) => setView(e.target.checked ? "list" : "drumroll")}
-
-            aria-label={view === "list" ? "リスト表示" : "ドラムロール表示"}
-
-          />
-
-          <div className="jwp__toggle-knobs">
-
-            <span className="jwp__toggle-icon" style={{ color: "#111" }}>
-
-              <ToggleIcon type="list" />
-
-            </span>
-
-            <span className="jwp__toggle-icon" style={{ color: "#111" }}>
-
-              <ToggleIcon type="drumroll" />
-
-            </span>
-
-          </div>
-
-        </div>
-
-      </div>
+      {toggleMounted ? createPortal(toggleNode, document.body) : null}
 
 
 
@@ -564,7 +560,7 @@ export default function JunniWorksPage() {
 
 
 
-      <footer className="jwp__footer">
+      <footer className="jwp__footer" ref={footerRef}>
 
         <div className="jwp__footer-inner">
 

@@ -174,7 +174,7 @@ div.jwp[data-view=drumroll|list][data-transitioned][data-pagehead]
 │     ├─ section.jwp__drumroll         # ★ 嵌套在内
 │     │   └─ JunniWorksDrumroll
 │     └─ nav.jwp__pagination           # 仅 list 模式
-├─ div.jwp__toggle[data-visible]       # checkbox 切 drumroll ↔ list
+├─ div.jwp__toggle[data-visible]       # button[data-type] 切 drumroll ↔ list
 ├─ aside.jwp__copyright
 └─ footer.jwp__footer                  # menu + IFUYUN + pageTop
 ```
@@ -248,7 +248,7 @@ npm run build    # 已通过（2026-06-17 结构纠偏后）
 - [x] Footer 去掉 sticky 巨型 Logo
 - [x] portfolio 页隐藏本站 Navbar / QuickActions
 - [ ] **Drumroll 驱动手感**：原站需 DevTools 实测是滚轮、拖拽还是 Lenis 区间驱动；本站目前仅 wheel
-- [ ] **Toggle 图标**：原站用 PNG（`list.png` / `drumroll.png`），本站为内联 SVG
+- [x] **Toggle 图标**：已切到 PNG；本地路径 `public/assets/images/works/toggle/list.png`、`public/assets/images/works/toggle/drumroll.png`
 - [ ] **List 缩略图**：第 6–12 项及页 2/3 需换真实图或自己的作品素材
 - [ ] **页头字体**：原站 `junni.ttf`，本站用 Montserrat 800 替代
 
@@ -336,6 +336,8 @@ npm run build    # 已通过（2026-06-17 结构纠偏后）
 | HTML 实锤 | 用户粘贴原站 HTML；确认 `works_drumroll` 嵌套在 `works_list` 内；about 文字为 `#f7f7f7` |
 | 结构纠偏 | 重写 `JunniWorksPage.tsx`、`JunniWorksDrumroll.tsx`；重写 `JunniWorksPage.css`；`App.tsx` 隐藏全局 UI |
 | 构建修复 | 修正 CSS `transition` 语法；`npm run build` 再次通过 |
+| Toggle 对齐 | 按用户提供原站片段改为 `button.toggle_checkbox + data-type`，并将 `list.png/drumroll.png` 下载到本地路径 |
+| 访问排查 | 用户反馈无法访问页面；确认并重启 dev server，当前地址 `http://localhost:5173/#/portfolio` 可用 |
 | 文档整理 | 本文件更新，供后续对话接力 |
 
 ---
@@ -347,6 +349,142 @@ npm run build    # 已通过（2026-06-17 结构纠偏后）
 > **现状**：`#/portfolio` → `JunniWorksPage`。DOM 已按原站嵌套（`works-list` 内含 `list-inner` + `drumroll` + `pagination`）。About 白字逐字 + 桌面 3 列跑马灯。Drumroll 有可见性裁剪 + PREV/NEXT。Footer 正常文档流。portfolio 页已隐藏 Navbar / QuickActions。`npm run build` 通过。
 >
 > **请先**对照原站截图，从【用户指定的差异点】开始精调。注意区分本页与 `JunniWorks.tsx`（首页椒4.0）。待办见本文档第 6 节。
+
+---
+
+## 12. 本轮新增（2026-06-17 下午）
+
+### 12.1 用户反馈与结论（Toggle）
+
+- 用户明确指出：目标效果是 **Toggle 在可见区间内持续 fixed 悬浮**（滚轮滚动时位置不变）。
+- 用户提供了原站 Toggle HTML/CSS 片段，关键点：
+  - `button.toggle_checkbox`（不是 input checkbox）
+  - `data-type="list|drumroll"` 驱动状态
+  - 图标为 PNG（`list.png`、`drumroll.png`）
+  - 固定定位参数：`left:50%`、`bottom:100px`、`width:160px`、`z-index:4`、`transition:.25s`
+
+### 12.2 代码已落地的调整
+
+- `src/components/junni/works-page/JunniWorksPage.tsx`
+  - Toggle 结构由 `input[type=checkbox]` 改为 `button.jwp__toggle-checkbox`。
+  - 使用 `data-type={view}` 表达当前视图，点击按钮切换 `list/drumroll`。
+  - Toggle 图标从内联 SVG 改为 `<img>`：
+    - `/assets/images/works/toggle/list.png`
+    - `/assets/images/works/toggle/drumroll.png`
+- `src/components/junni/works-page/JunniWorksPage.css`
+  - 对齐原站关键参数：`position: fixed`、`left:50%`、`bottom:100px`、`width:160px`、`z-index:4`、`font-size:160px`、`transition:.25s`。
+  - 滑块位移由 `:checked` 改为 `[data-type="list"]` 驱动。
+
+### 12.3 新增资源
+
+- 已从原站下载到本地：
+  - `public/assets/images/works/toggle/list.png`
+  - `public/assets/images/works/toggle/drumroll.png`
+
+### 12.4 本地运行状态（最新）
+
+- 先前出现“无法访问网页”反馈，排查后为 dev server 状态异常/未稳定监听。
+- 已重启后恢复可访问：
+  - `http://localhost:5173/#/portfolio`
+
+### 12.5 下一轮建议优先项
+
+1. 用原站截图逐帧核对 Toggle 的显示区间（何时出现/何时消失），避免“固定 vs 区间隐藏”理解偏差。
+2. 继续对齐 Toggle 细节：黑底胶囊高度、圆点大小、两图标间距、hover/active 反馈。
+3. 回到主线：Drumroll 手感与 List/分页的原站过渡节奏。
+
+---
+
+## 13. 本轮新增（2026-06-17 16:30，围绕 Toggle 位置持续修复）
+
+> 本节补齐“你根本没改 / 位置还不对 / 你查呀”这几轮之后的真实结论与代码落地状态，供后续会话直接续接。
+
+### 13.1 用户最新明确诉求
+
+- 不接受“看起来差不多”，要求 **严格按原站位置与行为**。
+- 重点是 Toggle：
+  - 出现在 works 区域时固定悬浮；
+  - 不能压在荧光绿 footer 上；
+  - list 模式下视觉上应在分页（`1 2 3 + 箭头`）下方。
+
+### 13.2 这几轮踩坑与纠偏（按时间顺序）
+
+1) **只改 `bottom` 无效**
+- 曾把 `bottom` 调回 `100/50`，但用户仍反馈位置不对。
+- 结论：问题不只在 CSS 数值。
+
+2) **仅靠 IO 判定 footer 进入即隐藏，不稳定**
+- Lenis 平滑滚动下，单纯 `window scroll` 或简单 IO 判断会出现“看不见/忽隐忽现”。
+- 期间出现过：
+  - Toggle 长时间 `data-visible=false`；
+  - 或者 footer 已进入还没及时隐藏。
+
+3) **关键根因定位（最重要）**
+- `App.tsx` 中 `main` 使用 `animate-fade-up`；
+- 该动画结束后仍保留 `transform: translateY(0)`；
+- 当祖先存在 transform 时，后代 `position: fixed` 会相对该祖先而非 viewport 定位；
+- 导致 Toggle“看似 fixed 实则跟着内容走”，滚到 footer 区域时压在绿底上。
+
+### 13.3 最终修复方案（已落地）
+
+#### A. 结构：Toggle 改为 Portal 到 `document.body`
+
+- 文件：`src/components/junni/works-page/JunniWorksPage.tsx`
+- 调整：
+  - 引入 `createPortal`；
+  - 将 Toggle 节点抽为 `toggleNode`；
+  - 用 `createPortal(toggleNode, document.body)` 挂载到 body；
+  - 增加 `toggleMounted`，仅客户端挂载后渲染，避免 SSR/hydration 风险。
+
+**结果**：Toggle 彻底脱离 `main` 的 transform 影响，`position: fixed` 恢复为相对视口定位（与原站一致）。
+
+#### B. 显隐：Lenis 回调 + scroll/resize 双保险
+
+- 文件：`src/components/junni/works-page/JunniWorksPage.tsx`
+- 调整：
+  - `useCallback(updateToggleVisibility)` 统一计算；
+  - `const lenis = useLenis(updateToggleVisibility)` 让 Lenis 滚动时持续更新；
+  - 同时监听 `window scroll`（passive）与 `resize`，兜底同步；
+  - `worksInView && !footerCoversToggle` 控制 `toggleVisible`。
+
+#### C. 布局参数保持原站
+
+- 文件：`src/components/junni/works-page/JunniWorksPage.css`
+- 维持：
+  - `.jwp__toggle { position: fixed; left:50%; bottom:100px; width:160px; z-index:4; }`
+  - 移动端：`bottom:50px; width:100px`
+  - 滑块方向：`data-type="drumroll"` 在右侧（56.25%）
+  - `:active` 果冻拉伸反馈已保留。
+
+### 13.4 浏览器对照验证结论（本轮）
+
+- 在 `#/portfolio`：
+  - Drumroll 区域：Toggle 固定在视口底部中间；
+  - List 区域：分页可见时，Toggle 在其下方悬浮；
+  - Footer 抬升进入 Toggle 区域时：Toggle 隐藏，不再压在荧光绿 footer 上。
+- 同时确认：
+  - Toggle 挂载父级为 `BODY`；
+  - `position: fixed` 与 `bottom: 100px` 生效。
+
+### 13.5 当前文件状态（与 Toggle 相关）
+
+- `src/components/junni/works-page/JunniWorksPage.tsx`
+  - 新增：`createPortal`、`toggleMounted`、`toggleNode`；
+  - 显隐逻辑改为 `updateToggleVisibility` + `useLenis` 回调驱动；
+  - Footer 仍通过 `footerRef` 参与遮挡判断。
+
+- `src/components/junni/works-page/JunniWorksPage.css`
+  - Toggle 尺寸/位置参数与原站一致；
+  - 保留 pagination 的底部留白规则；
+  - footer `margin-top` 维持常规值（未用“硬加大 margin-top”这种偏离原站的办法）。
+
+### 13.6 后续新对话建议（直接按此执行）
+
+1. **先做 3 段位点截图对照**：drumroll 中段 / list 分页处 / footer 临界处，逐一比原站。
+2. 若仍有“位置不对”，优先检查：
+   - 是否出现新的祖先 `transform`（影响 fixed）；
+   - `toggleVisible` 临界阈值是否过早隐藏（`footerCoversToggle`）。
+3. 再做动效微调：滑块缓动曲线、显示/隐藏过渡时机（而不是再改极端 `bottom` 值）。
 
 ---
 

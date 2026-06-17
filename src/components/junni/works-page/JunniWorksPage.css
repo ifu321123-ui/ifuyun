@@ -990,6 +990,20 @@
 
 
 
+@media (max-width: 949px) {
+
+  .jwp__pagination {
+
+    padding-bottom: min(110px, 17.6470588235%);
+
+    font-size: min(18px, 4.2352941176vw);
+
+  }
+
+}
+
+
+
 .jwp__pagination-list {
 
   display: flex;
@@ -1130,7 +1144,7 @@
 
   position: fixed;
 
-  z-index: 40;
+  z-index: 4;
 
   left: 50%;
 
@@ -1138,7 +1152,7 @@
 
   width: 160px;
 
-  transform: translateX(-50%);
+  transform: translate(-50%);
 
   opacity: 0;
 
@@ -1146,7 +1160,11 @@
 
   pointer-events: none;
 
-  transition: opacity 0.35s var(--jwp-ease), visibility 0.35s;
+  font-size: 160px;
+
+  transition: 0.25s;
+
+  transition-property: opacity, visibility;
 
 }
 
@@ -1159,20 +1177,6 @@
   visibility: visible;
 
   pointer-events: auto;
-
-}
-
-
-
-@media (min-width: 769px) {
-
-  .jwp__toggle {
-
-    bottom: 50px;
-
-    width: 100px;
-
-  }
 
 }
 
@@ -1194,7 +1198,7 @@
 
 
 
-.jwp__toggle-input {
+.jwp__toggle-checkbox {
 
   position: absolute;
 
@@ -1206,11 +1210,17 @@
 
   margin: 0;
 
-  opacity: 0;
+  padding: 0;
 
   z-index: 3;
 
+  border: 0;
+
+  background: transparent;
+
   cursor: pointer;
+
+  opacity: 0;
 
 }
 
@@ -1233,6 +1243,8 @@
   background: #111;
 
   border-radius: 40px;
+
+  overflow: hidden;
 
 }
 
@@ -1262,9 +1274,39 @@
 
 
 
-.jwp__toggle-input:checked + .jwp__toggle-knobs::before {
+.jwp__toggle-checkbox[data-type="drumroll"] + .jwp__toggle-knobs::before {
 
   left: 56.25%;
+
+}
+
+.jwp__toggle-checkbox:active:not([data-type="drumroll"]) + .jwp__toggle-knobs [data-icon="list"] {
+
+  width: 71.4285714286%;
+
+}
+
+.jwp__toggle-checkbox:active:not([data-type="drumroll"]) + .jwp__toggle-knobs::before {
+
+  width: 56.25%;
+
+  border-radius: 9999px;
+
+}
+
+.jwp__toggle-checkbox[data-type="drumroll"]:active + .jwp__toggle-knobs [data-icon="drumroll"] {
+
+  width: 71.4285714286%;
+
+}
+
+.jwp__toggle-checkbox[data-type="drumroll"]:active + .jwp__toggle-knobs::before {
+
+  width: 56.25%;
+
+  margin-left: -18.75%;
+
+  border-radius: 9999px;
 
 }
 
@@ -1284,6 +1326,8 @@
 
   width: 42.86%;
 
+  transition: 0.3s ease all;
+
 }
 
 
@@ -1298,13 +1342,37 @@
 
 
 
+.jwp__toggle-icon img {
+
+  width: 15px;
+
+  height: 15px;
+
+  display: block;
+
+}
+
+
+
 @media (min-width: 769px) {
 
-  .jwp__toggle-icon svg {
+  .jwp__toggle-icon img {
 
     width: 15px;
 
     height: 15px;
+
+  }
+
+}
+
+@media (max-width: 768px) {
+
+  .jwp__toggle {
+
+    bottom: 50px;
+
+    width: 100px;
 
   }
 
