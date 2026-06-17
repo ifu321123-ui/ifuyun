@@ -558,7 +558,7 @@
 
   z-index: 2;
 
-  min-height: min(50vw, 100vh);
+  min-height: 220vh;
 
 }
 
@@ -574,11 +574,22 @@
 
 .jwp__drumroll-wrap {
 
-  position: relative;
+  position: sticky;
+  top: 0;
 
-  height: min(50vw, 100vh);
+  height: 100vh;
 
-  min-height: 420px;
+  min-height: 100vh;
+
+}
+
+@media (max-width: 949px) {
+
+  .jwp__drumroll {
+
+    min-height: 180vh;
+
+  }
 
 }
 

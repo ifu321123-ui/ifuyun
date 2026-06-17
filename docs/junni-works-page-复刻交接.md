@@ -536,4 +536,93 @@ npm run build    # 已通过（2026-06-17 结构纠偏后）
 
 ---
 
-*文档结束。新对话请 @ 本文件并说明要从哪一步开始（例如：「先对齐 Drumroll 滚动手感」或「补原站右上角 MENU」）。*
+## 15. 本轮新增（2026-06-17 17:20~18:03，围绕 Drumroll 手感与素材占位）
+
+> 本节记录“圆筒在未到原站对应区间时仍随页面整体滚动”的连续修复过程。后续新对话请直接基于本节继续调手感。
+
+### 15.1 用户反馈与目标
+
+- 用户明确反馈：当前圆筒尚未到原站图二那种位置时，圆筒整体仍在随页面滚动，手感不对。
+- 用户同意优先修交互，并允许直接从原站抓更准确的数据/图片素材先占位。
+
+### 15.2 本轮关键结论（根因）
+
+- 之前实现主要依赖 `JunniWorksDrumroll` 内局部 `wheel` 监听；鼠标离开该局部区域时，页面滚动接管，导致“圆筒跟文档流位移”观感明显。
+- 缺少接近原站的“drumroll 粘滞区间（pin/sticky phase）”与统一滚轮接管策略。
+
+### 15.3 本轮已落地改动（代码）
+
+#### A. 滚轮接管从局部改为页面级（drumroll 视图内）
+
+- 文件：`src/components/junni/works-page/JunniWorksPage.tsx`
+- 调整：
+  - 新增窗口级 `wheel` 监听（capture + passive:false），只在 `view === "drumroll"` 且位于 drumroll 区域时生效。
+  - 非首尾项时优先拦截并驱动 `drumrollActive`；首尾继续向外滚动时释放页面滚动。
+- 目的：避免“只有鼠标悬停在局部元素上才生效”的不稳定体验。
+
+#### B. 移除子组件重复 wheel 监听
+
+- 文件：`src/components/junni/works-page/JunniWorksDrumroll.tsx`
+- 调整：
+  - 删除 `wrap.addEventListener("wheel", ...)` 局部监听逻辑。
+- 目的：避免窗口级接管与局部接管叠加，出现一次滚动跳两项/双触发。
+
+#### C. 增加 drumroll sticky 区间（接近原站 pin 段）
+
+- 文件：`src/components/junni/works-page/JunniWorksPage.css`
+- 调整：
+  - `.jwp__drumroll` 最小高度改为较长滚动区：桌面 `220vh`，移动端 `180vh`。
+  - `.jwp__drumroll-wrap` 改为 `position: sticky; top: 0; height: 100vh; min-height: 100vh;`。
+- 目的：滚动时形成“内容区滚过、圆筒阶段定住”的基础节奏，而非整块提前漂移。
+
+#### D. 滚轮输入调优（触控板/鼠标统一）
+
+- 文件：`src/components/junni/works-page/JunniWorksPage.tsx`
+- 调整：
+  - 增加 `wheelDeltaAccRef` 累计增量，达到阈值再触发切项（去抖）。
+  - `deltaMode` 归一化（行模式转像素）。
+  - 动态冷却：大滚轮更长冷却，小滚轮更短冷却。
+  - 大幅滚动可跨两项（后续在边界附近禁用）。
+- 目的：提升“跟手但不抖”的滚动质感。
+
+#### E. 圆筒运动从固定阻尼升级为自适应阻尼
+
+- 文件：`src/components/junni/works-page/JunniWorksDrumroll.tsx`
+- 调整：
+  - 引入 `targetActiveRef` / `smoothActiveRef`，渲染基于平滑值追踪目标值。
+  - 阻尼由固定系数改为随 `diff` 动态变化（差距大时快、接近时慢）。
+- 目的：消除“硬跳项”观感，更接近原站惯性滑入/收敛。
+
+#### F. 首尾橡皮筋阻尼（边界手感）
+
+- 文件：`src/components/junni/works-page/JunniWorksPage.tsx`、`JunniWorksDrumroll.tsx`
+- 调整：
+  - 接近首尾时提高触发阈值（更“重”），并禁用一次跨两项。
+  - 接近首尾时降低平滑推进速度（edge drag）。
+- 目的：边界不再“轻飘越界感”，更接近原站首尾阻尼。
+
+### 15.4 本轮素材占位升级（真实 URL）
+
+- 文件：`src/components/junni/works-page/junniWorksPageData.ts`
+- 调整：
+  - 第 1 页 12 个作品 `image` 已替换为原站详情页抓取到的 `microcms-assets` 真实图片 URL（不再用 `work01~05` / `shiyuan` 占位）。
+- 说明：
+  - 先前尝试批量抓 `og:image` 的命令曾失败/卡住，后改为稳定方式逐个抓取详情页首图并完成替换。
+
+### 15.5 本轮验证
+
+- `ReadLints`：相关文件无新增报错。
+- `npm run build`：多轮改动后均通过。
+
+### 15.6 当前状态（给下个会话）
+
+- 已从“局部 wheel + 硬切项”升级到“窗口接管 + sticky 区间 + 累计阈值 + 自适应阻尼 + 边界阻尼”。
+- 圆筒仍是离散索引驱动（以项为单位），但视觉过渡已平滑。
+- 若继续追 1:1，下一优先建议：
+  1. 用原站对照录屏做阈值微调（`stepThreshold`、`lockMs`、`damping` 系数）；
+  2. 评估是否改为“滚动进度连续映射 activeFloat”（而非离散步进）；
+  3. 对齐 list/drumroll 切换瞬间的过渡节奏（淡入淡出时长与延迟）。
+
+---
+
+*文档结束。新对话请 @ 本文件并说明要从哪一步开始（例如：「继续微调 Drumroll 阻尼参数」或「改成连续进度驱动」）。*
