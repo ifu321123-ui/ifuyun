@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react"
 
-export type PageId = "home" | "experience" | "projects" | "contact" | "neu"
+export type PageId = "home" | "experience" | "projects" | "portfolio" | "contact" | "neu"
 export type Route =
   | { page: PageId; slug?: undefined }
   | { page: "work"; slug: string }
 
-const PAGES: PageId[] = ["home", "experience", "projects", "contact", "neu"]
+const PAGES: PageId[] = ["home", "experience", "projects", "portfolio", "contact", "neu"]
 
 function parseHash(): Route {
   const id = window.location.hash.replace(/^#\/?/, "")

@@ -100,6 +100,7 @@ export const heroIntro = {
 export const notebookNav = [
   { id: "about" as const, label: "关于" },
   { id: "work" as const, label: "工作" },
+  { id: "portfolio" as const, label: "作品集" },
   { id: "project" as const, label: "项目" },
   { id: "connect" as const, label: "联系" },
 ]
