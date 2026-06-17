@@ -184,8 +184,10 @@ div.jwp[data-view=drumroll|list][data-transitioned][data-pagehead]
 | 项 | 实现 |
 |----|------|
 | 几何常量 | 与首页 `JunniWorks.tsx` 同源：`STEP_DEG=25`、`PERSPECTIVE=500`、`PANEL_DEG=51.1` 等 |
+| **面板尺寸** | **`PANEL_ASPECT=2.65` 固定窗口比例**；`fitTextureCover()` 对贴图做居中 cover 裁切（`tex.repeat/offset`） |
 | 可见性裁剪 | `VISIBLE_THETA_DEG=52`；项外范围 `opacity:0`、`visibility:hidden`、`data-visible="false"` |
-| 滚轮驱动 | drumroll 区域 `wheel` 切换 `activeIndex`（280ms 节流） |
+| 滚轮驱动 | 页面级 `wheel`（capture）+ 累计阈值 + sticky 区间；见 §15 |
+| 运动平滑 | `targetActiveRef` / `smoothActiveRef` 自适应阻尼；见 §15 |
 | PREV/NEXT | 列表末尾 `jwp__drumroll-item--nav`，按 `page`/`totalPages` 条件渲染 |
 | 链接 | 作品项用 `<a href="#work/{slug}">` |
 | WebGL | canvas 曲面贴图；`IntersectionObserver` 进入视口才 `requestAnimationFrame` |
@@ -194,9 +196,10 @@ div.jwp[data-view=drumroll|list][data-transitioned][data-pagehead]
 
 - 介绍文案：原站日文 `WORKS_PAGE_ABOUT_TEXT`（数组 10 行）；当前 TSX 用 `join("")` 合并为连续文本，**未保留 `<br>` 换行**
 - About 图：16 张 PNG 在 `public/works/junni/about/`
-- 页 1 前 5 项：使用 `public/works/junni/*` 真实缩略图
-- 页 1 第 6–12 项：暂用 `work01~05.png`、`shiyuan/*` **占位**
-- 页 2、3：`junniWorksPageData.ts` 中由页 1 衍生（标题加 II/III），**非真实分页内容**
+- **页 1（12 项）**：`image` 已全部替换为原站 `microcms-assets.io` 真实 URL（见 §15.4）
+- **页 2（12 项）**：标题 / 描述 / slug 已对齐原站 `junni.co.jp/works/page/2/`；**缩略图仍为临时占位**（当前复用 `PAGE_1[n].image`）
+- **页 3（2 项）**：标题 / 描述 / slug 已对齐原站 `junni.co.jp/works/page/3/`；**缩略图仍为临时占位**（当前用 `WORKS_PAGE_ABOUT_IMAGES`）
+- **待确认 slug**：`vi-ta`、`at-aroma`（原站详情页 URL 未在本轮完全核实）
 
 ### 4.6 构建与访问
 
@@ -247,9 +250,10 @@ npm run build    # 已通过（2026-06-17 结构纠偏后）
 - [x] Drumroll PREV/NEXT 导航项
 - [x] Footer 去掉 sticky 巨型 Logo
 - [x] portfolio 页隐藏本站 Navbar / QuickActions
-- [ ] **Drumroll 驱动手感**：原站需 DevTools 实测是滚轮、拖拽还是 Lenis 区间驱动；本站目前仅 wheel
+- [ ] **Drumroll 驱动手感**：已做窗口级 wheel + sticky + 阻尼（§15），但仍需对照原站录屏微调阈值 / 是否改连续进度驱动
 - [x] **Toggle 图标**：已切到 PNG；本地路径 `public/assets/images/works/toggle/list.png`、`public/assets/images/works/toggle/drumroll.png`
-- [ ] **List 缩略图**：第 6–12 项及页 2/3 需换真实图或自己的作品素材
+- [x] **Drumroll 圆筒图片统一尺寸**：固定 `PANEL_ASPECT` + `fitTextureCover`（§16）；`PANEL_ASPECT=2.65` 是否需量测微调待定
+- [ ] **List / Drumroll 缩略图**：页 1 已完成；**页 2/3 文案与 slug 已对齐，缩略图仍占位**
 - [ ] **页头字体**：原站 `junni.ttf`，本站用 Montserrat 800 替代
 
 ### P1 — 布局 / 细节
@@ -292,14 +296,15 @@ npm run build    # 已通过（2026-06-17 结构纠偏后）
 ## 8. 推荐新对话执行顺序
 
 1. **浏览器对照**：`#/portfolio` vs `junni.co.jp/works/`，截图列剩余差异清单
-2. **Drumroll 手感**：实测原站滚动行为，对齐 wheel / 拖拽 / 惯性
-3. **About 文案换行** + slider `data-media` 断点精细对照
-4. **Toggle + 分页** 视觉 1:1（PNG 图标、间距、hover）
-5. **List 网格** 三列间距、标题字号、hover 色
-6. **Footer** noise 纹理 + 社交区 + SVG Logo
-7. **右上角 MENU**（或确认继续沿用隐藏 Navbar 的简化方案）
-8. **替换作品数据与图片**
-9. **（可选）** 抽取 `useJunniDrumroll` 与首页共用
+2. **Drumroll 圆筒图片 1:1**（§16）：补全页 2/3 缩略图 → 微调 `PANEL_ASPECT` / scrim / 亮度
+3. **Drumroll 手感**：实测原站滚动行为，对齐 wheel / 拖拽 / 惯性（§15）
+4. **About 文案换行** + slider `data-media` 断点精细对照
+5. **Toggle + 分页** 视觉 1:1（PNG 图标、间距、hover）
+6. **List 网格** 三列间距、标题字号、hover 色
+7. **Footer** noise 纹理 + 社交区 + SVG Logo
+8. **右上角 MENU**（或确认继续沿用隐藏 Navbar 的简化方案）
+9. **替换作品数据与图片**（若改为用户自有项目）
+10. **（可选）** 抽取 `useJunniDrumroll` 与首页共用
 
 ---
 
@@ -339,6 +344,8 @@ npm run build    # 已通过（2026-06-17 结构纠偏后）
 | Toggle 对齐 | 按用户提供原站片段改为 `button.toggle_checkbox + data-type`，并将 `list.png/drumroll.png` 下载到本地路径 |
 | 访问排查 | 用户反馈无法访问页面；确认并重启 dev server，当前地址 `http://localhost:5173/#/portfolio` 可用 |
 | 文档整理 | 本文件更新，供后续对话接力 |
+| 圆筒图片尺寸 | 用户截图对比发现 Drumroll 图片大小不齐；固定面板比例 + cover 裁切（§16） |
+| 分页数据 | 页 2/3 文案与 slug 对齐原站；缩略图抓取未完成 |
 
 ---
 
@@ -346,9 +353,9 @@ npm run build    # 已通过（2026-06-17 结构纠偏后）
 
 > 继续 junni.co.jp **`/works/` 作品集页**复刻（非首页 home_works）。已读 `docs/junni-works-page-复刻交接.md`。
 >
-> **现状**：`#/portfolio` → `JunniWorksPage`。DOM 已按原站嵌套（`works-list` 内含 `list-inner` + `drumroll` + `pagination`）。About 白字逐字 + 桌面 3 列跑马灯。Drumroll 有可见性裁剪 + PREV/NEXT。Footer 正常文档流。portfolio 页已隐藏 Navbar / QuickActions。`npm run build` 通过。
+> **现状**：`#/portfolio` → `JunniWorksPage`。DOM 已按原站嵌套。Toggle Portal 固定定位已修复（§13）。Drumroll 已做 sticky + 窗口级 wheel + 自适应阻尼（§15）。**圆筒 WebGL 面板已改为固定比例 + cover 裁切**（§16）。页 1 缩略图为原站 microcms URL；页 2/3 文案与 slug 已对齐但图片仍占位。`npm run build` 通过。
 >
-> **请先**对照原站截图，从【用户指定的差异点】开始精调。注意区分本页与 `JunniWorks.tsx`（首页椒4.0）。待办见本文档第 6 节。
+> **请先**对照原站 `junni.co.jp/works/` 截图，从【用户指定的差异点】精调。当前主线建议：① 补全页 2/3 真实缩略图；② 微调 `PANEL_ASPECT` / scrim / 亮度；③ 继续 Drumroll 手感。注意区分本页与 `JunniWorks.tsx`（首页椒4.0）。待办见第 6 节与 §16.6。
 
 ---
 
@@ -625,4 +632,146 @@ npm run build    # 已通过（2026-06-17 结构纠偏后）
 
 ---
 
-*文档结束。新对话请 @ 本文件并说明要从哪一步开始（例如：「继续微调 Drumroll 阻尼参数」或「改成连续进度驱动」）。*
+## 16. 本轮新增（2026-06-17 18:15~18:20，圆筒图片尺寸统一 + 分页数据对齐）
+
+> 本节记录用户通过**原站 vs 本站截图对比**发现的 Drumroll 图片大小不一致问题，以及随后的代码修复与数据补全。后续新对话请**优先围绕圆筒视觉 1:1**继续精调。
+
+### 16.1 用户反馈（核心视觉问题）
+
+- 用户提供两组对比截图：
+  - **图 1 / 图 2（原站）**：`junni.co.jp/works/` Drumroll 圆筒中，Alche、M@STER EXPO 等项目封面在圆筒上**视觉尺寸与比例一致**，呈统一宽矩形窗口。
+  - **图 3 / 图 4（本站）**：同一 Drumroll 效果下，各项目图片**大小参差不齐**，有的显大、有的显小。
+- 用户判断：**原站应固定了图片显示尺寸**（统一容器 + 裁切），而非按每张原图比例直接撑开。
+
+### 16.2 根因定位
+
+**A. WebGL 几何按原图比例动态变化（主因）**
+
+修改前 `JunniWorksDrumroll.tsx` 逻辑：
+
+```ts
+const aspect = img.naturalWidth / img.naturalHeight
+const axial = aspect * PANEL_RAD   // ← 每张图面板高度不同
+const geo = new THREE.CylinderGeometry(1, 1, axial, ...)
+```
+
+- 横图 → `axial` 更大 → 圆筒上显更大
+- 竖图 / 方图 → `axial` 更小 → 圆筒上显更小
+- 这与原站「统一窗口 + 内容 cover」策略相反
+
+**B. 数据源本身为混合比例**
+
+- `junniWorksPageData.ts` 页 1 的 12 张 `microcms-assets` 封面本身宽高比不一（如 `idolmaster-expo_01.png` 与 `works-basica_3_v2.jpg`）。
+- 在未做统一裁切时，差异会被几何公式放大。
+
+### 16.3 已落地修复（代码）
+
+#### A. 固定面板比例 + 贴图 cover 裁切
+
+- 文件：`src/components/junni/works-page/JunniWorksDrumroll.tsx`
+- 新增常量：`PANEL_ASPECT = 2.65`
+- 新增函数：`fitTextureCover(tex, sourceAspect, targetAspect)`
+  - 贴图已设 `tex.rotation = TEX_ROTATION`（`-π/2`），裁切计算使用旋转后的 `displayedAspect = 1 / sourceAspect`
+  - 通过 `tex.repeat` / `tex.offset` 实现 CSS `object-fit: cover` 等效居中裁切
+- 几何统一为：
+
+```ts
+fitTextureCover(tex, aspect, PANEL_ASPECT)
+const axial = PANEL_ASPECT * PANEL_RAD   // 所有面板同高
+```
+
+- **预期效果**：圆筒上每一张图的「可视窗口」尺寸一致，仅内容裁切不同，接近原站。
+
+#### B. 第 2 / 3 页分页数据对齐原站
+
+- 文件：`src/components/junni/works-page/junniWorksPageData.ts`
+- 数据来源：`https://junni.co.jp/works/page/2/`、`https://junni.co.jp/works/page/3/`
+- 已删除原先 `PAGE_1.map(... II/III)` 假数据
+
+**页 2（12 项，顺序与原站一致）**
+
+| # | title | slug | description（摘要） |
+|---|-------|------|-------------------|
+| 1 | Fluffy HUGS | `fluffy_hugs` | NFT「Fluffy HUGs」スペシャルサイト |
+| 2 | Innofes DJ Booth | `innofes` | 現地とオンラインをインタラクティブにつなぐインスタレーション |
+| 3 | Junni is... | `junni_is` | 株式会社Junni採用特設サイト |
+| 4 | Tensura Virtual Gallery | `virtualgallery` | 「転スラバーチャルギャラリー」企画・開発 |
+| 5 | RWBY | `rwby` | アニメ『RWBY 氷雪帝国』プロモーション＋公式サイト |
+| 6 | You0DECO TV | `you0deco` | アニメ『ユーレイデコ』公式サイト制作 |
+| 7 | TENSURA MOVIE | `tensura-movie2022` | 劇場版転スラ 紅蓮の絆編 公式サイト |
+| 8 | vi-ta | `vi-ta` | [vi-ta hair design] WEBサイトリニューアル |
+| 9 | TOKOSHIE×BULLET | `tokoshie` | 「永久×バレット」ティザーサイト制作 |
+| 10 | BURN THE WITCH | `burnthewitch` | アニメ「BURN THE WITCH」公式サイト |
+| 11 | DENONBU | `denonbu` | 「電音部」オフィシャルサイト制作 |
+| 12 | TENSURA PORTAL | `tensura-portal` | 転スラ公式ポータルサイト制作 |
+
+**页 3（2 项）**
+
+| # | title | slug | description |
+|---|-------|------|-------------|
+| 1 | OBSOLETE | `obsolete-official` | アニメ「OBSOLETE」オフィシャルサイト制作 |
+| 2 | @aroma | `at-aroma` | @aroma online store renewal |
+
+#### C. slug 对齐原站详情页路径（已确认部分）
+
+原站详情页 URL 模式：`https://junni.co.jp/works/{slug}/`
+
+本轮已将多处 slug 从自创命名改为原站路径，例如：
+
+- `fluffy-hugs-special` → `fluffy_hugs`
+- `innofes-dj-booth` → `innofes`
+- `junni-is` → `junni_is`
+- `tensura-virtual-gallery` → `virtualgallery`
+- `you0deco-tv` → `you0deco`
+- `tensura-movie` → `tensura-movie2022`
+- `tokoshie-bullet` → `tokoshie`
+- `burn-the-witch` → `burnthewitch`
+- `obsolete` → `obsolete-official`
+
+**待核实**：`vi-ta`、`at-aroma` 的原站确切 slug（搜索未拿到详情页直链）。
+
+### 16.4 素材抓取进展与阻塞
+
+| 分页 | 文案 / slug | 缩略图 `image` |
+|------|-------------|----------------|
+| 页 1 | ✅ 对齐 | ✅ `microcms-assets.io` 真实 URL |
+| 页 2 | ✅ 对齐 | ⚠️ 临时复用 `PAGE_1[n].image` |
+| 页 3 | ✅ 对齐 | ⚠️ 临时用 `WORKS_PAGE_ABOUT_IMAGES` |
+
+- 本轮尝试用 Python 从详情页 HTML 批量提取 `microcms-assets` URL，在 **Windows PowerShell** 下因引号 / 正则转义多次失败，未完成批量回填。
+- 已通过 Web 搜索确认页 2 多项原站详情页存在（如 `/works/fluffy_hugs/`、`/works/innofes/`、`/works/rwby/` 等），下一轮应逐条抓 `og:image` 或页面内首图 URL。
+
+### 16.5 验证
+
+- `ReadLints`：相关文件无报错
+- `npm run build`：通过（§16 改动后）
+
+### 16.6 下一轮优先（圆筒视觉 1:1 主线）
+
+按建议顺序：
+
+1. **补全页 2 / 页 3 真实缩略图**
+   - 逐条访问 `junni.co.jp/works/{slug}/` 提取 `microcms-assets` 或 `og:image`
+   - 回填 `junniWorksPageData.ts` 中 `PAGE_2` / `PAGE_3` 的 `image` 字段
+   - 核实 `vi-ta`、`at-aroma` 原站 slug
+2. **对照验证 `PANEL_ASPECT=2.65`**
+   - 与原站同视口宽度截图对比圆筒窗口宽高比
+   - 必要时微调常量或 scrim（`.jwp__drumroll-scrim`）渐变
+3. **圆筒亮度 / 边缘淡出**
+   - 原站非当前项更暗、中心更亮；对照 `mat.color.setScalar(b)` 与 `PANEL_FADE_DEG` 参数
+4. **继续 §15 手感项**（若视觉已满意再做）
+   - `stepThreshold` / `lockMs` / `damping` 录屏微调
+   - 评估连续滚动进度驱动 `activeFloat`
+
+### 16.7 新对话复制指令（圆筒专项）
+
+> 继续 junni.co.jp `/works/` Drumroll 圆筒 **1:1 视觉复刻**。已读 `docs/junni-works-page-复刻交接.md` §16。
+>
+> **已完成**：固定面板 `PANEL_ASPECT` + `fitTextureCover`；页 1 真实缩略图；页 2/3 文案与 slug。
+> **待做**：页 2/3 缩略图回填；`PANEL_ASPECT` / scrim / 亮度对照；手感微调。
+>
+> 请先打开 `#/portfolio` 与原站并排截图，从用户指定差异点继续。
+
+---
+
+*文档结束。新对话请 @ 本文件并说明要从哪一步开始（建议：「补全页 2/3 缩略图」或「微调 PANEL_ASPECT 对照原站」）。*

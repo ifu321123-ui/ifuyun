@@ -111,19 +111,109 @@ const PAGE_1: WorksPageItem[] = [
   },
 ]
 
-const PAGE_2: WorksPageItem[] = PAGE_1.map((item, i) => ({
-  ...item,
-  slug: `${item.slug}-p2`,
-  title: `${item.title} II`,
-  image: WORKS_PAGE_ABOUT_IMAGES[i % WORKS_PAGE_ABOUT_IMAGES.length],
-}))
+const PAGE_2: WorksPageItem[] = [
+  {
+    slug: "fluffy_hugs",
+    title: "Fluffy HUGS",
+    description: "NFT「Fluffy HUGs」スペシャルサイト",
+    image: PAGE_1[0].image,
+    titleSize: "normal",
+  },
+  {
+    slug: "innofes",
+    title: "Innofes DJ Booth",
+    description: "現地とオンラインをインタラクティブにつなぐインスタレーション",
+    image: PAGE_1[1].image,
+    titleSize: "middle",
+  },
+  {
+    slug: "junni_is",
+    title: "Junni is...",
+    description: "株式会社Junni採用特設サイト",
+    image: PAGE_1[2].image,
+    titleSize: "normal",
+  },
+  {
+    slug: "virtualgallery",
+    title: "Tensura Virtual Gallery",
+    description: "「転スラバーチャルギャラリー」企画・開発",
+    image: PAGE_1[3].image,
+    titleSize: "small",
+  },
+  {
+    slug: "rwby",
+    title: "RWBY",
+    description: "アニメ『RWBY 氷雪帝国 』のプロモーション企画と公式サイト制作",
+    image: PAGE_1[4].image,
+    titleSize: "normal",
+  },
+  {
+    slug: "you0deco",
+    title: "You0DECO TV",
+    description: "アニメ『ユーレイデコ』公式サイト制作",
+    image: PAGE_1[5].image,
+    titleSize: "middle",
+  },
+  {
+    slug: "tensura-movie2022",
+    title: "TENSURA MOVIE",
+    description: "「劇場版 転生したらスライムだった件 紅蓮の絆編」公式サイト制作",
+    image: PAGE_1[6].image,
+    titleSize: "middle",
+  },
+  {
+    slug: "vi-ta",
+    title: "vi-ta",
+    description: "[vi-ta hair design] WEBサイトリニューアル",
+    image: PAGE_1[7].image,
+    titleSize: "normal",
+  },
+  {
+    slug: "tokoshie",
+    title: "TOKOSHIE×BULLET",
+    description: "「永久×バレット」ティザーサイト制作",
+    image: PAGE_1[8].image,
+    titleSize: "small",
+  },
+  {
+    slug: "burnthewitch",
+    title: "BURN THE WITCH",
+    description: "アニメ「BURN THE WITCH」公式サイト制作",
+    image: PAGE_1[9].image,
+    titleSize: "normal",
+  },
+  {
+    slug: "denonbu",
+    title: "DENONBU",
+    description: "「電音部」オフィシャルサイト制作",
+    image: PAGE_1[10].image,
+    titleSize: "normal",
+  },
+  {
+    slug: "tensura-portal",
+    title: "TENSURA PORTAL",
+    description: "アニメ「転生したらスライムだった件」公式 ポータルサイト制作",
+    image: PAGE_1[11].image,
+    titleSize: "middle",
+  },
+]
 
-const PAGE_3: WorksPageItem[] = PAGE_1.map((item, i) => ({
-  ...item,
-  slug: `${item.slug}-p3`,
-  title: `${item.title} III`,
-  image: WORKS_PAGE_ABOUT_IMAGES[(i + 4) % WORKS_PAGE_ABOUT_IMAGES.length],
-}))
+const PAGE_3: WorksPageItem[] = [
+  {
+    slug: "obsolete-official",
+    title: "OBSOLETE",
+    description: "アニメ「OBSOLETE」オフィシャルサイト制作",
+    image: WORKS_PAGE_ABOUT_IMAGES[0],
+    titleSize: "normal",
+  },
+  {
+    slug: "at-aroma",
+    title: "@aroma",
+    description: "@aroma online store renewal",
+    image: WORKS_PAGE_ABOUT_IMAGES[1],
+    titleSize: "normal",
+  },
+]
 
 export const WORKS_PAGE_DATA: WorksPageItem[][] = [PAGE_1, PAGE_2, PAGE_3]
 

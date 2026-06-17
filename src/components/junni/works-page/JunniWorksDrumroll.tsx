@@ -9,6 +9,7 @@ const STEP_RAD = STEP_DEG * DEG2RAD
 const PERSPECTIVE = 500
 const PANEL_DEG = 51.1
 const PANEL_RAD = PANEL_DEG * DEG2RAD
+const PANEL_ASPECT = 2.65
 const PANEL_FADE_DEG = 18
 const PANEL_VISIBLE_DEG = 58
 const VISIBLE_THETA_DEG = 52
@@ -21,6 +22,26 @@ function clamp(value: number, min: number, max: number) {
 
 function splitText(text: string) {
   return Array.from(text).map((char) => (char === " " ? "\u00A0" : char))
+}
+
+function fitTextureCover(tex: THREE.Texture, sourceAspect: number, targetAspect: number) {
+  // Texture is rotated 90deg on the drum panel, so use the displayed aspect after rotation.
+  const displayedAspect = sourceAspect > 0 ? 1 / sourceAspect : 1
+  let repeatX = 1
+  let repeatY = 1
+  let offsetX = 0
+  let offsetY = 0
+
+  if (displayedAspect > targetAspect) {
+    repeatX = targetAspect / displayedAspect
+    offsetX = (1 - repeatX) * 0.5
+  } else {
+    repeatY = displayedAspect / targetAspect
+    offsetY = (1 - repeatY) * 0.5
+  }
+
+  tex.repeat.set(repeatX, repeatY)
+  tex.offset.set(offsetX, offsetY)
 }
 
 function computeRadius(h: number) {
@@ -229,7 +250,8 @@ export default function JunniWorksDrumroll({
         tex.anisotropy = 8
         tex.center.set(0.5, 0.5)
         tex.rotation = TEX_ROTATION
-        const axial = aspect * PANEL_RAD
+        fitTextureCover(tex, aspect, PANEL_ASPECT)
+        const axial = PANEL_ASPECT * PANEL_RAD
         const geo = new THREE.CylinderGeometry(1, 1, axial, 64, 1, true, -PANEL_RAD / 2, PANEL_RAD)
         const mat = new THREE.MeshBasicMaterial({
           map: tex,
