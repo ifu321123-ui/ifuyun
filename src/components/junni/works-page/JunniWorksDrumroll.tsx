@@ -1,22 +1,27 @@
 import { CSSProperties, useCallback, useEffect, useRef } from "react"
 import * as THREE from "three"
+import {
+  FRONT_DEG,
+  PANEL_ASPECT,
+  PANEL_RAD,
+  PANEL_VISIBLE_DEG,
+  PERSPECTIVE,
+  SPIN_SIGN,
+  STEP_DEG,
+  STEP_RAD,
+  TEX_ROTATION,
+  clamp,
+  computeDrumRadius,
+  computePanelBox,
+  drumrollItemOpacity,
+  drumrollItemVisible,
+  drumrollPanelBrightness,
+  fitTextureCover,
+  splitDrumrollText,
+} from "../drumrollGeometry"
 import type { WorksPageItem } from "./junniWorksPageData"
 
-const STEP_DEG = 25
-const FRONT_DEG = 0
 const DEG2RAD = Math.PI / 180
-const STEP_RAD = STEP_DEG * DEG2RAD
-const PERSPECTIVE = 500
-/** junni.co.jp /works/ `.works_drumroll_image`: min(90vw,900px) × 16/9; PANEL_DEG≈51.1° @ home_works CDP. */
-const PANEL_DEG = 51.1
-const PANEL_RAD = PANEL_DEG * DEG2RAD
-const PANEL_ASPECT = 16 / 9
-const PANEL_FADE_DEG = 18
-const PANEL_VISIBLE_DEG = 58
-const VISIBLE_THETA_DEG = 58
-const PANEL_MAX_WIDTH = 900
-const SPIN_SIGN = 1
-const TEX_ROTATION = -Math.PI / 2
 
 /** Phase past last work item until every WebGL panel leaves the visible arc (|Δ|×25° ≥ 58°). */
 export const DRUMROLL_EXIT_WORK_MARGIN = 2.5
@@ -37,47 +42,6 @@ export function getDrumrollPhaseMax(itemCount: number) {
 
 /** @deprecated Use getDrumrollPhaseMax — kept for grep compatibility */
 export const DRUMROLL_EXIT_MARGIN = DRUMROLL_EXIT_WORK_MARGIN + DRUMROLL_NAV_HOLD_MARGIN
-
-function clamp(value: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, value))
-}
-
-function splitText(text: string) {
-  return Array.from(text).map((char) => (char === " " ? "\u00A0" : char))
-}
-
-function fitTextureCover(tex: THREE.Texture, sourceAspect: number, targetAspect: number) {
-  // Texture is rotated 90deg on the drum panel, so use the displayed aspect after rotation.
-  const displayedAspect = sourceAspect > 0 ? 1 / sourceAspect : 1
-  let repeatX = 1
-  let repeatY = 1
-  let offsetX = 0
-  let offsetY = 0
-
-  if (displayedAspect > targetAspect) {
-    repeatX = targetAspect / displayedAspect
-    offsetX = (1 - repeatX) * 0.5
-  } else {
-    repeatY = displayedAspect / targetAspect
-    offsetY = (1 - repeatY) * 0.5
-  }
-
-  tex.repeat.set(repeatX, repeatY)
-  tex.offset.set(offsetX, offsetY)
-}
-
-/** Target panel box — mirrors `.works_drumroll_image { width:min(90vw,900px); aspect-ratio:16/9 }`. */
-function computePanelBox(vw: number) {
-  const width = Math.min(vw * 0.9, PANEL_MAX_WIDTH)
-  const height = width * (9 / 16)
-  return { width, height }
-}
-
-/** Cylinder orbit radius so front panel height matches the 16:9 viewport box. */
-function computeDrumRadius(vw: number) {
-  const { height } = computePanelBox(vw)
-  return height / PANEL_RAD
-}
 
 type PanelRef = { mesh: THREE.Mesh; mat: THREE.MeshBasicMaterial; index: number }
 type SceneRefs = {
@@ -184,8 +148,8 @@ export default function JunniWorksDrumroll({
         const y = -radius * Math.sin(rad)
         const z = radius * (Math.cos(rad) - 1)
         const isActive = i === activeIndex
-        const isVisible = absTheta < VISIBLE_THETA_DEG && titleFade > 0.02
-        const opacity = isVisible ? clamp(1 - (absTheta - 46) / 14, 0, 1) * titleFade : 0
+        const isVisible = drumrollItemVisible(absTheta, titleFade)
+        const opacity = drumrollItemOpacity(absTheta, titleFade)
 
         item.style.transform = `translate(-50%, -50%) translateY(${y.toFixed(2)}px) translateZ(${z.toFixed(2)}px) rotateX(${theta.toFixed(3)}deg)`
         item.style.opacity = `${opacity}`
@@ -281,9 +245,7 @@ export default function JunniWorksDrumroll({
       refs.panels.forEach(({ mat, mesh, index }) => {
         const eff = (spinPhase - index) * STEP_DEG
         const abs = Math.abs(eff)
-        const t = clamp(1 - abs / PANEL_FADE_DEG, 0, 1)
-        const b = (0.1 + t * t * 0.9) * (1 - canvasFade)
-        mat.color.setScalar(b)
+        mat.color.setScalar(drumrollPanelBrightness(abs, canvasFade))
         mesh.scale.setScalar(1 + clamp(1 - abs / 44, 0, 1) * 0.012)
         mesh.renderOrder = Math.round(1000 - abs)
         mesh.visible = canvasFade < 0.98 && abs < PANEL_VISIBLE_DEG
@@ -388,7 +350,7 @@ export default function JunniWorksDrumroll({
       <div className="jwp__drumroll-slider">
         <ul className="jwp__drumroll-list">
           {items.map((work, i) => {
-            const descChars = splitText(work.description)
+            const descChars = splitDrumrollText(work.description)
             return (
               <li
                 key={work.slug}

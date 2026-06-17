@@ -8,10 +8,10 @@
   --font-averia: "Averia Serif Libre", "Noto Serif SC", "Songti SC", serif;
   --font-serif: "Playfair Display", "Averia Serif Libre", "Noto Serif SC", "Songti SC", serif;
 
-  --notebook-red: #1d01fe;
-  --notebook-ribbon: #4b39ff;
-  /* 红→蓝同色系换肤：把红色皮革/红色线稿插画整体旋到蓝色相 */
-  --notebook-hue: 236deg;
+  --notebook-red: #cbea41;
+  --notebook-ribbon: #9cbd1f;
+  /* 红→主题绿换肤：把红色皮革/红色线稿插画整体旋到黄绿色相 */
+  --notebook-hue: 65deg;
   --notebook-cream: #f2e3cf;
   --notebook-paper: #f5f0e6;
 
@@ -490,6 +490,8 @@
     background-repeat: repeat;
     background-position: center top;
     background-size: 41.5px;
+    /* 网格底图为蓝线稿，相对红底素材多旋 (hue - 236deg) 才能与主题绿对齐 */
+    filter: hue-rotate(calc(var(--notebook-hue) - 236deg));
     mask-image: linear-gradient(180deg, #000 0%, #000 48%, transparent 80%);
   }
   .notebook-paper-vfx--plain .notebook-paper-grid {

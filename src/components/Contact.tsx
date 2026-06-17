@@ -38,7 +38,7 @@ const links = [
 
 const GUNZE_BG = "#ffffff"
 const GUNZE_INK = "#0b0713"
-const GUNZE_BLUE = "#1700ff"
+const GUNZE_GREEN = "#cbea41"
 
 export default function Contact() {
   return (
@@ -56,14 +56,14 @@ export default function Contact() {
           <div className="relative">
             <div
               className="mb-4 inline-flex items-center gap-2 rounded-full border-2 px-3 py-1 text-xs font-black uppercase tracking-[0.08em]"
-              style={{ color: GUNZE_BLUE, borderColor: GUNZE_BLUE, backgroundColor: "#fff" }}
+              style={{ color: GUNZE_GREEN, borderColor: GUNZE_GREEN, backgroundColor: "#fff" }}
             >
-              <span className="size-1.5 rounded-full" style={{ backgroundColor: GUNZE_BLUE }} />
+              <span className="size-1.5 rounded-full" style={{ backgroundColor: GUNZE_GREEN }} />
               联系我
             </div>
             <h2
               className="max-w-2xl text-balance text-3xl font-black leading-tight tracking-[-0.06em] md:text-5xl"
-              style={{ color: GUNZE_BLUE }}
+              style={{ color: GUNZE_GREEN }}
             >
               Let&apos;s Build Something Together.
             </h2>
@@ -94,8 +94,8 @@ export default function Contact() {
                   style={{ borderColor: GUNZE_INK, boxShadow: "0.35rem 0.35rem 0 rgb(11 7 19 / 18%)" }}
                 >
                   <div
-                    className="grid size-11 place-items-center rounded-xl text-white transition-colors group-hover:bg-[#f2ff00] group-hover:text-[#0b0713]"
-                    style={{ backgroundColor: GUNZE_BLUE }}
+                    className="grid size-11 place-items-center rounded-xl transition-colors group-hover:bg-[#f2ff00] group-hover:text-[#0b0713]"
+                    style={{ backgroundColor: GUNZE_GREEN, color: GUNZE_INK }}
                   >
                     <l.icon className="size-5" />
                   </div>
@@ -114,8 +114,8 @@ export default function Contact() {
                   download
                   target="_blank"
                   rel="noreferrer"
-                  className="group inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-black text-white transition-transform hover:scale-[1.03]"
-                  style={{ backgroundColor: GUNZE_BLUE }}
+                  className="group inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-black transition-transform hover:scale-[1.03]"
+                  style={{ backgroundColor: GUNZE_GREEN, color: GUNZE_INK }}
                 >
                   <Download className="size-4" />
                   下载个人简历

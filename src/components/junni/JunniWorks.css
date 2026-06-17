@@ -23,18 +23,20 @@
   overflow: hidden;
   background: var(--works-dark);
   isolation: isolate;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
 }
 
-/* ── 巨型层叠 WORKS 标题 ─────────────────────────────── */
+/* WORKS 描边大字 — 顶行独占，裁剪回声不侵入圆筒区 */
 .junni-works__title {
-  position: absolute;
-  left: 50%;
-  top: clamp(1.6rem, 5.5vh, 3.25rem);
-  z-index: 2;
+  position: relative;
+  z-index: 4;
+  justify-self: center;
   width: min(86vw, 70rem);
   margin: 0;
+  padding-top: clamp(1rem, 3.5vh, 2rem);
+  overflow: hidden;
   opacity: var(--junni-works-title-opacity, 1);
-  transform: translateX(-50%);
   transition: opacity 0.35s ease;
   pointer-events: none;
 }
@@ -43,15 +45,17 @@
   position: relative;
   display: grid;
   place-items: center;
-  min-height: clamp(8rem, 20vw, 16.5rem);
-  padding-bottom: clamp(1.8rem, 4.8vw, 3.25rem);
-  margin-top: clamp(0.8rem, 2.3vw, 1.65rem);
+  min-height: clamp(6.5rem, 15vw, 12rem);
+  max-height: clamp(9rem, 22vh, 14rem);
+  padding-bottom: clamp(0.5rem, 1.5vw, 1.25rem);
+  margin-top: clamp(0.25rem, 1vw, 0.75rem);
+  overflow: hidden;
 }
 
 .junni-works__title-echo {
   grid-area: 1 / 1;
   color: transparent;
-  font-size: clamp(7rem, 16vw, 15rem);
+  font-size: clamp(5.5rem, 13vw, 12rem);
   font-weight: 900;
   line-height: 0.78;
   letter-spacing: -0.075em;
@@ -63,55 +67,94 @@
   white-space: nowrap;
 }
 
+/* 压低向下扩散的回声，避免压到圆筒 */
+.junni-works__title-echo[data-rep-txt-item="lower"] {
+  opacity: 0.55;
+}
+
 .junni-works__title-echo[data-rep-txt-item="main"] {
   opacity: 1;
 }
 
-/* ── WebGL 曲面图片层（开放圆筒弧，背面无几何=纯深底） ──── */
+/* 圆筒舞台 — 中间行（标题下方剩余高度内居中） */
+.junni-works__inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  contain: layout paint;
+}
+
+/* WebGL 裁剪框（原站 .home_works_image） */
+.junni-works__viewport {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  width: min(90vw, 900px);
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+/* ── WebGL 曲面图片层 ──── */
 .junni-works__webgl {
   position: absolute;
   inset: 0;
-  z-index: 1;
   display: block;
   width: 100%;
   height: 100%;
   pointer-events: none;
 }
 
-/* 柔和暗罩：边缘融入深底 + 轻压中心，保证白标题在亮图上可读 */
 .junni-works__scrim {
   position: absolute;
   inset: 0;
-  z-index: 2;
   pointer-events: none;
   background: radial-gradient(
     72% 58% at 50% 47%,
-    rgba(20, 21, 25, 0.18) 0%,
-    rgba(20, 21, 25, 0.05) 46%,
+    rgba(20, 21, 25, 0.12) 0%,
+    rgba(20, 21, 25, 0.04) 46%,
     rgba(20, 21, 25, 0) 70%
   );
 }
 
-/* ── 3D 卡片轮播 ────────────────────────────────────── */
+/* 3D 文字层容器 */
 .junni-works__slider {
   position: absolute;
-  inset: 0;
+  top: 50%;
+  left: 50%;
   z-index: 3;
-  display: grid;
-  place-items: center;
+  width: 100%;
+  height: min(50vw, 100%);
+  max-height: 100%;
+  transform: translate(-50%, -50%);
   pointer-events: none;
+  user-select: none;
+}
+
+@media (max-aspect-ratio: 1 / 1) {
+  .junni-works__slider {
+    height: min(50vh, 100%);
+  }
 }
 
 .junni-works__list {
-  position: relative;
-  width: min(92vw, 1100px);
-  height: 100%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max-content;
+  max-width: 92vw;
   margin: 0;
   padding: 0;
   list-style: none;
   perspective: 500px;
   perspective-origin: 50% 44%;
   transform-style: preserve-3d;
+  transform: translate(-50%, -50%);
 }
 
 .junni-works__item {
@@ -124,6 +167,11 @@
   backface-visibility: hidden;
   will-change: transform, opacity;
   text-align: center;
+  visibility: hidden;
+}
+
+.junni-works__item[data-visible="true"] {
+  visibility: visible;
 }
 
 .junni-works__item-link {
@@ -204,12 +252,9 @@
   transition-delay: var(--transition-delay);
 }
 
-/* ── 底部 shift 擦除条 ──────────────────────────────── */
+/* 底部 shift 擦除条 */
 .junni-works__shift {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  position: relative;
   z-index: 4;
   display: grid;
   gap: clamp(0.6rem, 1.8vh, 1.1rem);
@@ -264,11 +309,6 @@
   .junni-works {
     min-height: 280vh;
     min-height: 280dvh;
-  }
-
-  .junni-works__image-layer,
-  .junni-works__image::after {
-    width: 82vw;
   }
 
   .junni-works__item-desc {
