@@ -134,15 +134,13 @@ function AboutSliderMobile({ side, images }: { side: "left" | "right"; images: s
 
 const FOOTER_LINKS: { id: string; label: string; active?: boolean }[] = [
 
-  { id: "home", label: "关于" },
+  { id: "portfolio", label: "作品" },
 
-  { id: "experience", label: "工作" },
+  { id: "projects", label: "服务" },
 
-  { id: "portfolio", label: "作品集", active: true },
+  { id: "experience", label: "招募" },
 
-  { id: "projects", label: "项目" },
-
-  { id: "contact", label: "联系" },
+  { id: "contact", label: "接触" },
 
 ]
 
