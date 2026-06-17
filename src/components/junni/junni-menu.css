@@ -4,23 +4,24 @@
   --junni-menu-accent: #dcff46;
   --junni-menu-ink: #111;
   --junni-menu-text: #f7f7f7;
-  --junni-menu-btn-size: 4em;
+  --junni-menu-btn-size: 5em;
   --junni-menu-border: #fff;
   --scrollbar: 0px;
   position: fixed;
   top: 38px;
-  left: calc(100vw - 93px - 40px - var(--scrollbar));
+  right: calc(40px + var(--scrollbar));
+  left: auto;
   z-index: 200;
   opacity: 0;
   transition: 0.15s opacity;
   pointer-events: all;
-  font-size: 10px;
+  font-size: 14px;
 }
 
 @media not screen and (min-width: 769px) {
   .junni-menu {
     top: 20px;
-    left: calc(100vw - 93px - 20px - var(--scrollbar));
+    right: calc(20px + var(--scrollbar));
   }
 }
 
@@ -31,11 +32,12 @@
 .junni-menu_inner {
   display: flex;
   align-items: center;
-  font-size: 10px;
+  font-size: 14px;
 }
 
 .junni-menu_text {
   font-family: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  font-size: 1em;
   font-weight: 700;
   letter-spacing: 0.2em;
 }
@@ -67,7 +69,7 @@
   padding: 0;
   border: none;
   border-radius: 50%;
-  font-size: 10px;
+  font-size: 14px;
   cursor: pointer;
   background: transparent;
 }
@@ -353,62 +355,72 @@
   transition: 0.25s width;
 }
 
-.junni-nav_sns {
-  display: grid;
-  grid-template-columns: repeat(2, auto);
-  justify-content: flex-start;
-  gap: 1.8888888889em 2px;
-  max-width: max-content;
+.junni-nav_actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  width: fit-content;
+  max-width: 100%;
   margin: 100px 0 0;
   padding: 0;
-  list-style: none;
-  font-size: 18px;
 }
 
 @media not screen and (min-width: 950px) {
-  .junni-nav_sns {
+  .junni-nav_actions {
     margin-top: min(min(100px, 29.4117647059%), min(100px, 11.7647058824vh));
-    font-size: min(18px, 4.2352941176vw);
   }
 }
 
-.junni-nav_sns_item {
+.junni-nav_action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: auto;
+  max-width: 100%;
+  padding: 0.75rem 1.1rem;
+  border: none;
+  border-radius: 999px;
+  font-family: "Inter", "Noto Sans SC", ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
   line-height: 1;
-}
-
-.junni-nav_sns_item:nth-of-type(2n) {
-  text-align: right;
-}
-
-.junni-nav_sns_item_link {
-  position: relative;
-  display: inline-block;
-  font-family: "Montserrat", sans-serif;
-  letter-spacing: 0.01em;
-  color: var(--junni-menu-text);
   text-decoration: none;
+  white-space: nowrap;
+  transition:
+    transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.junni-nav_sns_item_link::after {
-  content: "";
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  width: 100%;
-  height: 1px;
-  transform: scaleX(0);
-  background-color: var(--junni-menu-accent);
-  transform-origin: bottom right;
-  transition: transform 0.4s cubic-bezier(0.86, 0, 0.07, 1);
+.junni-nav_action--primary {
+  background: var(--junni-menu-accent);
+  color: var(--junni-menu-ink);
+}
+
+.junni-nav_action--resume {
+  background: #1c1d21;
+  color: #f7f7f7;
+  border: 1px solid rgb(255 255 255 / 12%);
+}
+
+.junni-nav_action-icon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .junni-nav_sns_item_link {
+  .junni-nav_action {
     cursor: pointer;
   }
 
-  .junni-nav_sns_item_link:hover::after {
-    transform: scaleX(1);
-    transform-origin: bottom left;
+  .junni-nav_action--primary:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0.35rem 1rem rgb(220 255 70 / 28%);
+  }
+
+  .junni-nav_action--resume:hover {
+    background: #2a2b30;
   }
 }

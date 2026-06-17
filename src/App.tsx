@@ -11,6 +11,7 @@ import SmoothScroll from "./components/SmoothScroll"
 import NeuClone from "./components/neu/NeuClone"
 import ProjectDetail from "./components/ProjectDetail"
 import JunniWorksPage from "./components/junni/works-page/JunniWorksPage"
+import JunniAboutPage from "./components/junni/about-page/JunniAboutPage"
 import { cn } from "./lib/utils"
 import { useRoute } from "./hooks/useRoute"
 
@@ -21,6 +22,8 @@ function renderPage(
   switch (page) {
     case "experience":
       return <Experience />
+    case "about":
+      return <JunniAboutPage />
     case "projects":
       return <Projects />
     case "portfolio":
@@ -53,6 +56,8 @@ export default function App() {
   const isExperience = page === "experience"
   const isContact = page === "contact"
   const isPortfolio = page === "portfolio"
+  const isJunniAbout = page === "about"
+  const isJunniFullPage = isPortfolio || isJunniAbout
 
   // Neu 复刻页：完全独立的全屏页面，自带固定导航与平滑滚动，不套用本站的 Navbar / 内边距。
   if (isNeu) {
@@ -78,15 +83,15 @@ export default function App() {
       <div
         className={cn(
           "relative min-h-screen",
-          isContact || isExperience ? "bg-[#ffffff]" : isPortfolio ? "bg-[#1c1d21]" : "bg-background",
+          isContact || isExperience ? "bg-[#ffffff]" : isJunniFullPage ? "bg-[#1c1d21]" : "bg-background",
           isExperience && "neu-host-scale",
         )}
       >
         <main key={page} className="min-h-screen animate-fade-up">
           {renderPage(page, onJunniZoneChange)}
         </main>
-        {!isNotebookHome && !isPortfolio && <QuickActions />}
-        {!isNotebookHome && !isPortfolio && <IntroFlip />}
+        {!isNotebookHome && !isPortfolio && !isJunniAbout && <QuickActions />}
+        {!isNotebookHome && !isPortfolio && !isJunniAbout && <IntroFlip />}
       </div>
     </SmoothScroll>
   )

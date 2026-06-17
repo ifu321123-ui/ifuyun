@@ -5,28 +5,27 @@ export type MenuNamespace = "top" | "about" | "work" | "works" | "project" | "co
 export const JUNNI_MENU_NAV: {
   menu: MenuNamespace
   label: string
-  page: PageId | "about-anchor"
+  page: PageId
 }[] = [
-  { menu: "top", label: "TOP", page: "home" },
-  { menu: "about", label: "ABOUT", page: "about-anchor" },
-  { menu: "work", label: "WORK", page: "experience" },
-  { menu: "works", label: "WORKS", page: "portfolio" },
+  { menu: "top", label: "关于", page: "home" },
+  { menu: "work", label: "实习经历", page: "experience" },
+  { menu: "works", label: "项目&作品", page: "portfolio" },
   { menu: "project", label: "PROJECTS", page: "projects" },
-  { menu: "contact", label: "CONTACT", page: "contact" },
+  { menu: "contact", label: "联系我", page: "contact" },
 ]
 
-/** 原站社交链接占位（junni.co.jp） */
-export const JUNNI_MENU_SNS = [
-  { label: "X", href: "https://twitter.com/junni_jp" },
-  { label: "facebook", href: "https://www.facebook.com/junni.jp" },
-  { label: "Instagram", href: "https://www.instagram.com/junni_jp/?hl=ja" },
-  { label: "note", href: "https://note.com/junni_jp" },
-] as const
+/** 菜单底部快捷操作（替换原 SNS 链接区） */
+export const JUNNI_MENU_ACTIONS = {
+  portfolio: { label: "查看项目作品", page: "projects" as PageId },
+  resume: { label: "下载简历" },
+} as const
 
 export function pageToMenuNamespace(page: PageId | "work"): MenuNamespace {
   switch (page) {
     case "home":
       return "top"
+    case "about":
+      return "about"
     case "experience":
       return "work"
     case "portfolio":

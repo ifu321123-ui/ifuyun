@@ -1167,6 +1167,7 @@
 @layer components {
   :root {
     --gunze-blue: #1700ff;
+    --gunze-green: #dcff46;
     --gunze-bg: #ffffff;
     --gunze-ink: #0b0713;
     --gunze-yellow: #f2ff00;
@@ -1782,7 +1783,7 @@
 
   .gunze-movie .gunze-section-title,
   .gunze-ceo .gunze-section-title {
-    color: var(--gunze-blue);
+    color: var(--gunze-green);
   }
 
   .gunze-movie {
@@ -2195,7 +2196,7 @@
   .gunze-ceo__photo-main {
     position: relative;
     overflow: hidden;
-    border: 0.3rem solid var(--gunze-blue);
+    border: 0.3rem solid var(--gunze-green);
     border-radius: 1.4rem;
     background: #fff;
   }
@@ -2237,7 +2238,7 @@
 
   .gunze-ceo__catch {
     margin: 0 0 1.4rem;
-    color: var(--gunze-blue);
+    color: var(--gunze-green);
     font-size: clamp(1.6rem, 4vw, 3rem);
     font-weight: 950;
     line-height: 1;
@@ -2260,8 +2261,8 @@
     margin-top: 1.8rem;
     padding: 1.15rem 2rem;
     border-radius: 999px;
-    background: var(--gunze-blue);
-    color: #fff;
+    background: var(--gunze-green);
+    color: var(--gunze-ink);
     font-weight: 950;
     text-decoration: none;
     transition:
@@ -2271,7 +2272,7 @@
 
   .gunze-btn:hover {
     transform: translateY(-3px);
-    box-shadow: 0 1rem 2rem rgb(23 0 255 / 22%);
+    box-shadow: 0 1rem 2rem rgb(220 255 70 / 28%);
   }
 
   .profile-switcher {

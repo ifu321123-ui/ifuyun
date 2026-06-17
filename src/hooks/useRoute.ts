@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react"
 
-export type PageId = "home" | "experience" | "projects" | "portfolio" | "contact" | "neu"
+export type PageId = "home" | "experience" | "about" | "projects" | "portfolio" | "contact" | "neu"
 export type Route =
   | { page: PageId; slug?: undefined }
   | { page: "work"; slug: string }
 
-const PAGES: PageId[] = ["home", "experience", "projects", "portfolio", "contact", "neu"]
+const PAGES: PageId[] = ["home", "experience", "about", "projects", "portfolio", "contact", "neu"]
 
 function parseHash(): Route {
   const id = window.location.hash.replace(/^#\/?/, "")
@@ -23,15 +23,17 @@ export function navigate(page: PageId | `work/${string}`) {
 }
 
 export function useRoute(): Route {
-  const [route, setRoute] = useState<Route>(parseHash)
+  const [route, setRoute] = useState<Route>(() => parseHash())
 
   useEffect(() => {
-    const onHashChange = () => {
-      setRoute(parseHash())
-      // 滚动归零由 SmoothScroll 统一处理（Lenis / 原生兜底），避免双重滚动冲突。
+    const sync = () => setRoute(parseHash())
+    sync()
+    window.addEventListener("hashchange", sync)
+    window.addEventListener("popstate", sync)
+    return () => {
+      window.removeEventListener("hashchange", sync)
+      window.removeEventListener("popstate", sync)
     }
-    window.addEventListener("hashchange", onHashChange)
-    return () => window.removeEventListener("hashchange", onHashChange)
   }, [])
 
   return route

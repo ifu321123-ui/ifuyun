@@ -1,15 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import gsap from "gsap"
 import { useLenis } from "lenis/react"
+import { ArrowRight, Download } from "lucide-react"
+import { profile } from "@/data"
 import { navigate, useRoute, type PageId } from "@/hooks/useRoute"
 import {
+  JUNNI_MENU_ACTIONS,
   JUNNI_MENU_NAV,
-  JUNNI_MENU_SNS,
   routeToMenuNamespace,
 } from "./junniMenuData"
 import "./junni-menu.css"
 
-const BTN_PX = 40
+const BTN_PX = 70
 const PANEL_WIDTH = 340
 const PANEL_OFFSET = { top: -18, right: -24 }
 const PANEL_OFFSET_SP = { top: -10, right: -10 }
@@ -24,7 +26,7 @@ interface JunniMenuProps {
 }
 
 function getMenuType(page: PageId | "work", inJunniZone: boolean): "white" | "black" {
-  if (page === "portfolio") return "white"
+  if (page === "portfolio" || page === "about") return "white"
   if (page === "home" && inJunniZone) return "white"
   return "black"
 }
@@ -37,7 +39,7 @@ export default function JunniMenu({ inJunniZone = false }: JunniMenuProps) {
   const [menuActive, setMenuActive] = useState(false)
   const panelRef = useRef<HTMLDivElement>(null)
   const navItemRefs = useRef<(HTMLLIElement | null)[]>([])
-  const snsRef = useRef<HTMLUListElement>(null)
+  const actionsRef = useRef<HTMLDivElement>(null)
   const tweenRef = useRef<gsap.core.Timeline | null>(null)
   const reducedMotion =
     typeof window !== "undefined" &&
@@ -50,7 +52,7 @@ export default function JunniMenu({ inJunniZone = false }: JunniMenuProps) {
     const panel = panelRef.current
     const items = [
       ...navItemRefs.current.filter(Boolean),
-      snsRef.current,
+      actionsRef.current,
     ].filter(Boolean) as HTMLElement[]
     if (!panel) {
       setOpen(false)
@@ -124,7 +126,7 @@ export default function JunniMenu({ inJunniZone = false }: JunniMenuProps) {
 
     const items = [
       ...navItemRefs.current.filter(Boolean),
-      snsRef.current,
+      actionsRef.current,
     ].filter(Boolean) as HTMLElement[]
 
     const sp = isMenuSp()
@@ -307,24 +309,31 @@ export default function JunniMenu({ inJunniZone = false }: JunniMenuProps) {
                       </li>
                     ))}
                   </ul>
-                  <ul
-                    className="junni-nav_sns"
-                    ref={snsRef}
+                  <div
+                    className="junni-nav_actions"
+                    ref={actionsRef}
                     style={{ opacity: 0, transform: "translateY(15px)" }}
                   >
-                    {JUNNI_MENU_SNS.map((sns) => (
-                      <li key={sns.label} className="junni-nav_sns_item">
-                        <a
-                          className="junni-nav_sns_item_link"
-                          href={sns.href}
-                          rel="noopener noreferrer"
-                          target="_blank"
-                        >
-                          {sns.label}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
+                    <button
+                      type="button"
+                      className="junni-nav_action junni-nav_action--primary"
+                      onClick={() => onNavClick(JUNNI_MENU_ACTIONS.portfolio.page)}
+                    >
+                      <span>{JUNNI_MENU_ACTIONS.portfolio.label}</span>
+                      <ArrowRight className="junni-nav_action-icon" aria-hidden />
+                    </button>
+                    <a
+                      className="junni-nav_action junni-nav_action--resume"
+                      href={profile.resumeUrl}
+                      download
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={closeMenu}
+                    >
+                      <Download className="junni-nav_action-icon" aria-hidden />
+                      <span>{JUNNI_MENU_ACTIONS.resume.label}</span>
+                    </a>
+                  </div>
                 </div>
               </div>
             </nav>

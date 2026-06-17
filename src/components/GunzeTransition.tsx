@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { useLenis } from "lenis/react"
@@ -7,7 +7,6 @@ import JunniService from "./junni/JunniService"
 import JunniWorks from "./junni/JunniWorks"
 
 const ASSET = "/gunze/"
-const MOVIE_TOTAL = 5
 
 function clamp(v: number, min: number, max: number) {
   return Math.min(max, Math.max(min, v))
@@ -48,14 +47,6 @@ const MESSAGE_TITLE = "Message"
 
 gsap.registerPlugin(ScrollTrigger)
 
-const movieSlides = [
-  { id: "work01", image: "/works/work01.png", title: "一地人间" },
-  { id: "work02", image: "/works/work02.png", title: "食援" },
-  { id: "work03", image: "/works/work03.png", title: "蜀香" },
-  { id: "work04", image: "/works/work04.png", title: "崖上的希望" },
-  { id: "work05", image: "/works/work05.png", title: "武者" },
-]
-
 function Eyes({ className = "" }: { className?: string }) {
   return (
     <div className={`gunze-eyes ${className}`} aria-hidden>
@@ -80,108 +71,7 @@ function SvgSprite() {
       <symbol id="gunze-arrow" viewBox="0 0 27 26">
         <path d="M3 13h19M14 5l8 8-8 8" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
       </symbol>
-      <symbol id="gunze-play" viewBox="0 0 43 50">
-        <path d="M41 25 2 47V3l39 22Z" fill="currentColor" />
-      </symbol>
-      <symbol id="gunze-close" viewBox="0 0 75 75">
-        <path d="m18 18 39 39M57 18 18 57" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" />
-      </symbol>
     </svg>
-  )
-}
-
-function MovieSection() {
-  const [current, setCurrent] = useState(0)
-  const [modal, setModal] = useState<string | null>(null)
-
-  const visible = useMemo(() => {
-    return [-2, -1, 0, 1, 2].map((offset) => {
-      const index = (current + offset + movieSlides.length) % movieSlides.length
-      return { ...movieSlides[index], index, offset }
-    })
-  }, [current])
-
-  const activeWork = modal ? movieSlides.find((item) => item.id === modal) : null
-
-  return (
-    <section className="gunze-movie" id="movie">
-      <hgroup className="gunze-title-group">
-        <h2 className="gunze-section-title">作品概览</h2>
-        <p className="gunze-title-jp">部分设计作品</p>
-      </hgroup>
-
-      <div className="gunze-movie-slider" aria-label="130周年纪念视频列表">
-        <div className="gunze-movie-track">
-          {visible.map((slide) => {
-            const isActive = slide.offset === 0
-            return (
-              <button
-                key={`${slide.id}-${slide.offset}`}
-                type="button"
-                className={`gunze-movie-card is-offset-${slide.offset} ${isActive ? "is-active" : ""}`}
-                onClick={() => setModal(slide.id)}
-              >
-                <img src={slide.image} alt={slide.title} />
-                <span className="gunze-movie-caption">{slide.title}</span>
-              </button>
-            )
-          })}
-        </div>
-
-        <div className="gunze-movie-controller">
-          <button
-            type="button"
-            className="gunze-arrow-btn is-prev"
-            aria-label="上一个视频"
-            onClick={() => setCurrent((value) => (value - 1 + MOVIE_TOTAL) % MOVIE_TOTAL)}
-          >
-            <svg viewBox="0 0 27 26">
-              <use href="#gunze-arrow" />
-            </svg>
-          </button>
-          <div className="gunze-progress">
-            <span>{String(current + 1).padStart(2, "0")}</span>
-            <div className="gunze-progress__bar">
-              <div style={{ transform: `scaleX(${(current + 1) / MOVIE_TOTAL})` }} />
-            </div>
-            <span>{MOVIE_TOTAL}</span>
-          </div>
-          <button
-            type="button"
-            className="gunze-arrow-btn is-next"
-            aria-label="下一个视频"
-            onClick={() => setCurrent((value) => (value + 1) % MOVIE_TOTAL)}
-          >
-            <svg viewBox="0 0 27 26">
-              <use href="#gunze-arrow" />
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <div className="gunze-movie-more">
-        <button type="button" className="gunze-more-link" onClick={() => navigate("projects")}>
-          查看更多
-          <svg viewBox="0 0 27 26">
-            <use href="#gunze-arrow" />
-          </svg>
-        </button>
-      </div>
-
-      {modal && activeWork && (
-        <div className="gunze-modal" role="dialog" aria-modal="true">
-          <button type="button" className="gunze-modal__bg" aria-label="关闭弹窗" onClick={() => setModal(null)} />
-          <div className="gunze-modal__body gunze-modal__body--image">
-            <img src={activeWork.image} alt={activeWork.title} />
-            <button type="button" className="gunze-modal__close" aria-label="关闭弹窗" onClick={() => setModal(null)}>
-              <svg viewBox="0 0 75 75">
-                <use href="#gunze-close" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      )}
-    </section>
   )
 }
 
@@ -234,8 +124,8 @@ function CeoSection() {
               <br />
               敬请期待接下来的发展。
             </p>
-            <button type="button" className="gunze-btn">
-              首席执行官面试
+            <button type="button" className="gunze-btn" onClick={() => navigate("contact")}>
+              联系我
               <svg viewBox="0 0 27 26">
                 <use href="#gunze-arrow" />
               </svg>
@@ -466,7 +356,6 @@ export default function GunzeTransition() {
       </section>
       <JunniService />
       <JunniWorks />
-      <MovieSection />
       <CeoSection />
     </>
   )
