@@ -7,11 +7,13 @@ const FRONT_DEG = 0
 const DEG2RAD = Math.PI / 180
 const STEP_RAD = STEP_DEG * DEG2RAD
 const PERSPECTIVE = 500
-const PANEL_DEG = 51.1
+/** Angular gap between drum panels — must stay < STEP_DEG so #1c1d21 shows through. */
+const PANEL_GAP_DEG = 6
+const PANEL_DEG = STEP_DEG - PANEL_GAP_DEG
 const PANEL_RAD = PANEL_DEG * DEG2RAD
 const PANEL_ASPECT = 2.65
-const PANEL_FADE_DEG = 18
-const PANEL_VISIBLE_DEG = 58
+const PANEL_FADE_DEG = 14
+const PANEL_VISIBLE_DEG = 52
 const VISIBLE_THETA_DEG = 52
 const SPIN_SIGN = 1
 const TEX_ROTATION = -Math.PI / 2
@@ -62,8 +64,9 @@ type SceneRefs = {
 
 type Props = {
   items: WorksPageItem[]
+  /** Continuous drum phase (0 … items.length − 1). */
   active: number
-  onActiveChange: (index: number) => void
+  onActiveIndexChange?: (index: number) => void
   page: number
   totalPages: number
   onPageChange: (page: number) => void
@@ -72,7 +75,7 @@ type Props = {
 export default function JunniWorksDrumroll({
   items,
   active,
-  onActiveChange,
+  onActiveIndexChange,
   page,
   totalPages,
   onPageChange,
@@ -85,11 +88,23 @@ export default function JunniWorksDrumroll({
   const targetActiveRef = useRef(active)
   const smoothActiveRef = useRef(active)
   const radiusRef = useRef(360)
+  const activeIndexRef = useRef(Math.round(active))
 
   const n = items.length
   const navIndex = n
 
   targetActiveRef.current = active
+
+  const emitActiveIndex = useCallback(
+    (activeFloat: number) => {
+      const index = clamp(Math.round(activeFloat), 0, n - 1)
+      if (index !== activeIndexRef.current) {
+        activeIndexRef.current = index
+        onActiveIndexChange?.(index)
+      }
+    },
+    [n, onActiveIndexChange],
+  )
 
   const updateDomItems = useCallback(
     (activeFloat: number) => {
@@ -151,6 +166,7 @@ export default function JunniWorksDrumroll({
 
     const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true })
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    renderer.setClearColor(0x000000, 0)
     renderer.outputColorSpace = THREE.SRGBColorSpace
 
     const scene = new THREE.Scene()
@@ -191,16 +207,17 @@ export default function JunniWorksDrumroll({
     }
 
     const renderFrame = () => {
-      const target = targetActiveRef.current
+      const target = clamp(targetActiveRef.current, 0, n - 1)
       const current = smoothActiveRef.current
       const diff = target - current
       const absDiff = Math.abs(diff)
       const edgeDistance = Math.min(target, n - 1 - target)
-      const edgeDrag = edgeDistance <= 1 ? 0.86 : 1
-      const damping = clamp((0.11 + absDiff * 0.12) * edgeDrag, 0.095, 0.3)
+      const edgeDrag = edgeDistance <= 0.35 ? 0.78 : 1
+      const damping = clamp((0.14 + absDiff * 0.1) * edgeDrag, 0.12, 0.34)
       const next = current + diff * damping
       smoothActiveRef.current = next
 
+      emitActiveIndex(next)
       updateDomItems(next)
       refs.spinner.rotation.y = SPIN_SIGN * next * STEP_RAD
       refs.panels.forEach(({ mat, mesh, index }) => {
@@ -292,7 +309,7 @@ export default function JunniWorksDrumroll({
       renderer.dispose()
       sceneRef.current = null
     }
-  }, [items, updateDomItems])
+  }, [items, updateDomItems, emitActiveIndex, n])
 
   useEffect(() => {
     targetActiveRef.current = active
@@ -318,7 +335,7 @@ export default function JunniWorksDrumroll({
                   itemRefs.current[i] = node
                 }}
                 className="jwp__drumroll-item"
-                data-active={i === active}
+                data-active={i === Math.round(active)}
                 data-visible="false"
               >
                 <a className="jwp__drumroll-link" href={`#work/${work.slug}`}>

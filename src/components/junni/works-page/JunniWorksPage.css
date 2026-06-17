@@ -581,6 +581,8 @@
 
   min-height: 100vh;
 
+  background-color: #1c1d21;
+
 }
 
 @media (max-width: 949px) {

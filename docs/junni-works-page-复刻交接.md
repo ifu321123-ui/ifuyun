@@ -2,7 +2,7 @@
 
 > 用途：在新对话里继续 1:1 复刻 [junni.co.jp/works/](https://junni.co.jp/works/) **独立作品集列表页**，并精调视觉效果与动效。把本文件喂给新会话即可无缝接力。
 >
-> 来源：2026-06-17 多轮对话整理（原站 HTML 实锤、截图对比、首版实现、结构纠偏、CSS/路由修复）。
+> 来源：2026-06-17 多轮对话整理（原站 HTML 实锤、截图对比、首版实现、结构纠偏、CSS/路由修复、**§17 Drumroll 间隙/滚筒**）。
 >
 > 关联文档：[junni-works-复刻交接.md](./junni-works-复刻交接.md)（首页 `home_works`，**不是本页**）、[junni-about-works-shift-交接.md](./junni-about-works-shift-交接.md)、[junni-hero-复刻交接.md](./junni-hero-复刻交接.md)
 
@@ -21,7 +21,7 @@
 | 原站 URL | `https://junni.co.jp/works/` | `https://junni.co.jp/` 滚动中段 |
 | 原站类名 | `works_about`、`works_drumroll`、`works_list` | `home_works`、`home_works_wrap` |
 | 本站组件 | `src/components/junni/works-page/*` | `JunniWorks.tsx`（椒4.0） |
-| 驱动方式 | 滚轮切换 Drumroll + Toggle 切 List | ScrollTrigger pin + scrub 滚动 |
+| 驱动方式 | **§17：连续滚轮 `activeFloat`** + sticky；Toggle 切 List | ScrollTrigger pin + scrub 滚动 |
 | 作品数量 | 12 项/页 × 3 页 | 6 项 + and_more |
 
 **新对话务必先确认用户要改的是「作品集导航页」还是「首页 WORKS 轮播」。**
@@ -183,23 +183,24 @@ div.jwp[data-view=drumroll|list][data-transitioned][data-pagehead]
 
 | 项 | 实现 |
 |----|------|
-| 几何常量 | 与首页 `JunniWorks.tsx` 同源：`STEP_DEG=25`、`PERSPECTIVE=500`、`PANEL_DEG=51.1` 等 |
+| 几何常量 | **`STEP_DEG=25`**、`PERSPECTIVE=500`；**§17 已与首页分叉**：`PANEL_GAP_DEG=6`、`PANEL_DEG=19`（= STEP − GAP，露出底色缝）；首页 `JunniWorks.tsx` 仍为 `PANEL_DEG=51.1` |
 | **面板尺寸** | **`PANEL_ASPECT=2.65` 固定窗口比例**；`fitTextureCover()` 对贴图做居中 cover 裁切（`tex.repeat/offset`） |
+| **面板间隙** | 开放圆筒弧 + `PANEL_DEG < STEP_DEG` → 相邻 WebGL 弧面之间露出 `#1c1d21`；`.jwp__drumroll-wrap { background-color: #1c1d21 }` |
 | 可见性裁剪 | `VISIBLE_THETA_DEG=52`；项外范围 `opacity:0`、`visibility:hidden`、`data-visible="false"` |
-| 滚轮驱动 | 页面级 `wheel`（capture）+ 累计阈值 + sticky 区间；见 §15 |
-| 运动平滑 | `targetActiveRef` / `smoothActiveRef` 自适应阻尼；见 §15 |
+| 滚轮驱动 | **§17：连续 `activeFloat`**（`sensitivity=0.0032`）+ sticky 区间 + 首尾橡皮筋；见 §15 / §17 |
+| 运动平滑 | `targetActiveRef` / `smoothActiveRef` 自适应阻尼；渲染时 `target` clamp 到 `[0, n−1]` |
 | PREV/NEXT | 列表末尾 `jwp__drumroll-item--nav`，按 `page`/`totalPages` 条件渲染 |
 | 链接 | 作品项用 `<a href="#work/{slug}">` |
-| WebGL | canvas 曲面贴图；`IntersectionObserver` 进入视口才 `requestAnimationFrame` |
+| WebGL | canvas 曲面贴图；`setClearColor(0,0)` 透明；`IntersectionObserver` 进入视口才 `requestAnimationFrame` |
 
 ### 4.5 数据与素材现状
 
 - 介绍文案：原站日文 `WORKS_PAGE_ABOUT_TEXT`（数组 10 行）；当前 TSX 用 `join("")` 合并为连续文本，**未保留 `<br>` 换行**
 - About 图：16 张 PNG 在 `public/works/junni/about/`
 - **页 1（12 项）**：`image` 已全部替换为原站 `microcms-assets.io` 真实 URL（见 §15.4）
-- **页 2（12 项）**：标题 / 描述 / slug 已对齐原站 `junni.co.jp/works/page/2/`；**缩略图仍为临时占位**（当前复用 `PAGE_1[n].image`）
-- **页 3（2 项）**：标题 / 描述 / slug 已对齐原站 `junni.co.jp/works/page/3/`；**缩略图仍为临时占位**（当前用 `WORKS_PAGE_ABOUT_IMAGES`）
-- **待确认 slug**：`vi-ta`、`at-aroma`（原站详情页 URL 未在本轮完全核实）
+- **页 2（12 项）**：文案 / slug / **缩略图均已对齐**（§17 从各详情页抓取 `microcms` URL）
+- **页 3（2 项）**：文案 / slug / **缩略图均已对齐**（§17）
+- **slug 备注**：`vi-ta` 原站详情页路径为 `/works/vita/`（slug 字段仍用 `vi-ta`）；`at-aroma` 原站详情页 `/works/aroma/` 不存在直链 `at-aroma`，缩略图用 `aroma02.png`
 
 ### 4.6 构建与访问
 
@@ -250,10 +251,11 @@ npm run build    # 已通过（2026-06-17 结构纠偏后）
 - [x] Drumroll PREV/NEXT 导航项
 - [x] Footer 去掉 sticky 巨型 Logo
 - [x] portfolio 页隐藏本站 Navbar / QuickActions
-- [ ] **Drumroll 驱动手感**：已做窗口级 wheel + sticky + 阻尼（§15），但仍需对照原站录屏微调阈值 / 是否改连续进度驱动
+- [x] **Drumroll 驱动手感**：§17 已改为连续 `activeFloat` 滚轮驱动 + 阻尼；仍待对照原站录屏微调 `sensitivity` / 边界橡皮筋
 - [x] **Toggle 图标**：已切到 PNG；本地路径 `public/assets/images/works/toggle/list.png`、`public/assets/images/works/toggle/drumroll.png`
 - [x] **Drumroll 圆筒图片统一尺寸**：固定 `PANEL_ASPECT` + `fitTextureCover`（§16）；`PANEL_ASPECT=2.65` 是否需量测微调待定
-- [ ] **List / Drumroll 缩略图**：页 1 已完成；**页 2/3 文案与 slug 已对齐，缩略图仍占位**
+- [x] **Drumroll 面板间隙 + 滚筒离散感**：§17 `PANEL_GAP_DEG=6` / `PANEL_DEG=19`；首版验证已有深色缝，面板尺寸可能略小于原站
+- [x] **List / Drumroll 缩略图**：三页均已用原站 `microcms` URL（§17）
 - [ ] **页头字体**：原站 `junni.ttf`，本站用 Montserrat 800 替代
 
 ### P1 — 布局 / 细节
@@ -295,16 +297,17 @@ npm run build    # 已通过（2026-06-17 结构纠偏后）
 
 ## 8. 推荐新对话执行顺序
 
-1. **浏览器对照**：`#/portfolio` vs `junni.co.jp/works/`，截图列剩余差异清单
-2. **Drumroll 圆筒图片 1:1**（§16）：补全页 2/3 缩略图 → 微调 `PANEL_ASPECT` / scrim / 亮度
-3. **Drumroll 手感**：实测原站滚动行为，对齐 wheel / 拖拽 / 惯性（§15）
-4. **About 文案换行** + slider `data-media` 断点精细对照
-5. **Toggle + 分页** 视觉 1:1（PNG 图标、间距、hover）
-6. **List 网格** 三列间距、标题字号、hover 色
-7. **Footer** noise 纹理 + 社交区 + SVG Logo
-8. **右上角 MENU**（或确认继续沿用隐藏 Navbar 的简化方案）
-9. **替换作品数据与图片**（若改为用户自有项目）
-10. **（可选）** 抽取 `useJunniDrumroll` 与首页共用
+1. **浏览器对照**：`#/portfolio` vs `junni.co.jp/works/`，截图列剩余差异清单（**主线：Drumroll 间隙 / 面板尺寸 / 滚筒手感**，见 §17）
+2. **Drumroll 几何精调**：`PANEL_GAP_DEG` / `PANEL_DEG` / `PANEL_ASPECT` 与原站并排截图；平衡「缝隙明显」vs「面板够大」
+3. **Drumroll 手感**：`sensitivity`、阻尼系数、首尾橡皮筋 vs 原站录屏
+4. **圆筒亮度 / scrim**：`PANEL_FADE_DEG`、`mat.color.setScalar(b)`、`.jwp__drumroll-scrim`
+5. **About 文案换行** + slider `data-media` 断点精细对照
+6. **Toggle + 分页** 视觉 1:1（PNG 图标、间距、hover）
+7. **List 网格** 三列间距、标题字号、hover 色
+8. **Footer** noise 纹理 + 社交区 + SVG Logo
+9. **右上角 MENU**（或确认继续沿用隐藏 Navbar 的简化方案）
+10. **替换作品数据与图片**（若改为用户自有项目）
+11. **（可选）** 抽取 `useJunniDrumroll` 与首页共用（注意 §17：本页与首页 `PANEL_DEG` 已分叉）
 
 ---
 
@@ -346,16 +349,17 @@ npm run build    # 已通过（2026-06-17 结构纠偏后）
 | 文档整理 | 本文件更新，供后续对话接力 |
 | 圆筒图片尺寸 | 用户截图对比发现 Drumroll 图片大小不齐；固定面板比例 + cover 裁切（§16） |
 | 分页数据 | 页 2/3 文案与 slug 对齐原站；缩略图抓取未完成 |
+| Drumroll 间隙/滚筒 | 用户截图对比：原站有面板缝+连续滚动感，本站像连续曲面；§17 落地 `PANEL_GAP_DEG`、连续滚轮、页 2/3 缩略图 |
 
 ---
 
 ## 11. 新对话快速启动指令（复制即用）
 
-> 继续 junni.co.jp **`/works/` 作品集页**复刻（非首页 home_works）。已读 `docs/junni-works-page-复刻交接.md`。
+> 继续 junni.co.jp **`/works/` 作品集页**复刻（非首页 home_works）。已读 `docs/junni-works-page-复刻交接.md` **§17**。
 >
-> **现状**：`#/portfolio` → `JunniWorksPage`。DOM 已按原站嵌套。Toggle Portal 固定定位已修复（§13）。Drumroll 已做 sticky + 窗口级 wheel + 自适应阻尼（§15）。**圆筒 WebGL 面板已改为固定比例 + cover 裁切**（§16）。页 1 缩略图为原站 microcms URL；页 2/3 文案与 slug 已对齐但图片仍占位。`npm run build` 通过。
+> **现状**：`#/portfolio` → `JunniWorksPage`。DOM 已按原站嵌套。Toggle Portal 固定定位已修复（§13）。Drumroll：**§17 面板间隙（`PANEL_GAP_DEG=6`）+ 连续滚轮 `activeFloat` + 页 2/3 原站缩略图**。圆筒 `PANEL_ASPECT=2.65` + cover 裁切。`npm run build` 通过。
 >
-> **请先**对照原站 `junni.co.jp/works/` 截图，从【用户指定的差异点】精调。当前主线建议：① 补全页 2/3 真实缩略图；② 微调 `PANEL_ASPECT` / scrim / 亮度；③ 继续 Drumroll 手感。注意区分本页与 `JunniWorks.tsx`（首页椒4.0）。待办见第 6 节与 §16.6。
+> **请先**对照原站 `junni.co.jp/works/` 截图，从【用户指定的差异点】精调 Drumroll。主线建议：① `PANEL_GAP_DEG` / 面板视觉尺寸 1:1；② 滚轮 `sensitivity` / 阻尼；③ scrim / 亮度。注意区分本页（`PANEL_DEG=19`）与 `JunniWorks.tsx` 首页（`PANEL_DEG=51.1`）。待办见第 6 节与 §17.6。
 
 ---
 
@@ -626,8 +630,8 @@ npm run build    # 已通过（2026-06-17 结构纠偏后）
 - 已从“局部 wheel + 硬切项”升级到“窗口接管 + sticky 区间 + 累计阈值 + 自适应阻尼 + 边界阻尼”。
 - 圆筒仍是离散索引驱动（以项为单位），但视觉过渡已平滑。
 - 若继续追 1:1，下一优先建议：
-  1. 用原站对照录屏做阈值微调（`stepThreshold`、`lockMs`、`damping` 系数）；
-  2. 评估是否改为“滚动进度连续映射 activeFloat”（而非离散步进）；
+  1. ~~评估是否改为「滚动进度连续映射 activeFloat」~~ → **§17 已改为滚轮连续 phase**（scroll-scrub 因与滚轮冲突未采用）；
+  2. 用原站对照录屏做 **`sensitivity` / 阻尼** 微调（§17.7）；
   3. 对齐 list/drumroll 切换瞬间的过渡节奏（淡入淡出时长与延迟）。
 
 ---
@@ -735,11 +739,10 @@ const axial = PANEL_ASPECT * PANEL_RAD   // 所有面板同高
 | 分页 | 文案 / slug | 缩略图 `image` |
 |------|-------------|----------------|
 | 页 1 | ✅ 对齐 | ✅ `microcms-assets.io` 真实 URL |
-| 页 2 | ✅ 对齐 | ⚠️ 临时复用 `PAGE_1[n].image` |
-| 页 3 | ✅ 对齐 | ⚠️ 临时用 `WORKS_PAGE_ABOUT_IMAGES` |
+| 页 2 | ✅ 对齐 | ✅ §17 已从详情页回填 |
+| 页 3 | ✅ 对齐 | ✅ §17 已从详情页回填 |
 
-- 本轮尝试用 Python 从详情页 HTML 批量提取 `microcms-assets` URL，在 **Windows PowerShell** 下因引号 / 正则转义多次失败，未完成批量回填。
-- 已通过 Web 搜索确认页 2 多项原站详情页存在（如 `/works/fluffy_hugs/`、`/works/innofes/`、`/works/rwby/` 等），下一轮应逐条抓 `og:image` 或页面内首图 URL。
+> §16 当时页 2/3 缩略图未完成；已在 **§17** 通过 `curl` 抓各 `/works/{slug}/` 详情页 HTML 提取 `microcms` URL 解决。
 
 ### 16.5 验证
 
@@ -748,30 +751,194 @@ const axial = PANEL_ASPECT * PANEL_RAD   // 所有面板同高
 
 ### 16.6 下一轮优先（圆筒视觉 1:1 主线）
 
-按建议顺序：
-
-1. **补全页 2 / 页 3 真实缩略图**
-   - 逐条访问 `junni.co.jp/works/{slug}/` 提取 `microcms-assets` 或 `og:image`
-   - 回填 `junniWorksPageData.ts` 中 `PAGE_2` / `PAGE_3` 的 `image` 字段
-   - 核实 `vi-ta`、`at-aroma` 原站 slug
-2. **对照验证 `PANEL_ASPECT=2.65`**
-   - 与原站同视口宽度截图对比圆筒窗口宽高比
-   - 必要时微调常量或 scrim（`.jwp__drumroll-scrim`）渐变
-3. **圆筒亮度 / 边缘淡出**
-   - 原站非当前项更暗、中心更亮；对照 `mat.color.setScalar(b)` 与 `PANEL_FADE_DEG` 参数
-4. **继续 §15 手感项**（若视觉已满意再做）
-   - `stepThreshold` / `lockMs` / `damping` 录屏微调
-   - 评估连续滚动进度驱动 `activeFloat`
+> **多数项已在 §17 完成或迁移**。下轮请直接看 **§17.6 / §17.8**。
 
 ### 16.7 新对话复制指令（圆筒专项）
 
-> 继续 junni.co.jp `/works/` Drumroll 圆筒 **1:1 视觉复刻**。已读 `docs/junni-works-page-复刻交接.md` §16。
->
-> **已完成**：固定面板 `PANEL_ASPECT` + `fitTextureCover`；页 1 真实缩略图；页 2/3 文案与 slug。
-> **待做**：页 2/3 缩略图回填；`PANEL_ASPECT` / scrim / 亮度对照；手感微调。
->
-> 请先打开 `#/portfolio` 与原站并排截图，从用户指定差异点继续。
+> **已被 §17 取代**。请使用 **§11** 或 **§17.9** 的快速启动指令。
 
 ---
 
-*文档结束。新对话请 @ 本文件并说明要从哪一步开始（建议：「补全页 2/3 缩略图」或「微调 PANEL_ASPECT 对照原站」）。*
+## 17. 本轮新增（2026-06-17 晚间，Drumroll 面板间隙 + 连续滚筒 + 页 2/3 缩略图）★
+
+> **本节整合同一会话的全部对话**：用户指出原站 Drumroll「图与图之间有缝、可一直滚的圆柱感」，本站图 4 像一整块连续曲面；分析根因后落地代码修复。**后续新对话请优先围绕 §17 继续精调 Drumroll 效果。**
+
+### 17.1 用户反馈（截图对比 · 核心差异）
+
+用户提供原站截图（图 1–3）vs 本站截图（图 4），归纳：
+
+| 原站（图 1–3） | 本站修复前（图 4） |
+|---|---|
+| 每条作品带是**独立弧面卡片**，带与带之间有**深色空隙** | 像**一整块连续弯曲贴图**，无明显缝隙 |
+| 一条带内常可见**多张缩略图并排**（纹理内留白） | 单张 cover 图铺满整段弧面 |
+| 滚动感像**滚筒一直转**（相位连续变化） | 滚一下**跳一项**，手感离散 |
+| 多项并存、**不糊叠**成一张 | `PANEL_DEG(51.1°) > STEP_DEG(25°)` → 几何重叠 |
+
+用户直觉：**动态逻辑与 About 区类似**——离散元素 + 可见间隙 + 可持续滚动（About 用 CSS `gap:15px` 跑马灯；Drumroll 应在 WebGL 圆筒上实现同等「卡片感」）。
+
+### 17.2 根因分析（修复前）
+
+**A. 几何重叠消灭缝隙**
+
+- §16 沿用首页 `PANEL_DEG=51.1`、`STEP_DEG=25`。
+- 弧宽 > 间距 → 相邻面板在圆筒角向上大幅重叠，z-buffer 叠成连续曲面，**底色 `#1c1d21` 无法露出**。
+- 要出现角向 / 纵向可见缝：需 **`PANEL_DEG < STEP_DEG`**（或纹理内留白）。
+
+**B. 单图 cover 铺满**
+
+- 每作品仅一张 hero 图 + `fitTextureCover` → 带内视觉连续；原站不少 Drumroll 纹理为**横向多图拼条**。
+
+**C. 离散步进驱动**
+
+- §15 滚轮：`wheelDeltaAcc` 达阈值 → `drumrollActive ±1`（可跳 2）。
+- 首页 `JunniWorks.tsx` 为 `active = progress × (N−1)` **连续小数**；作品集页此前为整数索引 + 阻尼插值。
+
+**D. 与 About 的类比（设计语义，非同一实现）**
+
+| | About 跑马灯 | Drumroll（目标语义） |
+|---|---|---|
+| 离散 | `<img>` + `gap:15px` | WebGL 开放弧面卡片 |
+| 底色缝 | CSS gap | `PANEL_DEG < STEP_DEG` + 透明 canvas |
+| 连续滚 | CSS `jwp-slider` infinite | 连续 `activeFloat` 滚轮 |
+
+### 17.3 已落地修复（代码）
+
+#### A. 面板角向间隙（`JunniWorksDrumroll.tsx`）
+
+```ts
+const PANEL_GAP_DEG = 6
+const PANEL_DEG = STEP_DEG - PANEL_GAP_DEG   // = 19°
+const PANEL_FADE_DEG = 14                    // 由 18 收紧（面板变小后）
+const PANEL_VISIBLE_DEG = 52                 // 由 58 收紧
+```
+
+- 保留 `PANEL_ASPECT=2.65` + `fitTextureCover()`（§16）。
+- `renderer.setClearColor(0x000000, 0)`，canvas 透明。
+- 渲染帧内 `target = clamp(targetActiveRef.current, 0, n−1)`，允许父级传入略超界的橡皮筋值，显示仍收敛。
+
+#### B. 背景露出缝隙（`JunniWorksPage.css`）
+
+```css
+.jwp__drumroll-wrap {
+  background-color: #1c1d21;
+}
+```
+
+#### C. 连续滚筒滚轮（`JunniWorksPage.tsx`）
+
+- 删除：`wheelLockRef`、`wheelDeltaAccRef`、离散步进阈值 / `lockMs`。
+- 新增：`drumrollActiveRef` + `setDrumrollPhase(next)` **不硬 clamp**（首尾橡皮筋在 wheel 内处理）。
+- 滚轮逻辑（drumroll 视图 + sticky 区间内）：
+
+```ts
+const sensitivity = 0.0032
+let next = current + normalizedDelta * sensitivity
+// 首尾：current≤0.02 或 ≥max−0.02 时释放页面滚动，不 preventDefault
+// 中间：preventDefault；next<0 或 >max 时 ×0.22 橡皮筋
+```
+
+- `JunniWorksDrumroll`：`onActiveChange` 改名为可选 `onActiveIndexChange`（仅整数索引变化时回调）。
+
+#### D. 页 2 / 3 原站缩略图（`junniWorksPageData.ts`）
+
+从 `https://junni.co.jp/works/{slug}/` 详情页 HTML 提取 `microcms-assets` URL（`curl.exe` + Python 正则；PowerShell 内联 Python 易引号报错，宜写 `.py` 文件执行）。
+
+**页 2 缩略图（已写入）**
+
+| slug | image（microcms 文件名） |
+|------|--------------------------|
+| `fluffy_hugs` | `.../fluffyhugs01.jpg` |
+| `innofes` | `.../innofes01.png` |
+| `junni_is` | `.../junniis01.png` |
+| `virtualgallery` | `.../virtualgallery01.png` |
+| `rwby` | `.../works-rwby01.png` |
+| `you0deco` | `.../you0deco.png` |
+| `tensura-movie2022` | `.../tensura-guren.png` |
+| `vi-ta` | `.../vita01.png`（详情页 URL 为 `/works/vita/`） |
+| `tokoshie` | `.../tokoshie01.png` |
+| `burnthewitch` | `.../btw01.png` |
+| `denonbu` | `.../denonbu01.png` |
+| `tensura-portal` | `.../tensura_thum01.jpg` |
+
+**页 3 缩略图**
+
+| slug | image |
+|------|-------|
+| `obsolete-official` | `.../obsolete01.png` |
+| `at-aroma` | `.../aroma02.png`（详情页 `/works/aroma/`） |
+
+### 17.4 尝试过但未保留的方案
+
+**滚动进度映射 `activeFloat`（sticky 220vh → `progress × (n−1)`）**
+
+- 曾与滚轮连续驱动**冲突**：滚轮改 phase 但 scroll 位置不变 → 一旦页面滚动会跳相位。
+- **当前仅保留滚轮连续驱动**；若要做首页式 scrub，需同步 Lenis 滚动位置或二选一。
+
+### 17.5 修改文件清单
+
+| 文件 | 变更 |
+|------|------|
+| `src/components/junni/works-page/JunniWorksDrumroll.tsx` | `PANEL_GAP_DEG` / `PANEL_DEG=19`；透明 clearColor；阻尼 / fade 参数；`onActiveIndexChange` |
+| `src/components/junni/works-page/JunniWorksPage.tsx` | 连续滚轮 `activeFloat`；`setDrumrollPhase`；删除离散步进 |
+| `src/components/junni/works-page/JunniWorksPage.css` | `.jwp__drumroll-wrap` 背景色 |
+| `src/components/junni/works-page/junniWorksPageData.ts` | 页 2/3 全部 `image` 回填 |
+
+### 17.6 验证与已知剩余差距
+
+**验证（2026-06-17）**
+
+- `npm run build`：通过。
+- 本地 `#/portfolio` 滚入 Drumroll：面板间可见**深色缝隙**；滚轮可**连续**切换作品（非一格一跳）。
+- 抓取用的 `.tmp-*` 文件已删除，避免 Vite `EBUSY`（见 §5.1）。
+
+**与原站仍可能存在的差距（下轮精调）**
+
+| 项 | 说明 |
+|----|------|
+| 面板视觉尺寸 | `PANEL_DEG=19°` 小于首页实测 `51.1°`，缝隙清晰但单块可能偏小；可调 `PANEL_GAP_DEG`（4–7）平衡 |
+| 带内多图拼条 | 原站纹理常含多张缩略图+竖向留白；本站仍单图 cover |
+| 滚轮灵敏度 | `sensitivity=0.0032` 待录屏对照 |
+| scrim / 亮度 | `PANEL_FADE_DEG=14`、`mat.color.setScalar(b)` 待并排截图 |
+| 首页 vs 本页常量 | **勿直接把首页 `PANEL_DEG=51.1` 套回本页**，会再次消灭缝隙 |
+
+### 17.7 调参速查（`JunniWorksDrumroll.tsx` · 本页专用）
+
+| 常量 | 当前值 | 作用 |
+|------|--------|------|
+| `STEP_DEG` | 25 | 作品角间距（与 DOM 标题一致） |
+| `PANEL_GAP_DEG` | 6 | 两面板间角向空隙（度） |
+| `PANEL_DEG` | 19 | `STEP − GAP`；弧面张角 |
+| `PANEL_ASPECT` | 2.65 | 统一窗口宽高比 + cover |
+| `PANEL_FADE_DEG` | 14 | 相邻图暗化速度 |
+| `PANEL_VISIBLE_DEG` | 52 | WebGL mesh 可见阈值 |
+| `VISIBLE_THETA_DEG` | 52 | DOM 标题可见阈值 |
+
+`JunniWorksPage.tsx` 滚轮：
+
+| 常量 | 当前值 | 作用 |
+|------|--------|------|
+| `sensitivity` | 0.0032 | 滚轮增量 → phase 倍率 |
+| 橡皮筋系数 | 0.22 | 越界时 phase 衰减 |
+| 边界释放 | `≤0.02` / `≥max−0.02` | 允许页面继续滚动 |
+
+### 17.8 下一轮建议（Drumroll 效果精调主线）
+
+1. 原站 vs 本站**同视口并排截图**（Basica / Alche / Playyte 等典型项）。
+2. 微调 **`PANEL_GAP_DEG`**（增大 → 缝更明显、块更小）或略增 `PANEL_DEG`（减小缝、块更大）。
+3. 对照原站录屏调 **`sensitivity`**、阻尼 `damping`、首尾橡皮筋。
+4. 评估是否需 **横向多图拼条纹理**（更接近原站带内竖缝）。
+5. scrim 渐变与 `mat.color` 亮度曲线。
+6. **不要**在未改 `PANEL_DEG` 前提下仅放大 `PANEL_ASPECT` 指望出现缝隙。
+
+### 17.9 新对话复制指令（Drumroll 间隙 / 滚筒专项）
+
+> 继续 junni.co.jp `/works/` **Drumroll 圆筒效果 1:1 精调**。已读 `docs/junni-works-page-复刻交接.md` **§17**。
+>
+> **已完成**：`PANEL_GAP_DEG=6` / `PANEL_DEG=19` 面板缝；连续滚轮 `activeFloat`；页 2/3 原站缩略图；`PANEL_ASPECT` + cover。
+> **待做**：缝隙 vs 面板尺寸平衡、`sensitivity`/阻尼、scrim/亮度、（可选）多图拼条纹理。
+>
+> 请先 `#/portfolio` 与原站并排截图，从用户指定差异点继续。本页 `PANEL_DEG=19` ≠ 首页 `JunniWorks.tsx` 的 `51.1`。
+
+---
+
+*文档结束。新对话请 @ 本文件并说明要从哪一步开始（建议：「对照原站微调 PANEL_GAP_DEG / 面板尺寸」或「录屏对齐滚轮 sensitivity」）。*

@@ -162,12 +162,11 @@ export default function JunniWorksPage() {
   const [page, setPage] = useState(1)
 
   const [drumrollActive, setDrumrollActive] = useState(0)
+  const drumrollActiveRef = useRef(0)
 
   const [toggleVisible, setToggleVisible] = useState(false)
 
   const [toggleMounted, setToggleMounted] = useState(false)
-  const wheelLockRef = useRef(false)
-  const wheelDeltaAccRef = useRef(0)
 
   const updateToggleVisibility = useCallback(() => {
 
@@ -223,13 +222,18 @@ export default function JunniWorksPage() {
 
   const items = WORKS_PAGE_DATA[page - 1] ?? WORKS_PAGE_DATA[0]
 
+  const setDrumrollPhase = useCallback((next: number) => {
+    drumrollActiveRef.current = next
+    setDrumrollActive(next)
+  }, [])
+
+  useEffect(() => {
+    drumrollActiveRef.current = drumrollActive
+  }, [drumrollActive])
+
   useEffect(() => {
     const onWindowWheel = (e: WheelEvent) => {
       if (view !== "drumroll") return
-      if (wheelLockRef.current) {
-        e.preventDefault()
-        return
-      }
 
       const drumrollEl = drumrollSectionRef.current
       if (!drumrollEl) return
@@ -240,38 +244,26 @@ export default function JunniWorksPage() {
       if (!isInDrumrollZone) return
 
       const normalizedDelta = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY
-      wheelDeltaAccRef.current += normalizedDelta
-      const edgeDistance = Math.min(drumrollActive, items.length - 1 - drumrollActive)
-      const isNearEdge = edgeDistance <= 1
-      const stepThreshold = isNearEdge ? 110 : 70
-      if (Math.abs(wheelDeltaAccRef.current) < stepThreshold) {
-        e.preventDefault()
-        return
-      }
+      const max = Math.max(0, items.length - 1)
+      const current = drumrollActiveRef.current
+      const sensitivity = 0.0032
+      let next = current + normalizedDelta * sensitivity
 
-      const direction = wheelDeltaAccRef.current > 0 ? 1 : -1
-      const jump = !isNearEdge && Math.abs(normalizedDelta) > 260 ? 2 : 1
-      const isAtFirst = drumrollActive <= 0
-      const isAtLast = drumrollActive >= items.length - 1
-      const shouldReleaseToPage = (direction < 0 && isAtFirst) || (direction > 0 && isAtLast)
-      if (shouldReleaseToPage) {
-        wheelDeltaAccRef.current = 0
-        return
-      }
+      const releasingUp = normalizedDelta < 0 && current <= 0.02
+      const releasingDown = normalizedDelta > 0 && current >= max - 0.02
+      if (releasingUp || releasingDown) return
 
       e.preventDefault()
-      wheelDeltaAccRef.current = 0
-      wheelLockRef.current = true
-      const lockMs = Math.abs(normalizedDelta) > 140 ? 220 : 150
-      window.setTimeout(() => {
-        wheelLockRef.current = false
-      }, lockMs)
-      setDrumrollActive((prev) => Math.max(0, Math.min(items.length - 1, prev + direction * jump)))
+
+      if (next < 0) next *= 0.22
+      if (next > max) next = max + (next - max) * 0.22
+
+      setDrumrollPhase(next)
     }
 
     window.addEventListener("wheel", onWindowWheel, { passive: false, capture: true })
     return () => window.removeEventListener("wheel", onWindowWheel, true)
-  }, [drumrollActive, items.length, view])
+  }, [items.length, setDrumrollPhase, view])
 
 
 
@@ -297,14 +289,14 @@ export default function JunniWorksPage() {
 
   useEffect(() => {
 
-    setDrumrollActive(0)
-    wheelDeltaAccRef.current = 0
+    setDrumrollPhase(0)
 
-  }, [page])
+  }, [page, setDrumrollPhase])
 
   useEffect(() => {
 
-    wheelDeltaAccRef.current = 0
+    drumrollActiveRef.current = 0
+    setDrumrollActive(0)
 
   }, [view])
 
@@ -501,8 +493,6 @@ export default function JunniWorksPage() {
               items={items}
 
               active={drumrollActive}
-
-              onActiveChange={setDrumrollActive}
 
               page={page}
 
