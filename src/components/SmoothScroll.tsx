@@ -1,6 +1,6 @@
-import { useEffect, type PropsWithChildren } from "react"
-import { ReactLenis, useLenis } from "lenis/react"
-import { useRoute } from "@/hooks/useRoute"
+import { useCallback, useEffect, type PropsWithChildren } from "react"
+import { ReactLenis, useLenis, type Lenis } from "lenis/react"
+import { APP_SCROLL_RESET, useRoute } from "@/hooks/useRoute"
 
 /**
  * 是否开启平滑滚动。遵循系统无障碍偏好：
@@ -26,22 +26,46 @@ const lenisOptions = {
   easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
 }
 
-/** 路由（hash）切换时，将滚动瞬间归零。 */
+function scrollToTop(lenis?: Lenis | null) {
+  lenis?.scrollTo(0, { immediate: true })
+  lenis?.resize()
+  window.scrollTo(0, 0)
+}
+
+function useScrollToTopOnRoute(lenis?: Lenis | null) {
+  const route = useRoute()
+  const routeKey = route.page === "work" ? `work:${route.slug}` : route.page
+
+  const reset = useCallback(() => {
+    scrollToTop(lenis)
+  }, [lenis])
+
+  useEffect(() => {
+    reset()
+    const id = requestAnimationFrame(reset)
+    return () => cancelAnimationFrame(id)
+  }, [routeKey, reset])
+
+  useEffect(() => {
+    const onReset = () => {
+      reset()
+      requestAnimationFrame(reset)
+    }
+    window.addEventListener(APP_SCROLL_RESET, onReset)
+    return () => window.removeEventListener(APP_SCROLL_RESET, onReset)
+  }, [reset])
+}
+
+/** 路由（hash）切换或同页导航时，将滚动瞬间归零。 */
 function LenisScrollReset() {
   const lenis = useLenis()
-  const page = useRoute()
-  useEffect(() => {
-    lenis?.scrollTo(0, { immediate: true })
-  }, [page, lenis])
+  useScrollToTopOnRoute(lenis)
   return null
 }
 
 /** 减少动态效果时的归零兜底（不依赖 Lenis）。 */
 function NativeScrollReset() {
-  const page = useRoute()
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [page])
+  useScrollToTopOnRoute()
   return null
 }
 

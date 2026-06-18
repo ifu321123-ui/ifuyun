@@ -1,0 +1,172 @@
+/* 全站荧光绿页脚（jsf = junni site footer） */
+
+.jsf {
+  --jsf-dark: #1c1d21;
+  --jsf-green: #dcff46;
+}
+
+.jsf__footer {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  margin-top: 0;
+  border-radius: 100px 0 0;
+  background: var(--jsf-green);
+  opacity: 0;
+  transition: opacity 0.6s;
+}
+
+.jsf[data-visible="true"] .jsf__footer {
+  opacity: 1;
+}
+
+.jsf__footer-inner {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  padding: min(40px, 2.5%) 0 min(44px, 2.75%);
+}
+
+.jsf__footer-menu {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  justify-content: space-between;
+  gap: 1.2em 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  width: min(437px, 27.3125%);
+  margin-left: auto;
+  margin-right: min(56px, 3.5%);
+  font-size: min(24px, 1.5vw);
+}
+
+.jsf__footer-menu-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding-left: 1.17em;
+  padding-top: 0.2em;
+  color: var(--jsf-dark);
+  font-family: "Montserrat", sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  line-height: 1;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.jsf__footer-menu-link::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0.33em;
+  height: 0.33em;
+  background: var(--jsf-dark);
+}
+
+.jsf__footer-brand {
+  text-align: center;
+  width: min(890px, 55.625%);
+  margin: min(90px, 5.625%) auto 0;
+}
+
+.jsf__footer-logo {
+  font-family: "Montserrat", sans-serif;
+  font-size: min(150px, 9.375vw);
+  font-weight: 800;
+  line-height: 0.82;
+  letter-spacing: 0.01em;
+  color: var(--jsf-dark);
+}
+
+.jsf__footer-tagline {
+  margin-top: min(18px, 1.1vw);
+  font-family: "Yuji Syuku", "Klee One", "Caveat", "Segoe Script", "STKaiti", "KaiTi", cursive;
+  font-size: min(56px, 3.5vw);
+  font-weight: 700;
+  color: var(--jsf-dark);
+}
+
+.jsf__page-top {
+  width: max-content;
+  margin: min(58px, 3.625%) min(110px, 6.875%) 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--jsf-dark);
+  font-family: "Noto Serif SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: min(19px, 1.1875vw);
+  cursor: pointer;
+}
+
+.jsf__page-top svg {
+  width: min(50px, 3.125vw);
+  height: auto;
+}
+
+.jsf__copyright {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  padding: 1rem 0.5rem;
+  pointer-events: none;
+}
+
+.jsf__copyright-text {
+  display: block;
+  writing-mode: vertical-rl;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: #fbf9f5;
+  opacity: 0.7;
+}
+
+@media (max-width: 768px) {
+  .jsf__footer {
+    border-radius: clamp(25px, 6.54vw, 50px) 0 0 0;
+  }
+
+  .jsf__footer-inner {
+    padding: min(90px, 10.5882352941%) 0 min(50px, 5.8823529412%);
+  }
+
+  .jsf__footer-menu {
+    gap: 1.2em 0.5em;
+    width: max-content;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: min(24px, 4vw);
+  }
+
+  .jsf__footer-brand {
+    margin: min(120px, 14.1176470588%) auto 0;
+    width: min(92vw, 890px);
+  }
+
+  .jsf__footer-logo {
+    font-size: min(90px, 14vw);
+  }
+
+  .jsf__footer-tagline {
+    font-size: min(34px, 5.6vw);
+  }
+
+  .jsf__page-top {
+    margin: max(-20px, -2.3529411765vw) min(50px, 5.8823529412%) 0 auto;
+    font-size: min(19px, 2.2352941176vw);
+  }
+
+  .jsf__page-top svg {
+    width: min(60px, 7.0588235294vw);
+  }
+}

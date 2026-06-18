@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import JunniMenu from "./components/junni/JunniMenu"
+import JunniSiteFooter from "./components/junni/JunniSiteFooter"
 import Hero from "./components/Hero"
 import JunniTop from "./components/junni/JunniTop"
 import Experience from "./components/Experience"
@@ -10,17 +11,26 @@ import NeuClone from "./components/neu/NeuClone"
 import JunniWorkDetail from "./components/junni/work-detail/JunniWorkDetail"
 import JunniWorksPage from "./components/junni/works-page/JunniWorksPage"
 import { cn } from "./lib/utils"
-import { useRoute } from "./hooks/useRoute"
+import { useRoute, type PageId } from "./hooks/useRoute"
 
 function renderPage(
   page: string,
   onJunniZoneChange?: (inJunniZone: boolean) => void,
+  portfolioProps?: {
+    footerRef: React.RefObject<HTMLElement | null>
+    onReadyChange: (ready: boolean) => void
+  },
 ) {
   switch (page) {
     case "experience":
       return <Experience />
     case "portfolio":
-      return <JunniWorksPage />
+      return (
+        <JunniWorksPage
+          footerRef={portfolioProps?.footerRef}
+          onReadyChange={portfolioProps?.onReadyChange}
+        />
+      )
     case "contact":
       return <Contact />
     default:
@@ -49,6 +59,13 @@ export default function App() {
   const isContact = page === "contact"
   const isExperience = page === "experience"
   const isPortfolio = page === "portfolio"
+  const footerRef = useRef<HTMLElement>(null)
+  const [portfolioFooterVisible, setPortfolioFooterVisible] = useState(false)
+
+  useEffect(() => {
+    if (!isPortfolio) setPortfolioFooterVisible(true)
+    else setPortfolioFooterVisible(false)
+  }, [isPortfolio])
 
   // Neu 复刻页：完全独立的全屏页面，自带固定导航与平滑滚动，不套用本站的 Navbar / 内边距。
   if (isNeu) {
@@ -78,8 +95,16 @@ export default function App() {
         )}
       >
         <main key={page} className="min-h-screen animate-fade-up">
-          {renderPage(page, onJunniZoneChange)}
+          {renderPage(page, onJunniZoneChange, {
+            footerRef,
+            onReadyChange: setPortfolioFooterVisible,
+          })}
         </main>
+        <JunniSiteFooter
+          ref={footerRef}
+          activePage={page as PageId}
+          visible={portfolioFooterVisible}
+        />
         {!isNotebookHome && !isPortfolio && (
           <div className={cn(isExperience && "neu-host-scale")}>
             <IntroFlip />

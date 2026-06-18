@@ -17,9 +17,18 @@ function parseHash(): Route {
   return PAGES.includes(id as PageId) ? { page: id as PageId } : { page: "home" }
 }
 
+export const APP_SCROLL_RESET = "app:scroll-reset"
+
+export function requestScrollReset() {
+  window.dispatchEvent(new CustomEvent(APP_SCROLL_RESET))
+}
+
 export function navigate(page: PageId | `work/${string}`) {
   const current = window.location.hash.replace(/^#\/?/, "")
-  if (current === page) return
+  if (current === page) {
+    requestScrollReset()
+    return
+  }
   window.location.hash = `/${page}`
 }
 
