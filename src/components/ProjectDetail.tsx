@@ -67,7 +67,7 @@ function DetailNotFound() {
         <h1 className="text-5xl font-black tracking-[-0.08em]">没有找到这个作品</h1>
         <button
           type="button"
-          onClick={() => navigate("projects")}
+          onClick={() => navigate("portfolio")}
           className="mt-8 rounded-full border-[3px] bg-[#f2ff00] px-6 py-3 text-sm font-black shadow-[0.35rem_0.35rem_0_#0b0713]"
           style={{ borderColor: INK }}
         >
@@ -109,7 +109,7 @@ export default function ProjectDetail({ slug }: { slug: string }) {
           <header className="flex items-center justify-between gap-4">
             <button
               type="button"
-              onClick={() => navigate("projects")}
+              onClick={() => navigate("portfolio")}
               className="inline-flex items-center gap-2 rounded-full border-[3px] bg-white px-4 py-2 text-xs font-black uppercase tracking-[0.08em] shadow-[0.25rem_0.25rem_0_rgba(11,7,19,.16)] transition-transform hover:-translate-y-0.5"
               style={{ borderColor: INK }}
             >
@@ -218,7 +218,7 @@ export default function ProjectDetail({ slug }: { slug: string }) {
         <div className="mx-auto mt-10 max-w-7xl px-5 md:px-10">
           <button
             type="button"
-            onClick={() => navigate("projects")}
+            onClick={() => navigate("portfolio")}
             className="rounded-full border-[3px] bg-[#f2ff00] px-6 py-3 text-sm font-black text-[#0b0713] shadow-[0.35rem_0.35rem_0_#0b0713] transition-transform hover:-translate-y-0.5"
             style={{ borderColor: INK }}
           >

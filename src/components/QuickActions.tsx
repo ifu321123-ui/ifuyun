@@ -25,7 +25,7 @@ export default function QuickActions() {
       aria-hidden={!visible}
     >
       <button
-        onClick={() => navigate("projects")}
+        onClick={() => navigate("portfolio")}
         className="group inline-flex items-center justify-center gap-2 rounded-full bg-accent px-4 py-3 text-sm font-semibold text-accent-foreground shadow-lg transition-transform hover:scale-[1.03] sm:px-5"
         aria-label="查看项目作品"
       >

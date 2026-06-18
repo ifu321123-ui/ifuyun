@@ -1,17 +1,18 @@
 import { useEffect, useState } from "react"
 
-export type PageId = "home" | "experience" | "about" | "projects" | "portfolio" | "contact" | "neu"
+export type PageId = "home" | "experience" | "portfolio" | "contact" | "neu"
 export type Route =
   | { page: PageId; slug?: undefined }
   | { page: "work"; slug: string }
 
-const PAGES: PageId[] = ["home", "experience", "about", "projects", "portfolio", "contact", "neu"]
+const PAGES: PageId[] = ["home", "experience", "portfolio", "contact", "neu"]
 
 function parseHash(): Route {
   const id = window.location.hash.replace(/^#\/?/, "")
+  if (id === "projects") return { page: "portfolio" }
   if (id.startsWith("work/")) {
     const slug = id.replace(/^work\//, "")
-    return slug ? { page: "work", slug } : { page: "projects" }
+    return slug ? { page: "work", slug } : { page: "portfolio" }
   }
   return PAGES.includes(id as PageId) ? { page: id as PageId } : { page: "home" }
 }

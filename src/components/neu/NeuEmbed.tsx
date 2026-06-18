@@ -1,11 +1,8 @@
 import { useRef } from "react"
-import NeuHero from "./NeuHero"
 import NeuTransition from "./NeuTransition"
 import NeuAbout from "./NeuAbout"
 import NeuPixel from "./NeuPixel"
 import NeuService from "./NeuService"
-import NeuTeam from "./NeuTeam"
-import NeuContact from "./NeuContact"
 import "./neu.css"
 
 /**
@@ -18,13 +15,10 @@ export default function NeuEmbed() {
 
   return (
     <div className="neu-root neu-embed" ref={root}>
-      <NeuHero />
       <NeuTransition />
       <NeuAbout />
       <NeuPixel />
       <NeuService />
-      <NeuTeam />
-      <NeuContact />
     </div>
   )
 }

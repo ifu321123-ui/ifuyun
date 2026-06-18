@@ -101,7 +101,6 @@ export const notebookNav = [
   { id: "about" as const, label: "关于" },
   { id: "work" as const, label: "工作" },
   { id: "portfolio" as const, label: "作品集" },
-  { id: "project" as const, label: "项目" },
   { id: "connect" as const, label: "联系" },
 ]
 
@@ -335,6 +334,5 @@ export const aiWorkflowChapters = [
 export const navItems = [
   { id: "home", label: "首页" },
   { id: "experience", label: "工作经历" },
-  { id: "projects", label: "项目作品" },
   { id: "contact", label: "联系我" },
 ]

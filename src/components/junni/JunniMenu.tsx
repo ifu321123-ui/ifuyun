@@ -26,7 +26,7 @@ interface JunniMenuProps {
 }
 
 function getMenuType(page: PageId | "work", inJunniZone: boolean): "white" | "black" {
-  if (page === "portfolio" || page === "about") return "white"
+  if (page === "portfolio") return "white"
   if (page === "home" && inJunniZone) return "white"
   return "black"
 }

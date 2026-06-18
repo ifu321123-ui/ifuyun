@@ -7,10 +7,8 @@ export default function NotebookNav() {
       document.getElementById("about")?.scrollIntoView({ behavior: "smooth" })
     } else if (id === "work") {
       navigate("experience")
-    } else if (id === "project") {
-      navigate("projects")
     } else {
-      navigate("contact")
+      navigate(id === "portfolio" ? "portfolio" : "contact")
     }
   }
 

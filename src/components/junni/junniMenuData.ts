@@ -1,6 +1,6 @@
 import type { PageId, Route } from "@/hooks/useRoute"
 
-export type MenuNamespace = "top" | "about" | "work" | "works" | "project" | "contact"
+export type MenuNamespace = "top" | "work" | "works" | "contact"
 
 export const JUNNI_MENU_NAV: {
   menu: MenuNamespace
@@ -10,13 +10,12 @@ export const JUNNI_MENU_NAV: {
   { menu: "top", label: "关于", page: "home" },
   { menu: "work", label: "实习经历", page: "experience" },
   { menu: "works", label: "项目&作品", page: "portfolio" },
-  { menu: "project", label: "PROJECTS", page: "projects" },
   { menu: "contact", label: "联系我", page: "contact" },
 ]
 
 /** 菜单底部快捷操作（替换原 SNS 链接区） */
 export const JUNNI_MENU_ACTIONS = {
-  portfolio: { label: "查看项目作品", page: "projects" as PageId },
+  portfolio: { label: "查看项目作品", page: "portfolio" as PageId },
   resume: { label: "下载简历" },
 } as const
 
@@ -24,15 +23,11 @@ export function pageToMenuNamespace(page: PageId | "work"): MenuNamespace {
   switch (page) {
     case "home":
       return "top"
-    case "about":
-      return "about"
     case "experience":
       return "work"
     case "portfolio":
-      return "works"
-    case "projects":
     case "work":
-      return "project"
+      return "works"
     case "contact":
       return "contact"
     case "neu":

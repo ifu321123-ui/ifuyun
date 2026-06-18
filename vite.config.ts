@@ -12,7 +12,7 @@ export default defineConfig({
   },
   server: {
     watch: {
-      ignored: ["**/.tmp*", "**/*.tmp"],
+      ignored: ["**/.tmp*", "**/*.tmp", "**/tmp-*"],
     },
   },
 })

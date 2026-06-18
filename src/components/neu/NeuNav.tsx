@@ -1,13 +1,12 @@
 import { navigate } from "@/hooks/useRoute"
 
-export type NeuSection = "top" | "about" | "service" | "team" | "contact"
+export type NeuSection = "top" | "about" | "service" | "team"
 
 const LINKS: { id: NeuSection; label: string }[] = [
   { id: "top", label: "Top" },
   { id: "about", label: "About" },
   { id: "service", label: "Service" },
   { id: "team", label: "Team" },
-  { id: "contact", label: "Contact" },
 ]
 
 export default function NeuNav({

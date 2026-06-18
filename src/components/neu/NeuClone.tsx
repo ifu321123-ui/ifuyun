@@ -9,7 +9,6 @@ import NeuAbout from "./NeuAbout"
 import NeuPixel from "./NeuPixel"
 import NeuService from "./NeuService"
 import NeuTeam from "./NeuTeam"
-import NeuContact from "./NeuContact"
 import "./neu.css"
 
 const NAV_LINE = 56 // 判定线：导航栏中心大致 y 值
@@ -82,7 +81,6 @@ export default function NeuClone() {
       <NeuPixel />
       <NeuService />
       <NeuTeam />
-      <NeuContact />
     </div>
   )
 }

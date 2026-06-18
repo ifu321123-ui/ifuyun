@@ -7,7 +7,6 @@ const ROUTE_BY_NAV: Record<string, PageId> = {
   about: "home",
   work: "experience",
   portfolio: "portfolio",
-  project: "projects",
   connect: "contact",
 }
 
