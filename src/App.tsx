@@ -74,7 +74,7 @@ export default function App() {
       <div
         className={cn(
           "relative min-h-screen",
-          isContact || isExperience ? "bg-[#ffffff]" : isPortfolio ? "bg-[#1c1d21]" : "bg-background",
+          isContact ? "bg-[#1c1d21]" : isExperience ? "bg-[#ffffff]" : isPortfolio ? "bg-[#1c1d21]" : "bg-background",
         )}
       >
         <main key={page} className="min-h-screen animate-fade-up">

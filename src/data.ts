@@ -107,7 +107,7 @@ export const notebookNav = [
 export const notebook = {
   nameScript: "IFU.YUN",
   role: "Product Designer",
-  headlineMain: "软件应当",
+  headlineMain: "产品应当",
   headlineFeel: "让人觉得",
   rotatingEmphasis: ["可靠", "真诚", "简单", "自然", "有趣"],
   location: "China • GMT +8:00",
