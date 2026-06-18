@@ -10,6 +10,7 @@
   --svc-pad: clamp(1rem, 3vw, 2.5rem);
   --svc-num-w: clamp(3rem, 7vw, 5.25rem);
   --svc-col-gap: clamp(1rem, 3vw, 2.5rem);
+  --svc-toggle-w: clamp(1.6rem, 3vw, 2.2rem);
   position: relative;
   width: 100%;
   padding: min(130px, 8.125%) 0;
@@ -254,8 +255,8 @@
 /* —— +/× 切换 —— */
 .junni-service__toggle {
   position: relative;
-  width: clamp(1.6rem, 3vw, 2.2rem);
-  height: clamp(1.6rem, 3vw, 2.2rem);
+  width: var(--svc-toggle-w);
+  height: var(--svc-toggle-w);
   flex: none;
   color: var(--svc-ink);
   transition:
@@ -301,36 +302,30 @@
 }
 .junni-service__panel-inner {
   overflow: hidden;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: clamp(1.5rem, 3vw, 2.5rem);
-  /* 正文左缘与「名称」对齐：左 = 行内边距 + 编号列宽 + 列间距 */
-  padding: 0 var(--svc-pad) 0
+  width: 100%;
+  box-sizing: border-box;
+  /* 左缘与标题对齐；右缘不超过 × 按钮左缘 */
+  padding: 0 calc(var(--svc-pad) + var(--svc-toggle-w) + var(--svc-col-gap)) 0
     calc(var(--svc-pad) + var(--svc-num-w) + var(--svc-col-gap));
 }
 .junni-service__item[data-open="true"] .junni-service__panel-inner {
+  padding-top: clamp(0.75rem, 2vw, 1.25rem);
   padding-bottom: clamp(2.5rem, 5vw, 4rem);
-}
-@media (min-width: 768px) {
-  .junni-service__panel-inner {
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-    align-items: center;
-  }
 }
 .junni-service__text {
   margin: 0;
-  max-width: 34rem;
+  width: 100%;
   font-size: clamp(0.85rem, 1.5vw, 1rem);
   line-height: 2;
   color: rgba(247, 247, 247, 0.72);
 }
 
-/* —— 结构化排版（图2「教育背景」式：分块小标题 + 标签条目）—— */
+/* —— 结构化排版：单栏通栏，分块小标题 + 标签条目 —— */
 .junni-service__body {
   display: flex;
   flex-direction: column;
   gap: clamp(1.4rem, 2.6vw, 2.1rem);
-  max-width: 38rem;
+  width: 100%;
 }
 .junni-service__group {
   display: flex;
@@ -368,8 +363,8 @@
 }
 .junni-service__point {
   display: grid;
-  grid-template-columns: max-content 1fr;
-  gap: 0.5rem 0.9rem;
+  grid-template-columns: minmax(4.5rem, max-content) minmax(0, 1fr);
+  gap: 0.5rem clamp(0.9rem, 2vw, 2rem);
   align-items: baseline;
   font-size: clamp(0.82rem, 1.45vw, 0.98rem);
   line-height: 1.85;
@@ -417,24 +412,6 @@
     gap: 0.15rem;
   }
 }
-/* 右侧图片：居中横向图、带留白、不铺满整列（对齐原站） */
-.junni-service__image {
-  justify-self: center;
-  align-self: center;
-  width: min(100%, 30rem);
-  aspect-ratio: 4 / 3;
-  border-radius: 0.4rem;
-  overflow: hidden;
-  background: #000;
-  box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, 0.35);
-}
-.junni-service__image img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
 /* —— 进场擦除层 —— */
 .junni-service__shift {
   position: absolute;

@@ -34,7 +34,7 @@ function scrollToTop(lenis?: Lenis | null) {
 
 function useScrollToTopOnRoute(lenis?: Lenis | null) {
   const route = useRoute()
-  const routeKey = route.page === "work" ? `work:${route.slug}` : route.page
+  const routeKey = route.page
 
   const reset = useCallback(() => {
     scrollToTop(lenis)

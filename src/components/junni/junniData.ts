@@ -1,3 +1,5 @@
+import { WORKS_PAGE_ITEMS } from "./works-page/junniWorksPageData"
+
 /** junni.co.jp Hero 文案（MVP 2.0：6×6 网格卡片版） */
 export const junniHero = {
   logo: "IFUYUN",
@@ -65,8 +67,6 @@ export type JunniSolution = {
   num: string
   name: string
   detail: string
-  image: string
-  alt: string
   text?: string
   body?: {
     groups: {
@@ -108,8 +108,6 @@ export const junniSolutions: JunniSolution[] = [
         },
       ],
     },
-    image: "/works/shiyuan/01.png",
-    alt: "教育背景",
   },
   {
     num: "02",
@@ -135,8 +133,6 @@ export const junniSolutions: JunniSolution[] = [
         },
       ],
     },
-    image: "/works/shiyuan/02.png",
-    alt: "实习经历 · 四方伟业",
   },
   {
     num: "03",
@@ -194,8 +190,6 @@ export const junniSolutions: JunniSolution[] = [
         },
       ],
     },
-    image: "/works/shiyuan/03.png",
-    alt: "项目经历 · B 端产品",
   },
   {
     num: "04",
@@ -240,8 +234,6 @@ export const junniSolutions: JunniSolution[] = [
         },
       ],
     },
-    image: "/works/shiyuan/04.png",
-    alt: "项目经历 · 创新设计",
   },
   {
     num: "05",
@@ -267,8 +259,6 @@ export const junniSolutions: JunniSolution[] = [
         },
       ],
     },
-    image: "/works/shiyuan/05.png",
-    alt: "获奖情况",
   },
 ]
 
@@ -282,56 +272,21 @@ export type JunniWork = {
   description: string
   href: string
   image: string
+  drumrollImage?: string
   titleSize?: "small" | "middle" | "normal"
 }
 
-/** junni.co.jp home_works：先保留原站文案与链接，图片后续可替换为自己的项目素材 */
+/** 首页 WORKS 圆筒：与作品集页共用作品数据与封面图 */
 export const junniWorks: JunniWork[] = [
-  {
-    slug: "basica",
-    title: "BaSICA",
-    description: "株式会社BaSICA コーポレートサイトリニューアル",
-    href: "/works/basica",
-    image: "/works/junni/basica.jpg",
-    titleSize: "normal",
-  },
-  {
-    slug: "alche-studio",
-    title: "Alche, Inc",
-    description: "Alche株式会社 コーポレートサイトリニューアル",
-    href: "/works/alche-studio",
-    image: "/works/junni/alche-studio.png",
-    titleSize: "normal",
-  },
-  {
-    slug: "2nd-star-production",
-    title: "2nd STAR PRODUCTION",
-    description: "「2nd STAR PRODUCTION」コーポレートサイト制作",
-    href: "/works/2nd-star-production",
-    image: "/works/junni/2nd-star-production.jpg",
-    titleSize: "small",
-  },
-  {
-    slug: "opb_app",
-    title: "ONE PIECE BASE",
-    description: "ONE PIECE BASEアプリ開発／制作",
-    href: "/works/opb_app",
-    image: "/works/junni/opb_app.png",
-    titleSize: "middle",
-  },
-  {
-    slug: "master-expo",
-    title: "M@STER EXPO",
-    description: "THE IDOLM@STER M@STER EXPO 公式ブース出展",
-    href: "/works/master-expo",
-    image: "/works/junni/master-expo.png",
-    titleSize: "middle",
-  },
+  ...WORKS_PAGE_ITEMS.map((item) => ({
+    ...item,
+    href: "#/portfolio",
+  })),
   {
     slug: "and_more",
     title: "and more...",
-    description: "WORKS - 制作実績一覧ページ",
-    href: "/works",
+    description: "查看全部作品",
+    href: "#/portfolio",
     image: "",
   },
 ]

@@ -1,14 +1,8 @@
 import { forwardRef } from "react"
 import { useLenis } from "lenis/react"
 import { navigate, type PageId } from "@/hooks/useRoute"
+import { SITE_NAV } from "./junniMenuData"
 import "./JunniSiteFooter.css"
-
-const FOOTER_LINKS: { id: PageId; label: string }[] = [
-  { id: "portfolio", label: "作品" },
-  { id: "experience", label: "经历" },
-  { id: "contact", label: "联系" },
-  { id: "home", label: "首页" },
-]
 
 type JunniSiteFooterProps = {
   activePage: PageId
@@ -36,13 +30,13 @@ const JunniSiteFooter = forwardRef<HTMLElement, JunniSiteFooterProps>(
         <footer className="jsf__footer" ref={ref}>
           <div className="jsf__footer-inner">
             <ul className="jsf__footer-menu">
-              {FOOTER_LINKS.map((link) => (
-                <li key={link.id}>
+              {SITE_NAV.map((link) => (
+                <li key={link.page}>
                   <button
                     type="button"
                     className="jsf__footer-menu-link"
-                    data-active={link.id === activePage}
-                    onClick={() => link.id !== activePage && navigate(link.id)}
+                    data-active={link.page === activePage}
+                    onClick={() => link.page !== activePage && navigate(link.page)}
                   >
                     {link.label}
                   </button>

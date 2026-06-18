@@ -2,6 +2,7 @@ import type { PageId, Route } from "@/hooks/useRoute"
 
 export type MenuNamespace = "top" | "work" | "works" | "contact"
 
+/** 全站主导航 / 页脚导航共用 */
 export const JUNNI_MENU_NAV: {
   menu: MenuNamespace
   label: string
@@ -12,6 +13,8 @@ export const JUNNI_MENU_NAV: {
   { menu: "works", label: "项目&作品", page: "portfolio" },
   { menu: "contact", label: "联系我", page: "contact" },
 ]
+
+export const SITE_NAV = JUNNI_MENU_NAV
 
 /** 菜单底部快捷操作（替换原 SNS 链接区） */
 export const JUNNI_MENU_ACTIONS = {
@@ -30,8 +33,6 @@ export function pageToMenuNamespace(page: PageId | "work"): MenuNamespace {
       return "works"
     case "contact":
       return "contact"
-    case "neu":
-      return "top"
     default:
       return "top"
   }

@@ -93,8 +93,8 @@ function CeoSection() {
     <section className="gunze-ceo" id="ceo" onMouseMove={onMove} onMouseLeave={onLeave}>
       <div className="gunze-ceo__inner">
         <hgroup className="gunze-title-group gunze-title-group--ceo">
-          <h2 className="gunze-section-title">From CEO</h2>
-          <p className="gunze-title-jp">总裁致辞</p>
+          <h2 className="gunze-section-title">From Me</h2>
+          <p className="gunze-title-jp">写在最后</p>
         </hgroup>
 
         <div className="gunze-ceo__main">
@@ -107,22 +107,22 @@ function CeoSection() {
               </div>
             </div>
             <figcaption>
-              郡志株式会社社长兼代表董事
+              AI 复合型产品经理 · UX 设计
               <br />
-              佐口俊康
+              付云椒
             </figcaption>
           </figure>
 
           <div className="gunze-ceo__copy">
-            <p className="gunze-ceo__catch">难以理解 = 有趣</p>
+            <p className="gunze-ceo__catch">体验为先 = 价值落地</p>
             <p>
-              即使拥有130年的经验，未来依然难以预测。
+              工具总在变，好的体验却不会过时。
               <br />
-              但“不可预测的未来”本身就充满魅力。
+              我始终相信，产品要从真实问题出发，
               <br />
-              “GUNZE，不可预测”也同样令人着迷。
+              用设计把复杂变清晰，用 AI 把验证变更快。
               <br />
-              敬请期待接下来的发展。
+              也想继续把这三件事，织进每一次创作里。
             </p>
             <button type="button" className="gunze-btn" onClick={() => navigate("contact")}>
               联系我

@@ -1,7 +1,6 @@
 import { useState, type CSSProperties } from "react"
 import { ArrowUpRight } from "lucide-react"
 import { projects, projectTabs, type ProjectCategory } from "@/data"
-import { navigate } from "@/hooks/useRoute"
 import { cn } from "@/lib/utils"
 import SplitText from "./SplitText"
 
@@ -147,10 +146,7 @@ export default function Projects() {
               {filtered.map((p, i) => (
                 <article
                   key={p.title}
-                  className={cn("pin-card group", p.slug ? "cursor-pointer" : "cursor-default")}
-                  onClick={() => {
-                    if (p.slug) navigate(`work/${p.slug}`)
-                  }}
+                  className={cn("pin-card group", "cursor-default")}
                   style={{ "--rot": ROTATIONS[i % ROTATIONS.length] } as CSSProperties}
                 >
                   {/* GUNZE 风格项目卡 */}

@@ -5,7 +5,7 @@ import "./JunniService.css"
 /**
  * junni.co.jp SERVICE / PERFORMANCE 区块复刻。
  * - 标题逐字描边 + transition-delay 入场（IntersectionObserver 触发 .is-in）
- * - 手风琴：点击 + 展开暗色面板（长文 + 图），+ 形变 ×；可多项同时展开（对齐原站逐项 data-open）
+ * - 手风琴：点击 + 展开暗色面板（长文），+ 形变 ×；可多项同时展开（对齐原站逐项 data-open）
  * - 7 条 shift_layer 作为进场竖向擦除（氛围层）
  * 样式自包含（不依赖 .junni-root 变量），可安全嵌入任意页面流。
  */
@@ -138,9 +138,6 @@ export default function JunniService() {
                   ) : (
                     <p className="junni-service__text">{item.text}</p>
                   )}
-                  <div className="junni-service__image">
-                    <img src={item.image} alt={item.alt} loading="lazy" />
-                  </div>
                 </div>
               </div>
             </li>

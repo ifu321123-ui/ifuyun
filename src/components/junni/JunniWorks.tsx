@@ -21,6 +21,7 @@ import {
   drumrollPanelBrightness,
   fitTextureCover,
   splitDrumrollText,
+  workDrumrollSrc,
 } from "./drumrollGeometry"
 import { junniWorks } from "./junniData"
 import "./JunniWorks.css"
@@ -194,12 +195,12 @@ export default function JunniWorks() {
     const loader = new THREE.TextureLoader()
     const loads = junniWorks
       .map((work, index) => ({ work, index }))
-      .filter(({ work }) => !!work.image)
+      .filter(({ work }) => !!workDrumrollSrc(work))
       .map(
         ({ work, index }) =>
           new Promise<{ index: number; tex: THREE.Texture } | null>((resolve) => {
             loader.load(
-              work.image,
+              workDrumrollSrc(work),
               (tex) => resolve({ index, tex }),
               undefined,
               () => resolve(null),

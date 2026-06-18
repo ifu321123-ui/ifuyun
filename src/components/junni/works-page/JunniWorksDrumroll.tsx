@@ -18,6 +18,7 @@ import {
   drumrollPanelBrightness,
   fitTextureCover,
   splitDrumrollText,
+  workDrumrollSrc,
 } from "../drumrollGeometry"
 import type { WorksPageItem } from "./junniWorksPageData"
 
@@ -270,11 +271,11 @@ export default function JunniWorksDrumroll({
     const loader = new THREE.TextureLoader()
     const loads = items
       .map((work, index) => ({ work, index }))
-      .filter(({ work }) => !!work.image)
+      .filter(({ work }) => !!workDrumrollSrc(work))
       .map(
         ({ work, index }) =>
           new Promise<{ index: number; tex: THREE.Texture } | null>((resolve) => {
-            loader.load(work.image, (tex) => resolve({ index, tex }), undefined, () => resolve(null))
+            loader.load(workDrumrollSrc(work), (tex) => resolve({ index, tex }), undefined, () => resolve(null))
           }),
       )
 
@@ -361,7 +362,7 @@ export default function JunniWorksDrumroll({
                 data-active={i === Math.round(active)}
                 data-visible="false"
               >
-                <a className="jwp__drumroll-link" href={`#work/${work.slug}`}>
+                <div className="jwp__drumroll-link">
                   <span className="jwp__drumroll-title" data-size={work.titleSize ?? "normal"}>
                     {work.title}
                   </span>
@@ -376,7 +377,7 @@ export default function JunniWorksDrumroll({
                       </span>
                     ))}
                   </span>
-                </a>
+                </div>
               </li>
             )
           })}

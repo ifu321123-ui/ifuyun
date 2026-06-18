@@ -7,8 +7,6 @@ import Experience from "./components/Experience"
 import Contact from "./components/Contact"
 import IntroFlip from "./components/IntroFlip"
 import SmoothScroll from "./components/SmoothScroll"
-import NeuClone from "./components/neu/NeuClone"
-import JunniWorkDetail from "./components/junni/work-detail/JunniWorkDetail"
 import JunniWorksPage from "./components/junni/works-page/JunniWorksPage"
 import { cn } from "./lib/utils"
 import { useRoute, type PageId } from "./hooks/useRoute"
@@ -53,9 +51,6 @@ export default function App() {
   useEffect(() => {
     if (isNotebookHome) setInJunniZone(true)
   }, [isNotebookHome])
-  const isNeu = page === "neu"
-  // 工作经历页内嵌了 Neu（其设计基准 1rem=10px，会把整页根字号设为 62.5%）。
-  // 这里把本站内容整体放大 1.6 倍还原 16px 视感，Neu 区块再自行抵消，实现 1:1 共存。
   const isContact = page === "contact"
   const isExperience = page === "experience"
   const isPortfolio = page === "portfolio"
@@ -66,24 +61,6 @@ export default function App() {
     if (!isPortfolio) setPortfolioFooterVisible(true)
     else setPortfolioFooterVisible(false)
   }, [isPortfolio])
-
-  // Neu 复刻页：完全独立的全屏页面，自带固定导航与平滑滚动，不套用本站的 Navbar / 内边距。
-  if (isNeu) {
-    return (
-      <SmoothScroll>
-        <NeuClone />
-      </SmoothScroll>
-    )
-  }
-
-  if (page === "work") {
-    return (
-      <SmoothScroll>
-        <JunniMenu />
-        <JunniWorkDetail slug={route.slug} />
-      </SmoothScroll>
-    )
-  }
 
   return (
     <SmoothScroll>
@@ -105,11 +82,7 @@ export default function App() {
           activePage={page as PageId}
           visible={portfolioFooterVisible}
         />
-        {!isNotebookHome && !isPortfolio && (
-          <div className={cn(isExperience && "neu-host-scale")}>
-            <IntroFlip />
-          </div>
-        )}
+        {!isNotebookHome && !isPortfolio && <IntroFlip />}
       </div>
     </SmoothScroll>
   )

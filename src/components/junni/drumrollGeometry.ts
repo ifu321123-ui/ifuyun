@@ -21,6 +21,10 @@ export function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value))
 }
 
+export function workDrumrollSrc(work: { drumrollImage?: string; image: string }) {
+  return work.drumrollImage ?? work.image
+}
+
 export function splitDrumrollText(text: string) {
   return Array.from(text).map((char) => (char === " " ? "\u00A0" : char))
 }
