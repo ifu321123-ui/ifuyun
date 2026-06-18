@@ -400,7 +400,7 @@ export default function JunniWorksDrumroll({
               </svg>
             </i>
             <span className="jwp__drumroll-nav-en">PREV</span>
-            <span className="jwp__drumroll-nav-ja">前のページ</span>
+            <span className="jwp__drumroll-nav-ja">上一页</span>
           </button>
         ) : (
           <span className="jwp__drumroll-nav-spacer" aria-hidden="true" />
@@ -419,7 +419,7 @@ export default function JunniWorksDrumroll({
               </svg>
             </i>
             <span className="jwp__drumroll-nav-en">NEXT</span>
-            <span className="jwp__drumroll-nav-ja">次のページ</span>
+            <span className="jwp__drumroll-nav-ja">下一页</span>
           </button>
         ) : (
           <span className="jwp__drumroll-nav-spacer" aria-hidden="true" />

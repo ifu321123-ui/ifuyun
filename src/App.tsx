@@ -7,7 +7,7 @@ import Contact from "./components/Contact"
 import IntroFlip from "./components/IntroFlip"
 import SmoothScroll from "./components/SmoothScroll"
 import NeuClone from "./components/neu/NeuClone"
-import ProjectDetail from "./components/ProjectDetail"
+import JunniWorkDetail from "./components/junni/work-detail/JunniWorkDetail"
 import JunniWorksPage from "./components/junni/works-page/JunniWorksPage"
 import { cn } from "./lib/utils"
 import { useRoute } from "./hooks/useRoute"
@@ -63,7 +63,7 @@ export default function App() {
     return (
       <SmoothScroll>
         <JunniMenu />
-        <ProjectDetail slug={route.slug} />
+        <JunniWorkDetail slug={route.slug} />
       </SmoothScroll>
     )
   }

@@ -49,7 +49,7 @@ function scrollProgressToPhase(progress: number, itemCount: number) {
 
 
 
-const PAGE_TITLE = "OUR WORKS"
+const PAGE_TITLE = "MY WORKS"
 
 type ViewMode = "drumroll" | "list"
 
@@ -159,13 +159,13 @@ function AboutSliderMobile({ side, images }: { side: "left" | "right"; images: s
 
 const FOOTER_LINKS: { id: string; label: string; active?: boolean }[] = [
 
-  { id: "portfolio", label: "作品" },
+  { id: "portfolio", label: "作品", active: true },
 
-  { id: "projects", label: "服务" },
+  { id: "experience", label: "经历" },
 
-  { id: "experience", label: "招募" },
+  { id: "contact", label: "联系" },
 
-  { id: "contact", label: "接触" },
+  { id: "home", label: "首页" },
 
 ]
 
@@ -347,7 +347,7 @@ export default function JunniWorksPage() {
 
   const toggleNode = (
 
-    <div className="jwp__toggle" data-visible={toggleVisible ? "true" : "false"} aria-label="表示切替">
+    <div className="jwp__toggle" data-visible={toggleVisible ? "true" : "false"} aria-label="视图切换">
 
       <div className="jwp__toggle-wrap">
 
@@ -363,7 +363,7 @@ export default function JunniWorksPage() {
 
           onClick={() => setView((prev) => (prev === "list" ? "drumroll" : "list"))}
 
-          aria-label={view === "list" ? "リスト表示" : "ドラムロール表示"}
+          aria-label={view === "list" ? "列表视图" : "滚筒视图"}
 
         />
 
@@ -435,7 +435,7 @@ export default function JunniWorksPage() {
 
       <div className="jwp__works-container">
 
-        <section className="jwp__about jwp__fade" aria-label="制作実績について">
+        <section className="jwp__about jwp__fade" aria-label="关于作品">
 
           <div className="jwp__about-inner">
 
@@ -469,7 +469,7 @@ export default function JunniWorksPage() {
 
         <div className="jwp__works-list" ref={worksListRef} data-type={view}>
 
-          <div className="jwp__list-inner" aria-label="作品一覧">
+          <div className="jwp__list-inner" aria-label="作品列表">
 
             {items.map((work) => (
 
@@ -531,7 +531,7 @@ export default function JunniWorksPage() {
 
 
 
-          <nav className="jwp__pagination" aria-label="ページネーション">
+          <nav className="jwp__pagination" aria-label="分页导航">
 
               <button
 
@@ -541,7 +541,7 @@ export default function JunniWorksPage() {
 
                 disabled={page <= 1}
 
-                aria-label="前のページ"
+                aria-label="上一页"
 
                 onClick={() => goPage(page - 1)}
 
@@ -595,7 +595,7 @@ export default function JunniWorksPage() {
 
                 disabled={page >= WORKS_PAGE_TOTAL}
 
-                aria-label="次のページ"
+                aria-label="下一页"
 
                 onClick={() => goPage(page + 1)}
 
@@ -669,7 +669,7 @@ export default function JunniWorksPage() {
 
             <p className="jwp__footer-logo">IFUYUN</p>
 
-            <p className="jwp__footer-tagline">自由地、独特地。</p>
+            <p className="jwp__footer-tagline">懂产品的设计师，懂 AI 的产品人。</p>
 
           </div>
 
