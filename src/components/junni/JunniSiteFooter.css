@@ -113,24 +113,6 @@
   height: auto;
 }
 
-.jsf__copyright {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  z-index: 30;
-  padding: 1rem 0.5rem;
-  pointer-events: none;
-}
-
-.jsf__copyright-text {
-  display: block;
-  writing-mode: vertical-rl;
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  color: #fbf9f5;
-  opacity: 0.7;
-}
-
 @media (max-width: 768px) {
   .jsf__footer {
     border-radius: clamp(25px, 6.54vw, 50px) 0 0 0;

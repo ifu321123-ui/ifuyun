@@ -158,6 +158,9 @@ export default function JunniWorksDrumroll({
         item.style.zIndex = `${Math.round(1000 - absTheta)}`
         item.dataset.active = String(isActive)
         item.dataset.visible = String(isVisible && opacity > 0.02)
+        item
+          .querySelector<HTMLAnchorElement>(".jwp__drumroll-link")
+          ?.setAttribute("tabindex", isActive ? "0" : "-1")
       })
 
       updateStageChrome(activeFloat)
@@ -285,12 +288,13 @@ export default function JunniWorksDrumroll({
         if (!res) return
         const { index, tex } = res
         const img = tex.image as HTMLImageElement
+        const work = items[index]
         const aspect = img?.naturalWidth ? img.naturalWidth / img.naturalHeight : 16 / 9
         tex.colorSpace = THREE.SRGBColorSpace
         tex.anisotropy = 8
         tex.center.set(0.5, 0.5)
         tex.rotation = TEX_ROTATION
-        fitTextureCover(tex, aspect, PANEL_ASPECT)
+        fitTextureCover(tex, aspect, PANEL_ASPECT, work.drumrollFocal ?? "center")
         const axial = PANEL_ASPECT * PANEL_RAD
         const geo = new THREE.CylinderGeometry(1, 1, axial, 64, 1, true, -PANEL_RAD / 2, PANEL_RAD)
         const mat = new THREE.MeshBasicMaterial({
@@ -362,7 +366,7 @@ export default function JunniWorksDrumroll({
                 data-active={i === Math.round(active)}
                 data-visible="false"
               >
-                <div className="jwp__drumroll-link">
+                <a className="jwp__drumroll-link" href={`#work/${work.slug}`}>
                   <span className="jwp__drumroll-title" data-size={work.titleSize ?? "normal"}>
                     {work.title}
                   </span>
@@ -377,7 +381,7 @@ export default function JunniWorksDrumroll({
                       </span>
                     ))}
                   </span>
-                </div>
+                </a>
               </li>
             )
           })}

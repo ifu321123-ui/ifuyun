@@ -74,7 +74,8 @@ function isMenuOverLightBackground(): boolean {
   return onLight
 }
 
-function getMenuType(page: PageId, onLightBg: boolean): "white" | "black" {
+function getMenuType(page: PageId | "work", onLightBg: boolean): "white" | "black" {
+  if (page === "work") return "black"
   if (page === "home" || page === "experience") return onLightBg ? "black" : "white"
   return "white"
 }

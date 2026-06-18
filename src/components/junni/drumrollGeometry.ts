@@ -29,9 +29,21 @@ export function splitDrumrollText(text: string) {
   return Array.from(text).map((char) => (char === " " ? "\u00A0" : char))
 }
 
+export type TextureFocal = "top" | "center" | "bottom"
+
+function focalScalar(focal: TextureFocal) {
+  return focal === "top" ? 0 : focal === "bottom" ? 1 : 0.5
+}
+
 /** Texture is rotated 90° on the drum panel — use displayed aspect after rotation. */
-export function fitTextureCover(tex: THREE.Texture, sourceAspect: number, targetAspect: number) {
+export function fitTextureCover(
+  tex: THREE.Texture,
+  sourceAspect: number,
+  targetAspect: number,
+  focalY: TextureFocal = "center",
+) {
   const displayedAspect = sourceAspect > 0 ? 1 / sourceAspect : 1
+  const focal = focalScalar(focalY)
   let repeatX = 1
   let repeatY = 1
   let offsetX = 0
@@ -39,10 +51,10 @@ export function fitTextureCover(tex: THREE.Texture, sourceAspect: number, target
 
   if (displayedAspect > targetAspect) {
     repeatX = targetAspect / displayedAspect
-    offsetX = (1 - repeatX) * 0.5
+    offsetX = (1 - repeatX) * focal
   } else {
     repeatY = displayedAspect / targetAspect
-    offsetY = (1 - repeatY) * 0.5
+    offsetY = (1 - repeatY) * focal
   }
 
   tex.repeat.set(repeatX, repeatY)

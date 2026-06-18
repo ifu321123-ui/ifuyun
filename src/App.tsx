@@ -7,6 +7,7 @@ import Experience from "./components/Experience"
 import Contact from "./components/Contact"
 import IntroFlip from "./components/IntroFlip"
 import SmoothScroll from "./components/SmoothScroll"
+import JunniWorkDetail from "./components/junni/work-detail/JunniWorkDetail"
 import JunniWorksPage from "./components/junni/works-page/JunniWorksPage"
 import { cn } from "./lib/utils"
 import { useRoute, type PageId } from "./hooks/useRoute"
@@ -61,6 +62,15 @@ export default function App() {
     if (!isPortfolio) setPortfolioFooterVisible(true)
     else setPortfolioFooterVisible(false)
   }, [isPortfolio])
+
+  if (page === "work") {
+    return (
+      <SmoothScroll>
+        <JunniMenu />
+        <JunniWorkDetail slug={route.slug} />
+      </SmoothScroll>
+    )
+  }
 
   return (
     <SmoothScroll>

@@ -47,11 +47,16 @@ function scrollProgressToPhase(progress: number, itemCount: number) {
 
 
 
-const PAGE_TITLE = "MY WORKS"
+const PAGE_TITLE = "MY PROJECT"
 
 type ViewMode = "drumroll" | "list"
 
+const PORTFOLIO_VIEW_KEY = "jwp-view-mode"
 
+function readPortfolioView(): ViewMode {
+  if (typeof window === "undefined") return "list"
+  return sessionStorage.getItem(PORTFOLIO_VIEW_KEY) === "drumroll" ? "drumroll" : "list"
+}
 
 /** Desktop: 3 columns × 3 marquee tracks per side (matches原站 min-md structure). */
 
@@ -169,7 +174,7 @@ export default function JunniWorksPage({ footerRef, onReadyChange }: JunniWorksP
 
   const [pageHead, setPageHead] = useState(false)
 
-  const [view, setView] = useState<ViewMode>("list")
+  const [view, setView] = useState<ViewMode>(readPortfolioView)
 
   const [page, setPage] = useState(1)
 
@@ -312,6 +317,10 @@ export default function JunniWorksPage({ footerRef, onReadyChange }: JunniWorksP
     requestAnimationFrame(() => ScrollTrigger.refresh())
 
   }, [page, setDrumrollPhase])
+
+  useEffect(() => {
+    sessionStorage.setItem(PORTFOLIO_VIEW_KEY, view)
+  }, [view])
 
   useEffect(() => {
 

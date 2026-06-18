@@ -214,12 +214,13 @@ export default function JunniWorks() {
         if (!res) return
         const { index, tex } = res
         const img = tex.image as HTMLImageElement
+        const work = junniWorks[index]
         const aspect = img?.naturalWidth ? img.naturalWidth / img.naturalHeight : 16 / 9
         tex.colorSpace = THREE.SRGBColorSpace
         tex.anisotropy = 8
         tex.center.set(0.5, 0.5)
         tex.rotation = TEX_ROTATION
-        fitTextureCover(tex, aspect, PANEL_ASPECT)
+        fitTextureCover(tex, aspect, PANEL_ASPECT, work?.drumrollFocal ?? "center")
         const axial = PANEL_ASPECT * PANEL_RAD
         const geo = new THREE.CylinderGeometry(1, 1, axial, 64, 1, true, -PANEL_RAD / 2, PANEL_RAD)
         const mat = new THREE.MeshBasicMaterial({

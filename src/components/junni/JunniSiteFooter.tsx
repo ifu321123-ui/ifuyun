@@ -21,12 +21,6 @@ const JunniSiteFooter = forwardRef<HTMLElement, JunniSiteFooterProps>(
 
     return (
       <div className="jsf" data-visible={visible ? "true" : "false"} data-site-footer>
-        <aside className="jsf__copyright" aria-hidden="true">
-          <small className="jsf__copyright-text">
-            Copyright © IFU.YUN · Inspired by JUNNI
-          </small>
-        </aside>
-
         <footer className="jsf__footer" ref={ref}>
           <div className="jsf__footer-inner">
             <ul className="jsf__footer-menu">

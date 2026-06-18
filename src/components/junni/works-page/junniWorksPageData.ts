@@ -1,3 +1,5 @@
+import type { TextureFocal } from "../drumrollGeometry"
+
 export type WorksPageItem = {
 
   slug: string
@@ -11,6 +13,10 @@ export type WorksPageItem = {
   /** 3D 圆筒贴图（竖版海报）；列表区仍用 image */
 
   drumrollImage?: string
+
+  /** 滚筒贴图 cover 裁切锚点（不拉伸） */
+
+  drumrollFocal?: TextureFocal
 
   titleSize?: "small" | "middle" | "normal"
 
@@ -107,6 +113,8 @@ export const WORKS_PAGE_ITEMS: WorksPageItem[] = [
 
     drumrollImage: "/works/shiyuan/drumroll.png",
 
+    drumrollFocal: "bottom",
+
     titleSize: "normal",
 
   },
@@ -123,6 +131,8 @@ export const WORKS_PAGE_ITEMS: WorksPageItem[] = [
     image: "/works/shuxiang/01.png",
 
     drumrollImage: "/works/shuxiang/drumroll.png",
+
+    drumrollFocal: "top",
 
     titleSize: "normal",
 
@@ -141,6 +151,8 @@ export const WORKS_PAGE_ITEMS: WorksPageItem[] = [
 
     drumrollImage: "/works/yidirenjian/drumroll.png",
 
+    drumrollFocal: "center",
+
     titleSize: "small",
 
   },
@@ -157,6 +169,8 @@ export const WORKS_PAGE_ITEMS: WorksPageItem[] = [
     image: "/works/mahui/01.png",
 
     drumrollImage: "/works/mahui/drumroll.png",
+
+    drumrollFocal: "top",
 
     titleSize: "normal",
 
@@ -175,6 +189,8 @@ export const WORKS_PAGE_ITEMS: WorksPageItem[] = [
 
     drumrollImage: "/works/scbank/drumroll.png",
 
+    drumrollFocal: "top",
+
     titleSize: "middle",
 
   },
@@ -183,7 +199,7 @@ export const WORKS_PAGE_ITEMS: WorksPageItem[] = [
 
     slug: "yunyacun",
 
-    title: "崖上的希望",
+    title: "崖上的希望·云崖村扶贫纪实",
 
     description:
       "本作品将「镜头」聚焦四川大凉山悬崖村，一座位于悬崖之上的村庄。在国家的大力脱贫攻坚和精准扶贫政策下，我们一起见证悬崖村「藤梯变钢梯」、从贫瘠茅草屋到小康楼房、从没有经济支撑到发展特色农业旅游的「云端巨变」！",
@@ -191,6 +207,8 @@ export const WORKS_PAGE_ITEMS: WorksPageItem[] = [
     image: "/works/yunyacun/drumroll.png",
 
     drumrollImage: "/works/yunyacun/drumroll.png",
+
+    drumrollFocal: "center",
 
     titleSize: "small",
 
@@ -208,6 +226,8 @@ export const WORKS_PAGE_ITEMS: WorksPageItem[] = [
     image: "/works/shanxiaoyang/01.png",
 
     drumrollImage: "/works/shanxiaoyang/drumroll.png",
+
+    drumrollFocal: "top",
 
     titleSize: "middle",
 
