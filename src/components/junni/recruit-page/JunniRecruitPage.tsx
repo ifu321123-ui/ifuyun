@@ -203,7 +203,7 @@ export default function JunniRecruitPage() {
   const messageChars = [...RECRUIT_MESSAGE_CHARS]
 
   return (
-    <div className="jrp" data-pagehead={pageHead ? "true" : "false"} data-namespace="recruit">
+    <div className="jrp" data-menu-bg="dark" data-pagehead={pageHead ? "true" : "false"} data-namespace="recruit">
       <header className="jrp__head">
         <SpacedHead title={RECRUIT_PAGE_TITLE.split("").join(" ")} />
       </header>

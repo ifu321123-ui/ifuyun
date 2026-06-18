@@ -1,6 +1,6 @@
 export default function BusinessIntro() {
   return (
-    <section className="business-intro" id="business" aria-label="郡士业务介绍">
+    <section className="business-intro" id="business" data-menu-bg="light" aria-label="郡士业务介绍">
       <div className="business-intro__inner">
         <h2 className="business-intro__lead">
           我在解决<span className="business-intro__lead-soft">什么</span>问题？

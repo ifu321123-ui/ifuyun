@@ -289,7 +289,7 @@ export default function GunzeTransition() {
   return (
     <>
       <SvgSprite />
-      <section ref={stageRef} className="gunze-stage" aria-label="GUNZE 130th transition">
+      <section ref={stageRef} className="gunze-stage" data-menu-bg="light" aria-label="GUNZE 130th transition">
         <div className="gunze-scene">
           <div className="gunze-question-layer">
             <img

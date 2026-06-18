@@ -198,7 +198,7 @@
 
   .notebook-section .notebook-leather {
     background-color: #f17fb3;
-    filter: saturate(1.06) brightness(1.02);
+    filter: saturate(1) brightness(1.04) contrast(0.88);
   }
 
   .notebook-section .notebook-binder {
@@ -336,27 +336,31 @@
     background-color: #d94b3a;
     background-image:
       linear-gradient(
+        oklch(0.78 0.12 350 / 52%),
+        oklch(0.78 0.12 350 / 52%)
+      ),
+      linear-gradient(
         145deg,
-        oklch(1 0 0 / 16%) 0%,
+        oklch(1 0 0 / 8%) 0%,
         oklch(1 0 0 / 0%) 30%,
         oklch(0 0 0 / 0%) 70%,
-        oklch(0 0 0 / 18%) 100%
+        oklch(0 0 0 / 8%) 100%
       ),
       url("/notebook/leather-red.jpg");
-    background-repeat: no-repeat, repeat;
-    background-position: center, left top;
-    background-size: cover, 900px;
-    background-blend-mode: overlay, multiply;
-    filter: hue-rotate(var(--notebook-hue));
+    background-repeat: no-repeat, no-repeat, repeat;
+    background-position: center, center, left top;
+    background-size: cover, cover, 2200px;
+    background-blend-mode: normal, overlay, soft-light;
+    filter: hue-rotate(var(--notebook-hue)) contrast(0.9);
     box-shadow:
       /* 顶部 rim light + 整圈细高光 */
       inset 0 1px 0 oklch(1 0 0 / 34%),
       inset 0 0 0 1px oklch(1 0 0 / 12%),
       /* 皮革左右压痕（向内的暗边，强化厚度） */
-      inset 7px 0 16px -10px oklch(0 0 0 / 45%),
-      inset -7px 0 16px -10px oklch(0 0 0 / 45%),
+      inset 7px 0 16px -10px oklch(0 0 0 / 28%),
+      inset -7px 0 16px -10px oklch(0 0 0 / 28%),
       /* 底部受光面阴影 */
-      inset 0 -3px 14px oklch(0 0 0 / 38%),
+      inset 0 -3px 14px oklch(0 0 0 / 26%),
       /* 贴合接触阴影 → 中景 → 远景环境光，逐层加大羽化让边缘溶入背景 */
       0 6px 16px -8px oklch(0 0 0 / 50%),
       0 28px 64px -28px oklch(0 0 0 / 62%),

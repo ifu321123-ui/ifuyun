@@ -143,6 +143,8 @@ export default function JunniHero({ onInZoneChange }: JunniHeroProps) {
       // 接近翻完时把 sticky 底色由黑切绿：此刻多数格子已是绿背，
       // 网格细缝随之由黑转绿、与 home_about 无缝衔接，且消除黑底上的绿色缝隙。
       scene.style.background = p >= FLIP_END ? "#cbea41" : "#0a0a0a"
+      scene.dataset.menuBg = p >= FLIP_END ? "light" : "dark"
+      window.dispatchEvent(new Event("junni-menu-bg"))
 
       // 背面文字整体淡入：等大多数格子翻成绿背后再显现，避免文字浮在半翻的格子上。
       if (backOverlay) backOverlay.style.opacity = map(p, 0.8, 0.94, 0, 1).toFixed(3)
@@ -156,6 +158,8 @@ export default function JunniHero({ onInZoneChange }: JunniHeroProps) {
       // 降级：直接呈现绿底终态，并撤掉重型矩阵，背面文字常显。
       matrix.style.display = "none"
       scene.style.background = "#cbea41"
+      scene.dataset.menuBg = "light"
+      window.dispatchEvent(new Event("junni-menu-bg"))
       if (backOverlay) backOverlay.style.opacity = "1"
       return
     }
@@ -228,10 +232,11 @@ export default function JunniHero({ onInZoneChange }: JunniHeroProps) {
     <section
       ref={stageRef}
       className="junni-hero-stage"
+      data-menu-bg="light"
       style={{ "--junni-stage-vh": JUNNI_STAGE_VH } as CSSProperties}
       aria-label="JUNNI Hero"
     >
-      <div ref={sceneRef} className="junni-hero-scene">
+      <div ref={sceneRef} className="junni-hero-scene" data-menu-bg="dark">
         <div ref={matrixRef} className="junni-grid-perspective">
           <div ref={gridRef} className="junni-grid">
             {cells.map((cell, i) => (

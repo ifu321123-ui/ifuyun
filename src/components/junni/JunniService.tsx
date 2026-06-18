@@ -47,7 +47,7 @@ export default function JunniService() {
   )
 
   return (
-    <section ref={sectionRef} className="junni-service" aria-label="SERVICE PERFORMANCE">
+    <section ref={sectionRef} className="junni-service" data-menu-bg="light" aria-label="SERVICE PERFORMANCE">
       {/* gooey 滤镜：模糊 + 提升 alpha 对比，让相邻黄绿圆球黏连成液体（只作用于液体层） */}
       <svg className="junni-service__goo-defs" width="0" height="0" aria-hidden="true" focusable="false">
         <defs>

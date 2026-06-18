@@ -21,22 +21,72 @@ function isMenuSp() {
 }
 
 interface JunniMenuProps {
-  /** 首页 Junni 黑底区：触发器用白色样式 */
+  /** @deprecated 首页菜单对比度改由滚动采样背景亮度决定 */
   inJunniZone?: boolean
 }
 
-function getMenuType(page: PageId | "work", inJunniZone: boolean): "white" | "black" {
-  if (page === "portfolio") return "white"
-  if (page === "home" && inJunniZone) return "white"
-  return "black"
+function parseOpaqueRgb(color: string): [number, number, number] | null {
+  const match = color.match(
+    /rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)/,
+  )
+  if (!match) return null
+  const alpha = match[4] !== undefined ? Number(match[4]) : 1
+  if (alpha <= 0.08) return null
+  return [Number(match[1]), Number(match[2]), Number(match[3])]
 }
 
-export default function JunniMenu({ inJunniZone = false }: JunniMenuProps) {
+function relativeLuminance(rgb: [number, number, number]): number {
+  const linear = rgb.map((v) => {
+    const s = v / 255
+    return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4
+  })
+  return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2]
+}
+
+function isMenuOverLightBackground(): boolean {
+  if (typeof window === "undefined") return false
+  const menu = document.querySelector<HTMLElement>(".junni-menu")
+  if (!menu) return false
+
+  const sp = isMenuSp()
+  const x = Math.min(window.innerWidth - 12, window.innerWidth - (sp ? 34 : 68))
+  const y = sp ? 30 : 54
+  const prevPointerEvents = menu.style.pointerEvents
+  menu.style.pointerEvents = "none"
+
+  let onLight = false
+  let el = document.elementFromPoint(x, y)
+  for (let depth = 0; depth < 16 && el; depth++) {
+    const marked = el.getAttribute("data-menu-bg")
+    if (marked === "light" || marked === "dark") {
+      onLight = marked === "light"
+      break
+    }
+    const rgb = parseOpaqueRgb(getComputedStyle(el).backgroundColor)
+    if (rgb) {
+      onLight = relativeLuminance(rgb) > 0.42
+      break
+    }
+    el = el.parentElement
+  }
+
+  menu.style.pointerEvents = prevPointerEvents
+  return onLight
+}
+
+function getMenuType(page: PageId | "work", onLightBg: boolean): "white" | "black" {
+  if (page === "work") return "black"
+  if (page === "home" || page === "experience") return onLightBg ? "black" : "white"
+  return "white"
+}
+
+export default function JunniMenu(_props: JunniMenuProps = {}) {
   const route = useRoute()
   const page = route.page
   const lenis = useLenis()
   const [open, setOpen] = useState(false)
   const [menuActive, setMenuActive] = useState(false)
+  const [onLightBg, setOnLightBg] = useState(false)
   const panelRef = useRef<HTMLDivElement>(null)
   const navItemRefs = useRef<(HTMLLIElement | null)[]>([])
   const actionsRef = useRef<HTMLDivElement>(null)
@@ -46,7 +96,46 @@ export default function JunniMenu({ inJunniZone = false }: JunniMenuProps) {
     window.matchMedia("(prefers-reduced-motion: reduce)").matches
 
   const namespace = routeToMenuNamespace(route)
-  const menuType = getMenuType(page, inJunniZone)
+  const menuType = getMenuType(page, onLightBg)
+
+  useEffect(() => {
+    const needsBgSampling = page === "home" || page === "experience"
+    if (!needsBgSampling) {
+      setOnLightBg(false)
+      return
+    }
+
+    let frame = 0
+    let current = false
+
+    const sample = () => {
+      const next = isMenuOverLightBackground()
+      if (next !== current) {
+        current = next
+        setOnLightBg(next)
+      }
+    }
+
+    const tick = () => {
+      sample()
+      frame = requestAnimationFrame(tick)
+    }
+
+    sample()
+    frame = requestAnimationFrame(tick)
+
+    const onResize = () => sample()
+    window.addEventListener("resize", onResize)
+    window.addEventListener("junni-menu-bg", sample)
+    lenis?.on("scroll", sample)
+
+    return () => {
+      cancelAnimationFrame(frame)
+      window.removeEventListener("resize", onResize)
+      window.removeEventListener("junni-menu-bg", sample)
+      lenis?.off("scroll", sample)
+    }
+  }, [page, lenis])
 
   const closeMenu = useCallback(() => {
     const panel = panelRef.current

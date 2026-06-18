@@ -319,6 +319,7 @@ export default function JunniWorks() {
     <section
       ref={sectionRef}
       className="junni-works"
+      data-menu-bg="dark"
       data-gooey-color="yellow"
       aria-label="WORKS"
       style={stageVars}

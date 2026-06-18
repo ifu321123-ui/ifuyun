@@ -64,7 +64,7 @@ export default function JunniAbout() {
   }
 
   return (
-    <section ref={sectionRef} className="junni-about" aria-label="ABOUT JUNNI">
+    <section ref={sectionRef} className="junni-about" data-menu-bg="light" aria-label="ABOUT JUNNI">
       <div className="junni-about__inner">
         <div className="junni-about__copy" aria-label={[...junniHero.manifesto, ...junniHero.manifestoExtended].join("")}>
           {junniHero.aboutParagraphs.map((paragraph, paragraphIndex) => (
