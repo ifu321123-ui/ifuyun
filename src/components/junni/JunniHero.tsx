@@ -3,7 +3,6 @@ import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { useLenis } from "lenis/react"
 import { bindScrollTriggerUpdate } from "@/lib/scrollSync"
-import { isTouchLikeDevice } from "@/lib/scrollEnv"
 import {
   JUNNI_GRID_COLS,
   JUNNI_GRID_ROWS,
@@ -205,14 +204,9 @@ export default function JunniHero({ onInZoneChange }: JunniHeroProps) {
 
     apply(0)
     updateNavZone()
-
-    const refreshTimer = window.setTimeout(
-      () => ScrollTrigger.refresh(),
-      isTouchLikeDevice() ? 350 : 0,
-    )
+    ScrollTrigger.refresh()
 
     return () => {
-      window.clearTimeout(refreshTimer)
       hoverCleanups.forEach((fn) => fn())
       unbindScroll()
       tween.scrollTrigger?.kill()

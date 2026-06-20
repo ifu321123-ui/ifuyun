@@ -11,10 +11,6 @@ gsap.registerPlugin(ScrollTrigger)
 
 markTouchStaticDocument()
 
-if (isTouchLikeDevice()) {
-  ScrollTrigger.normalizeScroll(true)
-}
-
 if ("scrollRestoration" in history) {
   history.scrollRestoration = "manual"
 }

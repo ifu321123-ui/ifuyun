@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, type PropsWithChildren } from "react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { ReactLenis, useLenis } from "lenis/react"
+import { ReactLenis, useLenis, type Lenis } from "lenis/react"
 import {
   APP_SCROLL_RESET,
   clearHomeWorksReturn,
@@ -22,13 +22,13 @@ const lenisOptions = {
   easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
 }
 
-function scrollToTop(lenis?: ReturnType<typeof useLenis>) {
+function scrollToTop(lenis?: Lenis | null) {
   lenis?.scrollTo(0, { immediate: true })
   lenis?.resize()
   window.scrollTo(0, 0)
 }
 
-function restoreHomeWorksScroll(lenis?: ReturnType<typeof useLenis>) {
+function restoreHomeWorksScroll(lenis?: Lenis | null) {
   const y = peekHomeWorksReturnScroll()
   if (y == null) return () => {}
 
@@ -56,7 +56,7 @@ function restoreHomeWorksScroll(lenis?: ReturnType<typeof useLenis>) {
   }
 }
 
-function useScrollToTopOnRoute(lenis?: ReturnType<typeof useLenis>) {
+function useScrollToTopOnRoute(lenis?: Lenis | null) {
   const route = useRoute()
   const routeKey = route.page
   const prevRouteRef = useRef(routeKey)
@@ -69,12 +69,11 @@ function useScrollToTopOnRoute(lenis?: ReturnType<typeof useLenis>) {
   }, [])
 
   useEffect(() => {
-    const delay = isTouchLikeDevice() ? 350 : 0
-    const id = window.setTimeout(() => {
+    const id = requestAnimationFrame(() => {
       scrollToTop(lenisRef.current)
       ScrollTrigger.refresh()
-    }, delay)
-    return () => window.clearTimeout(id)
+    })
+    return () => cancelAnimationFrame(id)
   }, [])
 
   useEffect(() => {

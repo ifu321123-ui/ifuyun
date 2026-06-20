@@ -241,7 +241,7 @@ export default function JunniWorks() {
         tex.anisotropy = 8
         tex.center.set(0.5, 0.5)
         tex.rotation = TEX_ROTATION
-        fitTextureCover(tex, aspect, PANEL_ASPECT, "center")
+        fitTextureCover(tex, aspect, PANEL_ASPECT, work?.drumrollFocal ?? "center")
         const axial = PANEL_ASPECT * PANEL_RAD
         const geo = new THREE.CylinderGeometry(1, 1, axial, 64, 1, true, -PANEL_RAD / 2, PANEL_RAD)
         const mat = new THREE.MeshBasicMaterial({
@@ -258,7 +258,7 @@ export default function JunniWorks() {
         refs!.panels.push({ mesh, mat, index })
       })
       resize()
-      renderer.render(refs.scene, refs.camera)
+      renderer!.render(refs!.scene, refs!.camera)
     })
 
     resize()
@@ -305,10 +305,9 @@ export default function JunniWorks() {
     updateDomItems(trigger.progress * (N - 1))
 
     const unbindScroll = bindScrollTriggerUpdate(lenis)
-    const refreshId = requestAnimationFrame(() => ScrollTrigger.refresh())
+    ScrollTrigger.refresh()
 
     return () => {
-      cancelAnimationFrame(refreshId)
       unbindScroll()
       trigger.kill()
     }
