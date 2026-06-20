@@ -10,8 +10,8 @@ export const RECRUIT_MESSAGE_CHARS =
 
 export const RECRUIT_SPECIAL = {
   title: "成都四方伟业软件股份有限公司\n领先的大数据、人工智能产品及服务提供商",
-  image: "/works/shiyuan/01.png",
-  imageAlt: "四方伟业 · 数字孪生智能平台",
+  image: "/works/sefonsoft/company.png",
+  imageAlt: "四方伟业 · 团队协作",
   text: "四方伟业（SEFONSOFT）总部位于成都，是一家专注大数据与人工智能领域的软件产品及服务提供商。公司以自主研发的数字孪生智能平台、可视化分析决策平台等核心产品，为超过1500家政府机构及企事业单位提供数据智能解决方案，业务覆盖智慧城市、交通、能源等多个行业，服务延伸至全球数十个国家和地区。",
   link: "https://www.sefonsoft.com/",
 } as const
