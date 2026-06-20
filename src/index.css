@@ -2514,6 +2514,14 @@
     object-fit: cover;
   }
 
+  .gunze-ceo__photo-main > .is-default {
+    object-fit: contain;
+    padding: clamp(1rem, 4vw, 2rem);
+    box-sizing: border-box;
+    background: #fff;
+    transition: opacity 0.25s ease-out;
+  }
+
   .gunze-ceo__photo-main .is-hover {
     position: absolute;
     inset: 0;
@@ -2521,9 +2529,12 @@
     transition: opacity 0.25s ease-out;
   }
 
-  .gunze-ceo__photo-main:hover .is-hover,
-  .gunze-ceo:hover .gunze-ceo__photo-main .is-hover {
+  .gunze-ceo__photo-main:hover .is-hover {
     opacity: 1;
+  }
+
+  .gunze-ceo__photo-main:hover > .is-default {
+    opacity: 0;
   }
 
   .gunze-ceo figcaption {

@@ -76,21 +76,8 @@ function SvgSprite() {
 }
 
 function CeoSection() {
-  const onMove = (event: React.MouseEvent<HTMLElement>) => {
-    const rect = event.currentTarget.getBoundingClientRect()
-    const x = clamp((event.clientX - rect.left) / rect.width - 0.5, -0.5, 0.5)
-    const y = clamp((event.clientY - rect.top) / rect.height - 0.5, -0.5, 0.5)
-    event.currentTarget.style.setProperty("--eye-x", `${x * 28}px`)
-    event.currentTarget.style.setProperty("--eye-y", `${y * 16}px`)
-  }
-
-  const onLeave = (event: React.MouseEvent<HTMLElement>) => {
-    event.currentTarget.style.setProperty("--eye-x", "0px")
-    event.currentTarget.style.setProperty("--eye-y", "0px")
-  }
-
   return (
-    <section className="gunze-ceo" id="ceo" onMouseMove={onMove} onMouseLeave={onLeave}>
+    <section className="gunze-ceo" id="ceo">
       <div className="gunze-ceo__inner">
         <hgroup className="gunze-title-group gunze-title-group--ceo">
           <h2 className="gunze-section-title">From Me</h2>
@@ -100,10 +87,9 @@ function CeoSection() {
         <div className="gunze-ceo__main">
           <figure className="gunze-ceo__photo">
             <div className="gunze-ceo__photo-main">
-              <img className="is-default" src={`${ASSET}ceo-img-2.png`} alt="" />
+              <img className="is-default" src={`${ASSET}ceo-img-hover-2.png`} alt="" />
               <div className="is-hover">
-                <img src={`${ASSET}ceo-img-hover-2.png`} alt="" />
-                <Eyes className="gunze-eyes--ceo" />
+                <img src={`${ASSET}ceo-img-2.png`} alt="付云椒" />
               </div>
             </div>
             <figcaption>
@@ -322,32 +308,35 @@ export default function GunzeTransition() {
                 <p className="gunze-msg-p">
                   我的故事始于设计。
                   <br />
-                  最开始，
+                  那时满脑子都是被色值和构图塞满的粗糙念头，
                   <br />
-                  我只是喜欢好看的界面。
+                  100% 是视觉冲动——
+                  <br />
+                  我只想把东西做得足够好看。
                 </p>
                 <p className="gunze-msg-p">
-                  后来，
+                  后来我才明白，
                   <br />
-                  我开始关注用户为什么点击，
+                  界面不只是好看的表皮——
+                  <br />
+                  它是与用户之间一场无声的共情对话。
+                  <br />
+                  我开始追问：他们为什么点击，
                   <br />
                   为什么停留，
                   <br />
-                  为什么离开。
+                  又为什么悄然离开。
                 </p>
                 <p className="gunze-msg-p">
                   于是我走向产品。
                   <br />
-                  从关注像素，
+                  我迫使自己摘下「只看界面」的滤镜，
                   <br />
-                  到关注问题本身。
-                </p>
-                <p className="gunze-msg-p">
-                  而现在，
+                  用研究去定义真正的问题——
                   <br />
-                  我正在学习如何用AI，
+                  从雕琢每一个像素，
                   <br />
-                  创造真正有价值的产品。
+                  到驯服那些抽象却真实的痛点。
                 </p>
               </div>
             </div>

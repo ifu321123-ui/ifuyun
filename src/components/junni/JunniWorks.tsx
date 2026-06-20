@@ -23,6 +23,7 @@ import {
   splitDrumrollText,
   workDrumrollSrc,
 } from "./drumrollGeometry"
+import { markHomeWorksReturn } from "@/hooks/useRoute"
 import { junniWorks } from "./junniData"
 import "./JunniWorks.css"
 
@@ -375,6 +376,9 @@ export default function JunniWorks() {
                       data-circle-cursor="more_detail"
                       data-slug={work.slug}
                       tabIndex={isActive ? 0 : -1}
+                      onClick={() => {
+                        markHomeWorksReturn(window.scrollY)
+                      }}
                     >
                       <span className="junni-works__item-title" data-size={work.titleSize ?? "normal"}>
                         {work.title}

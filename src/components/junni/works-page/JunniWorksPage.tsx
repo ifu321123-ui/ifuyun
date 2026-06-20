@@ -469,7 +469,7 @@ export default function JunniWorksPage({ footerRef, onReadyChange }: JunniWorksP
 
               <article key={work.slug} className="jwp__list-item-wrap">
 
-                <div className="jwp__list-item">
+                <a href={`#/work/${work.slug}`} className="jwp__list-item">
 
                   <div className="jwp__list-item-main">
 
@@ -495,7 +495,7 @@ export default function JunniWorksPage({ footerRef, onReadyChange }: JunniWorksP
 
                   </div>
 
-                </div>
+                </a>
 
               </article>
 

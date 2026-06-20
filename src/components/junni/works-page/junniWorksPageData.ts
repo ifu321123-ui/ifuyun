@@ -26,35 +26,17 @@ export type WorksPageItem = {
 
 export const WORKS_PAGE_ABOUT_TEXT = [
 
-  "我是付云椒，",
+  "做作品时，",
 
-  "成都锦城学院数字媒体技术专业在读，",
+  "我习惯从问题出发，",
 
-  "一位兼具产品设计、",
+  "而不是从界面出发。",
 
-  "UI/UX 设计与 AI 工作流",
+  "先理解场景与用户，",
 
-  "能力的复合型创作者。",
+  "再让设计把想法落地。",
 
-  "个人定位——",
-
-  "懂产品的设计师，懂 AI 的产品人。",
-
-  "在校期间担任码绘技术工作室 UI 组负责人，",
-
-  "主导团队知识库建设与竞赛项目设计；",
-
-  "同时参与四川银行问卷后台管理系统",
-
-  "等商业项目的原型与界面设计。",
-
-  "在移动端体验、文化叙事、",
-
-  "B 端系统与 AIGC 创作中持续探索。",
-
-  "以下为精选的部分项目与作品，",
-
-  "欢迎浏览。",
+  "以下是几段这样的尝试。",
 
 ] as const
 
@@ -180,7 +162,7 @@ export const WORKS_PAGE_ITEMS: WorksPageItem[] = [
 
     slug: "scbank-survey",
 
-    title: "SCBANK SURVEY",
+    title: "四川银行问卷后台管理系统",
 
     description:
       "服务于银行内部人员；为市场调研岗设计客户偏好、产品反馈等问卷；为管理层快速获取战略决策所需调研数据，助力精准决策与业务优化。",
@@ -191,7 +173,7 @@ export const WORKS_PAGE_ITEMS: WorksPageItem[] = [
 
     drumrollFocal: "top",
 
-    titleSize: "middle",
+    titleSize: "small",
 
   },
 
@@ -204,9 +186,9 @@ export const WORKS_PAGE_ITEMS: WorksPageItem[] = [
     description:
       "本作品将「镜头」聚焦四川大凉山悬崖村，一座位于悬崖之上的村庄。在国家的大力脱贫攻坚和精准扶贫政策下，我们一起见证悬崖村「藤梯变钢梯」、从贫瘠茅草屋到小康楼房、从没有经济支撑到发展特色农业旅游的「云端巨变」！",
 
-    image: "/works/yunyacun/drumroll.png",
+    image: "/works/yunyacun/01.png",
 
-    drumrollImage: "/works/yunyacun/drumroll.png",
+    drumrollImage: "/works/yunyacun/01.png",
 
     drumrollFocal: "center",
 

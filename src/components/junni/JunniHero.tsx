@@ -243,6 +243,8 @@ export default function JunniHero({ onInZoneChange }: JunniHeroProps) {
               <div
                 key={i}
                 className="junni-cell"
+                data-col={cell.col}
+                data-row={cell.row}
                 ref={(el) => {
                   cellRefs.current[i] = el
                 }}

@@ -139,7 +139,7 @@ function MediaBlock({ media }: { media: WorkMedia }) {
   }
 
   return (
-    <figure className="jwd__figure">
+    <figure className={`jwd__figure${media.fit === "full" ? " jwd__figure--full" : ""}`}>
       <img src={media.src} alt={media.alt ?? ""} loading="lazy" decoding="async" />
     </figure>
   )
@@ -164,7 +164,11 @@ function WorkSectionBlock({ section, index }: { section: WorkSection; index: num
 
       {section.media ? (
         <Reveal
-          className={`jwd__section-media${index === 0 ? " jwd__section-media--wide" : ""}`}
+          className={`jwd__section-media${index === 0 ? " jwd__section-media--wide" : ""}${
+            section.media.type === "image" && section.media.fit === "full"
+              ? " jwd__section-media--full"
+              : ""
+          }`}
           delay={2}
         >
           <MediaBlock media={section.media} />

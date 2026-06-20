@@ -3,7 +3,7 @@ import { WORKS_PAGE_DATA, type WorksPageItem } from "../works-page/junniWorksPag
 export type WorkCredit = { role: string; name: string }
 
 export type WorkMedia =
-  | { type: "image"; src: string; alt?: string }
+  | { type: "image"; src: string; alt?: string; fit?: "full" }
   | { type: "video"; src: string; alt?: string; poster?: string }
   | { type: "youtube"; src: string; alt?: string }
 
@@ -50,26 +50,26 @@ export const WORK_DETAIL_BY_SLUG: Record<string, WorkDetail> = {
       "《食援》是一款以「药食同源」「乡村振兴」「以食为援」为核心理念的 App。旨在让用户深入了解中医药膳文化，将药膳食材知识普及与乡村振兴助农融于一体的综合型平台，让用户「懂药膳、选好材」，同时助力农户增收。",
     sections: [
       {
-        heading: "圈子、帮扶与其他界面",
-        body: [
-          "圈子模块以「共论药膳、共助乡村」为核心，打造知识分享与助农成果可见的社区闭环；帮扶模块从消费助农延伸至情感联结，涵盖定点帮扶、滞销急救与助农商城；其余界面覆盖个人中心、登录、搜索与识材等常用场景。",
-        ],
-        media: { type: "image", src: "/works/shiyuan/02.png", alt: "食援 圈子 · 帮扶 · 其他界面" },
-      },
-      {
         heading: "设计规范、Logo 与 IP，建立食援的视觉识别体系",
         body: [
-          "从图标、配色到字体，构建统一的绿色健康调性；Logo 以「食」字与稻穗结合，传递健康与丰收；IP「膳小羊」以圆润造型贯穿各模块，增强品牌亲和力。",
-          "下方原型图完整呈现首页、百科、圈子、帮扶与个人中心等核心界面框架。",
+          "从 Tab 栏、功能区图标到配色与字体，构建统一的绿色健康调性；Logo 以「食」字与稻穗结合，传递健康与丰收；IP「膳小羊」以圆润造型贯穿各模块，增强品牌亲和力。",
+          "原型图完整呈现首页、百科、圈子、帮扶与个人中心等核心界面框架。",
         ],
-        media: { type: "image", src: "/works/shiyuan/03.png", alt: "食援 设计规范 · Logo · IP · 原型图" },
+        media: { type: "image", src: "/works/shiyuan/02.png", alt: "食援 设计规范 · Logo · IP · 原型图" },
       },
       {
         heading: "特色功能：从计划定制到互动体验",
         body: [
-          "「制定计划」根据用户体质与节气智能推荐七日养生方案；「养生五色」以五脏对应五色食材，点击即可查看功效；「小厨房」可视化演示药食相冲风险；「锦囊妙书」以可听可读的三维空间呈现中医典故。",
+          "「制定计划」根据用户体质与节气智能推荐七日养生方案；「养生五色」以五脏对应五色食材，点击即可查看功效；「小厨房」可视化演示药食相冲风险；「锦囊妙书」以可听可读的三维空间呈现中医典故；「百科」以二十四节气串联当季药膳推荐。",
         ],
-        media: { type: "image", src: "/works/shiyuan/04.png", alt: "食援 特色功能" },
+        media: { type: "image", src: "/works/shiyuan/03.png", alt: "食援 特色功能 · 金刚区 · 百科" },
+      },
+      {
+        heading: "圈子、帮扶与其他界面",
+        body: [
+          "圈子模块以「共论药膳、共助乡村」为核心，打造知识分享与助农成果可见的社区闭环；帮扶模块从消费助农延伸至情感联结，涵盖定点帮扶、滞销急救与助农商城；其余界面覆盖个人中心、登录、搜索与识材等常用场景。",
+        ],
+        media: { type: "image", src: "/works/shiyuan/04.png", alt: "食援 圈子 · 帮扶 · 其他界面" },
       },
       {
         heading: "引导页与界面总览",
@@ -176,6 +176,14 @@ export const WORK_DETAIL_BY_SLUG: Record<string, WorkDetail> = {
         ],
         media: { type: "image", src: "/works/yidirenjian/04.png", alt: "一地人间 特色界面 · 农业变迁" },
       },
+      {
+        heading: "界面总览 · 相信土地的力量",
+        body: [
+          "以「见天地之广阔，解民生之多艰」为叙事主线，将春耕、耕令有节、藏粮于地、新农人等核心界面汇于一处，呈现从灾年纪忆到智慧农业的完整视觉叙事。",
+          "「朝阳产业」篇章以麦穗与土地意象收尾，传递对农业未来的信念——相信土地的力量。",
+        ],
+        media: { type: "image", src: "/works/yidirenjian/05.png", alt: "一地人间 界面总览 · 朝阳产业" },
+      },
     ],
   },
   "mahui-studio": {
@@ -197,20 +205,20 @@ export const WORK_DETAIL_BY_SLUG: Record<string, WorkDetail> = {
       "码绘技术工作室官网是集工作室展示、技术培养、竞赛活动、产品发布与简历投递于一体的 Web 平台。以深蓝与黑白为主调，传递专业、创新、年轻的品牌气质，并同步完成移动端适配。",
     sections: [
       {
-        heading: "从引导登录到全站模块，构建完整品牌门户",
-        body: [
-          "引导与登录页以指纹动效与几何图形建立科技感知；技术培养、竞赛与项目开发模块以 3D 球体与编号列表呈现工作室核心能力。",
-          "活动页展示线下课堂与新闻动态；Framework 与 Score 以行星轨迹与雷达图可视化组织架构与技能维度；产品页、移动端视图与简历投递页覆盖访客了解、成果展示与人才招募的完整路径。",
-        ],
-        media: { type: "image", src: "/works/mahui/01.png", alt: "码绘工作室官网设计展示" },
+        media: {
+          type: "image",
+          src: "/works/mahui/detail.png",
+          alt: "码绘工作室官网设计展示",
+          fit: "full",
+        },
       },
     ],
   },
   "scbank-survey": {
     slug: "scbank-survey",
-    title: "SCBANK SURVEY",
+    title: "四川银行问卷后台管理系统",
     subtitle: "四川银行后台管理系统",
-    heroImage: "/works/scbank/01.png",
+    heroImage: "/works/scbank/drumroll.png",
     client: "四川银行（课程 / 竞赛项目）",
     scope: "B 端后台 / 原型设计 / 交互设计",
     release: "2024 — 2025",
@@ -223,20 +231,28 @@ export const WORK_DETAIL_BY_SLUG: Record<string, WorkDetail> = {
       "面向银行内部运营场景的后台管理系统，整合客户意见收集、问卷调研、留言自动分发与处理进度追踪等能力。以舒适、高效、简约为情绪版设计导向，帮助提升服务效率与客户体验。",
     sections: [
       {
-        heading: "布局、配色与组件，建立统一的 B 端设计体系",
-        body: [
-          "以 1440px 画布、200px 侧栏与 24 栏栅格构建清晰的信息架构；主题色蓝 #4D6DFF 与辅助色 #FFB85C 搭配成功、信息、警示等功能色。",
-          "图标提供线性、面性与双色三种样式；按钮、分页、输入框、日期选择、开关与下拉等基础组件规范完整，保障多模块界面的一致性。",
-        ],
-        media: { type: "image", src: "/works/scbank/02.png", alt: "四川银行后台 设计规范" },
+        media: {
+          type: "image",
+          src: "/works/scbank/detail-01.png",
+          alt: "四川银行后台 项目概述与情绪版",
+          fit: "full",
+        },
       },
       {
-        heading: "从精准原型到高保真界面",
-        body: [
-          "精准原型阶段严格把控组件布局与弹窗逻辑，以流程图串联问卷管理、统计分析、权限与账号等核心模块，满足 UX 规范并便于评审迭代。",
-          "高保真界面涵盖仪表盘数据可视化、列表筛选与分页、用户管理、表单弹窗等典型 B 端场景，在统一视觉语言下呈现完整产品体验。",
-        ],
-        media: { type: "image", src: "/works/scbank/03.png", alt: "四川银行后台 原型与高保真" },
+        media: {
+          type: "image",
+          src: "/works/scbank/detail-02.png",
+          alt: "四川银行后台 布局 · 配色 · 组件规范",
+          fit: "full",
+        },
+      },
+      {
+        media: {
+          type: "image",
+          src: "/works/scbank/detail-03.png",
+          alt: "四川银行后台 精准原型与高保真界面",
+          fit: "full",
+        },
       },
     ],
   },
@@ -244,7 +260,7 @@ export const WORK_DETAIL_BY_SLUG: Record<string, WorkDetail> = {
     slug: "yunyacun",
     title: "崖上的希望·云崖村扶贫纪实",
     subtitle: "悬崖村脱贫攻坚 · 数字叙事设计",
-    heroImage: "/works/shiyuan/04.png",
+    heroImage: "/works/yunyacun/01.png",
     client: "乡村振兴主题作品",
     scope: "视觉叙事 / 网页设计 / 信息设计",
     release: "2025",
@@ -253,17 +269,52 @@ export const WORK_DETAIL_BY_SLUG: Record<string, WorkDetail> = {
       "作品聚焦四川大凉山悬崖村，见证「藤梯变钢梯」、从茅草屋到小康楼房、从贫瘠到特色农业旅游的云端巨变，以数字叙事传递脱贫攻坚的时代记忆。",
     sections: [
       {
-        heading: "用视觉叙事记录悬崖村的时代变迁",
-        body: [
-          "以时间轴与对比影像为核心叙事结构，强化「_before / after_」的视觉冲击。大幅留白与庄重排版传递对土地与变革的尊重。",
-        ],
-        media: { type: "image", src: "/works/shiyuan/04.png", alt: "崖上的希望 主视觉" },
+        media: {
+          type: "image",
+          src: "/works/yunyacun/detail-01.png",
+          alt: "崖上的希望 全国乡村振兴",
+          fit: "full",
+        },
       },
       {
-        body: [
-          "数据可视化与人物故事穿插其中，避免单一煽情。整体色调从苍凉转向温暖，呼应「希望」主题。",
-        ],
-        media: { type: "image", src: "/works/shiyuan/05.png", alt: "崖上的希望 叙事页" },
+        media: {
+          type: "image",
+          src: "/works/yunyacun/detail-02.png",
+          alt: "崖上的希望 云端上的巨变",
+          fit: "full",
+        },
+      },
+      {
+        media: {
+          type: "image",
+          src: "/works/yunyacun/detail-03.png",
+          alt: "崖上的希望 扶贫人物风采",
+          fit: "full",
+        },
+      },
+      {
+        media: {
+          type: "image",
+          src: "/works/yunyacun/detail-04.png",
+          alt: "崖上的希望 扶贫成效",
+          fit: "full",
+        },
+      },
+      {
+        media: {
+          type: "image",
+          src: "/works/yunyacun/detail-05.png",
+          alt: "崖上的希望 云上特产",
+          fit: "full",
+        },
+      },
+      {
+        media: {
+          type: "image",
+          src: "/works/yunyacun/detail-06.png",
+          alt: "崖上的希望 走进悬崖村",
+          fit: "full",
+        },
       },
     ],
   },

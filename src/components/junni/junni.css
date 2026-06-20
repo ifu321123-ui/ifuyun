@@ -36,6 +36,22 @@
   isolation: isolate;
 }
 
+/* 翻至绿背时：网格容器与格缝同步染绿，避免 3D 透视在四角露出黑底 */
+.junni-hero-scene[data-menu-bg="light"] {
+  background: var(--junni-green);
+}
+
+.junni-hero-scene[data-menu-bg="light"] .junni-grid-perspective,
+.junni-hero-scene[data-menu-bg="light"] .junni-grid {
+  background: var(--junni-green);
+}
+
+/* 绿背阶段取消格内圆角裁切，避免四角露出底层黑缝 */
+.junni-hero-scene[data-menu-bg="light"] .junni-face {
+  clip-path: none;
+  border-radius: 0;
+}
+
 /* ===== 2. 矩阵透视 + 鼠标微随动父层 ===== */
 .junni-grid-perspective {
   position: absolute;
@@ -119,6 +135,47 @@
   -webkit-backface-visibility: hidden;
 }
 
+/* 贴视口外缘的格：向外那一侧取消圆角，避免底层黑色从角部/边部穿出 */
+.junni-cell[data-col="0"][data-row="0"] .junni-face {
+  clip-path: inset(0 round 0 0 var(--junni-radius) 0);
+  border-radius: 0 0 var(--junni-radius) 0;
+}
+
+.junni-cell[data-col="5"][data-row="0"] .junni-face {
+  clip-path: inset(0 round 0 0 0 var(--junni-radius));
+  border-radius: 0 0 0 var(--junni-radius);
+}
+
+.junni-cell[data-col="0"][data-row="5"] .junni-face {
+  clip-path: inset(0 round 0 var(--junni-radius) 0 0);
+  border-radius: 0 var(--junni-radius) 0 0;
+}
+
+.junni-cell[data-col="5"][data-row="5"] .junni-face {
+  clip-path: inset(0 round var(--junni-radius) 0 0 0);
+  border-radius: var(--junni-radius) 0 0 0;
+}
+
+.junni-cell[data-row="0"]:not([data-col="0"]):not([data-col="5"]) .junni-face {
+  clip-path: inset(0 round 0 0 var(--junni-radius) var(--junni-radius));
+  border-radius: 0 0 var(--junni-radius) var(--junni-radius);
+}
+
+.junni-cell[data-row="5"]:not([data-col="0"]):not([data-col="5"]) .junni-face {
+  clip-path: inset(0 round var(--junni-radius) var(--junni-radius) 0 0);
+  border-radius: var(--junni-radius) var(--junni-radius) 0 0;
+}
+
+.junni-cell[data-col="0"]:not([data-row="0"]):not([data-row="5"]) .junni-face {
+  clip-path: inset(0 round 0 var(--junni-radius) var(--junni-radius) 0);
+  border-radius: 0 var(--junni-radius) var(--junni-radius) 0;
+}
+
+.junni-cell[data-col="5"]:not([data-row="0"]):not([data-row="5"]) .junni-face {
+  clip-path: inset(0 round var(--junni-radius) 0 0 var(--junni-radius));
+  border-radius: var(--junni-radius) 0 0 var(--junni-radius);
+}
+
 .junni-face--back {
   transform: rotateX(180deg); /* 绕 X 轴预转，与 scroll/hover 的 rotateX 同轴贴合 3D 双面 */
 }
@@ -169,7 +226,8 @@
 .junni-kv-back-overlay {
   position: absolute;
   inset: 0;
-  z-index: 3;
+  z-index: 4;
+  transform: translateZ(24px);
   pointer-events: none;
   opacity: 0;
 }

@@ -166,7 +166,7 @@
   line-height: 2;
   letter-spacing: 0.05em;
   text-align: center;
-  color: var(--jrp-ink);
+  color: var(--jrp-white);
   opacity: 0;
   transition: opacity 1s 0.5s;
 }

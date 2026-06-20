@@ -389,11 +389,21 @@
   max-width: 72rem;
 }
 
+.jwd__section-media--full {
+  max-width: min(96vw, 88rem);
+}
+
 .jwd__figure {
   margin: 0;
   overflow: hidden;
   border-radius: 0.35rem;
   box-shadow: 0 1.25rem 3rem rgb(0 0 0 / 8%);
+}
+
+.jwd__figure--full {
+  overflow: visible;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .jwd__figure img {
@@ -402,6 +412,12 @@
   max-width: 100%;
   height: auto;
   margin: 0 auto;
+}
+
+.jwd__figure--full img {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
 }
 
 .jwd__video-wrap {

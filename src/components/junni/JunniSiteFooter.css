@@ -10,7 +10,7 @@
   z-index: 1;
   width: 100%;
   margin-top: 0;
-  border-radius: 100px 0 0;
+  border-radius: 0;
   background: var(--jsf-green);
   opacity: 0;
   transition: opacity 0.6s;
@@ -114,10 +114,6 @@
 }
 
 @media (max-width: 768px) {
-  .jsf__footer {
-    border-radius: clamp(25px, 6.54vw, 50px) 0 0 0;
-  }
-
   .jsf__footer-inner {
     padding: min(90px, 10.5882352941%) 0 min(50px, 5.8823529412%);
   }

@@ -1,6 +1,16 @@
-import { useCallback, useEffect, type PropsWithChildren } from "react"
+import { useCallback, useEffect, useRef, type PropsWithChildren } from "react"
+import gsap from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { ReactLenis, useLenis, type Lenis } from "lenis/react"
-import { APP_SCROLL_RESET, useRoute } from "@/hooks/useRoute"
+import {
+  APP_SCROLL_RESET,
+  clearHomeWorksReturn,
+  finishHomeWorksReturn,
+  peekHomeWorksReturnScroll,
+  useRoute,
+} from "@/hooks/useRoute"
+
+gsap.registerPlugin(ScrollTrigger)
 
 /**
  * 是否开启平滑滚动。遵循系统无障碍偏好：
@@ -32,19 +42,60 @@ function scrollToTop(lenis?: Lenis | null) {
   window.scrollTo(0, 0)
 }
 
+/** 从作品集返回首页 WORKS：先 resize 更新 limit，再恢复 Lenis 滚动，避免与原生 scroll 脱节。 */
+function restoreHomeWorksScroll(lenis?: Lenis | null) {
+  const y = peekHomeWorksReturnScroll()
+  if (y == null) return () => {}
+
+  const apply = () => {
+    if (lenis) {
+      lenis.resize()
+      lenis.scrollTo(y, { immediate: true, force: true })
+    } else {
+      window.scrollTo(0, y)
+    }
+    ScrollTrigger.update()
+  }
+
+  apply()
+  const raf = requestAnimationFrame(apply)
+  const timer = window.setTimeout(() => {
+    apply()
+    ScrollTrigger.refresh()
+    finishHomeWorksReturn()
+  }, 150)
+
+  return () => {
+    cancelAnimationFrame(raf)
+    clearTimeout(timer)
+  }
+}
+
 function useScrollToTopOnRoute(lenis?: Lenis | null) {
   const route = useRoute()
   const routeKey = route.page
+  const prevRouteRef = useRef(routeKey)
 
   const reset = useCallback(() => {
     scrollToTop(lenis)
   }, [lenis])
 
   useEffect(() => {
+    const prev = prevRouteRef.current
+    prevRouteRef.current = routeKey
+
+    if (prev === "portfolio" && routeKey !== "home") {
+      clearHomeWorksReturn()
+    }
+
+    if (routeKey === "home" && prev === "portfolio" && peekHomeWorksReturnScroll() != null) {
+      return restoreHomeWorksScroll(lenis)
+    }
+
     reset()
     const id = requestAnimationFrame(reset)
     return () => cancelAnimationFrame(id)
-  }, [routeKey, reset])
+  }, [routeKey, reset, lenis])
 
   useEffect(() => {
     const onReset = () => {

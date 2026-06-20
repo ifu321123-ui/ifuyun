@@ -14,7 +14,7 @@ export const profile = {
   github: "https://github.com/ifu321123-ui",
   resumeUrl: "/resume.pdf",
   portfolioUrl: "/portfolio.pdf",
-  currentStatus: "成都锦城学院 · 数字媒体技术（产品设计 / UI 方向）",
+  currentStatus: "成都锦城学院 · 数字媒体技术",
   previous: ["成都四方伟业（UI 实习生）", "码绘技术工作室 UI 组负责人"],
   brandClosing:
     "Let’s Build Something Together. 我相信 AI 正在改变产品创造方式，如果你也对产品、设计与 AI 充满兴趣，欢迎与我交流。",
@@ -75,6 +75,8 @@ export const about = {
     { name: "“互联网+”大学生创新创业大赛 四川赛区三等奖", level: "省级", year: "2025" },
     { name: "第十九届大学生创新创业大赛 金奖", level: "省级", year: "2025" },
     { name: "ican 大学生创新创业大赛 四川赛区三等奖", level: "省级", year: "2025" },
+    { name: "国家励志奖学金", level: "国家级", year: "2025" },
+    { name: "校级一等奖学金", level: "校级", year: "2025" },
   ],
 }
 
@@ -120,7 +122,7 @@ export const notebook = {
       className: "notebook-note--lined",
     },
     {
-      text: "软件应当赋能于人",
+      text: "产品应当赋能于人",
       paper: "/notebook/note-grid.png",
       font: "sans" as const,
       className: "notebook-note--grid",
