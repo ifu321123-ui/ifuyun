@@ -1,9 +1,13 @@
 import { ScrollTrigger } from "gsap/ScrollTrigger"
-import type { Lenis } from "lenis"
+
+type LenisLike = {
+  on: (event: "scroll", handler: () => void) => void
+  off: (event: "scroll", handler: () => void) => void
+}
 
 /** Lenis 平滑滚动或原生 scroll 时，同步 ScrollTrigger（及可选回调）。 */
 export function bindScrollTriggerUpdate(
-  lenis: Lenis | null | undefined,
+  lenis: LenisLike | null | undefined,
   onScroll?: () => void,
 ) {
   const handler = () => {

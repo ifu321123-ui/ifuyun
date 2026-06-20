@@ -5,9 +5,15 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 import App from "./App"
 import "./index.css"
 
-import { isTouchLikeDevice } from "@/lib/scrollEnv"
+import { isTouchLikeDevice, markTouchStaticDocument } from "@/lib/scrollEnv"
 
 gsap.registerPlugin(ScrollTrigger)
+
+markTouchStaticDocument()
+
+if (isTouchLikeDevice()) {
+  ScrollTrigger.normalizeScroll(true)
+}
 
 if ("scrollRestoration" in history) {
   history.scrollRestoration = "manual"
@@ -24,7 +30,6 @@ if (typeof window !== "undefined" && !isTouchLikeDevice()) {
     { passive: true },
   )
 } else if (typeof window !== "undefined") {
-  // iOS 地址栏伸缩会频繁触发 resize；防抖避免 ScrollTrigger 反复 refresh 导致回顶。
   let resizeTimer = 0
   window.addEventListener(
     "resize",

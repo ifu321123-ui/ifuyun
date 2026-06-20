@@ -27,3 +27,17 @@ export function shouldSkipDecorativeMotion() {
   if (isTouchLikeDevice()) return true
   return prefersReducedMotion()
 }
+
+/** iOS 上 WebGL 易 OOM 崩溃导致整页白屏；触屏设备优先 DOM 圆筒，桌面保留 WebGL。 */
+export function shouldUseWebGL() {
+  if (typeof window === "undefined") return false
+  if (isTouchLikeDevice()) return false
+  return true
+}
+
+export function markTouchStaticDocument() {
+  if (typeof document === "undefined") return
+  if (isTouchLikeDevice()) {
+    document.documentElement.classList.add("touch-static")
+  }
+}

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, type PropsWithChildren } from "react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { ReactLenis, useLenis, type Lenis } from "lenis/react"
+import { ReactLenis, useLenis } from "lenis/react"
 import {
   APP_SCROLL_RESET,
   clearHomeWorksReturn,
@@ -13,8 +13,6 @@ import { shouldUseLenis } from "@/lib/scrollEnv"
 
 gsap.registerPlugin(ScrollTrigger)
 
-const useLenisScroll = shouldUseLenis()
-
 const lenisOptions = {
   lerp: 0.09,
   duration: 1.2,
@@ -24,13 +22,13 @@ const lenisOptions = {
   easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
 }
 
-function scrollToTop(lenis?: Lenis | null) {
+function scrollToTop(lenis?: ReturnType<typeof useLenis>) {
   lenis?.scrollTo(0, { immediate: true })
   lenis?.resize()
   window.scrollTo(0, 0)
 }
 
-function restoreHomeWorksScroll(lenis?: Lenis | null) {
+function restoreHomeWorksScroll(lenis?: ReturnType<typeof useLenis>) {
   const y = peekHomeWorksReturnScroll()
   if (y == null) return () => {}
 
@@ -58,7 +56,7 @@ function restoreHomeWorksScroll(lenis?: Lenis | null) {
   }
 }
 
-function useScrollToTopOnRoute(lenis?: Lenis | null) {
+function useScrollToTopOnRoute(lenis?: ReturnType<typeof useLenis>) {
   const route = useRoute()
   const routeKey = route.page
   const prevRouteRef = useRef(routeKey)
@@ -71,11 +69,12 @@ function useScrollToTopOnRoute(lenis?: Lenis | null) {
   }, [])
 
   useEffect(() => {
-    const id = requestAnimationFrame(() => {
+    const delay = isTouchLikeDevice() ? 350 : 0
+    const id = window.setTimeout(() => {
       scrollToTop(lenisRef.current)
       ScrollTrigger.refresh()
-    })
-    return () => cancelAnimationFrame(id)
+    }, delay)
+    return () => window.clearTimeout(id)
   }, [])
 
   useEffect(() => {
@@ -123,6 +122,8 @@ function NativeScrollReset() {
 }
 
 export default function SmoothScroll({ children }: PropsWithChildren) {
+  const useLenisScroll = shouldUseLenis()
+
   if (!useLenisScroll) {
     return (
       <>

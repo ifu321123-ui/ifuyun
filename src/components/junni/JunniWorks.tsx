@@ -24,6 +24,7 @@ import {
   workDrumrollSrc,
 } from "./drumrollGeometry"
 import { bindScrollTriggerUpdate } from "@/lib/scrollSync"
+import { isTouchLikeDevice, shouldUseWebGL } from "@/lib/scrollEnv"
 import { markHomeWorksReturn } from "@/hooks/useRoute"
 import { junniWorks } from "./junniData"
 import "./JunniWorks.css"
@@ -122,49 +123,68 @@ export default function JunniWorks() {
     const viewport = viewportRef.current
     if (!canvas || !section || !viewport) return
 
-    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true })
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-    renderer.outputColorSpace = THREE.SRGBColorSpace
+    updateDomItems(0)
 
-    const scene = new THREE.Scene()
-    const camera = new THREE.PerspectiveCamera(50, 1, 1, 8000)
-    camera.position.z = PERSPECTIVE
-
-    const drum = new THREE.Group()
-    drum.rotation.z = Math.PI / 2
-    const spinner = new THREE.Group()
-    drum.add(spinner)
-    scene.add(drum)
-
-    const refs: SceneRefs = {
-      renderer,
-      scene,
-      camera,
-      drum,
-      spinner,
-      panels: [],
-      raf: 0,
-      running: false,
+    if (!shouldUseWebGL()) {
+      section.dataset.webgl = "off"
+      return
     }
-    sceneRef.current = refs
+
+    let disposed = false
+    let renderer: THREE.WebGLRenderer | null = null
+    let refs: SceneRefs | null = null
+
+    try {
+      renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true })
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, isTouchLikeDevice() ? 1.25 : 2))
+      renderer.outputColorSpace = THREE.SRGBColorSpace
+
+      const scene = new THREE.Scene()
+      const camera = new THREE.PerspectiveCamera(50, 1, 1, 8000)
+      camera.position.z = PERSPECTIVE
+
+      const drum = new THREE.Group()
+      drum.rotation.z = Math.PI / 2
+      const spinner = new THREE.Group()
+      drum.add(spinner)
+      scene.add(drum)
+
+      refs = {
+        renderer,
+        scene,
+        camera,
+        drum,
+        spinner,
+        panels: [],
+        raf: 0,
+        running: false,
+      }
+      sceneRef.current = refs
+    } catch {
+      section.dataset.webgl = "off"
+      return
+    }
+
+    if (!refs || !renderer) return
 
     const resize = () => {
       const panelBox = computePanelBox(window.innerWidth)
       const rect = viewport.getBoundingClientRect()
       const w = rect.width || panelBox.width
       const h = rect.height || panelBox.height
-      renderer.setSize(w, h, false)
-      camera.aspect = w / h
-      camera.fov = (2 * Math.atan(h / 2 / PERSPECTIVE) * 180) / Math.PI
-      camera.updateProjectionMatrix()
+      renderer!.setSize(w, h, false)
+      refs!.camera.aspect = w / h
+      refs!.camera.fov = (2 * Math.atan(h / 2 / PERSPECTIVE) * 180) / Math.PI
+      refs!.camera.updateProjectionMatrix()
       const drumRadius = computeHomeWorksRadius(window.innerHeight)
       radiusRef.current = drumRadius
-      drum.scale.setScalar(drumRadius)
-      drum.position.z = -drumRadius
+      refs!.drum.scale.setScalar(drumRadius)
+      refs!.drum.position.z = -drumRadius
       updateDomItems(progressRef.current * (N - 1))
     }
 
     const renderFrame = () => {
+      if (!refs || !renderer) return
       const p = progressRef.current
       const active = p * (N - 1)
       updateDomItems(active)
@@ -182,16 +202,17 @@ export default function JunniWorks() {
     }
 
     const start = () => {
+      if (!refs) return
       if (refs.running) return
       refs.running = true
       refs.raf = requestAnimationFrame(renderFrame)
     }
     const stop = () => {
+      if (!refs) return
       refs.running = false
       cancelAnimationFrame(refs.raf)
     }
 
-    let disposed = false
     const loader = new THREE.TextureLoader()
     const loads = junniWorks
       .map((work, index) => ({ work, index }))
@@ -209,7 +230,7 @@ export default function JunniWorks() {
       )
 
     Promise.all(loads).then((results) => {
-      if (disposed) return
+      if (disposed || !refs || !renderer) return
       results.forEach((res) => {
         if (!res) return
         const { index, tex } = res
@@ -220,7 +241,7 @@ export default function JunniWorks() {
         tex.anisotropy = 8
         tex.center.set(0.5, 0.5)
         tex.rotation = TEX_ROTATION
-        fitTextureCover(tex, aspect, PANEL_ASPECT, work?.drumrollFocal ?? "center")
+        fitTextureCover(tex, aspect, PANEL_ASPECT, "center")
         const axial = PANEL_ASPECT * PANEL_RAD
         const geo = new THREE.CylinderGeometry(1, 1, axial, 64, 1, true, -PANEL_RAD / 2, PANEL_RAD)
         const mat = new THREE.MeshBasicMaterial({
@@ -233,8 +254,8 @@ export default function JunniWorks() {
         })
         const mesh = new THREE.Mesh(geo, mat)
         mesh.rotation.y = -SPIN_SIGN * index * STEP_RAD
-        refs.spinner.add(mesh)
-        refs.panels.push({ mesh, mat, index })
+        refs!.spinner.add(mesh)
+        refs!.panels.push({ mesh, mat, index })
       })
       resize()
       renderer.render(refs.scene, refs.camera)
@@ -254,12 +275,12 @@ export default function JunniWorks() {
       io.disconnect()
       stop()
       window.removeEventListener("resize", resize)
-      refs.panels.forEach(({ mesh, mat }) => {
+      refs?.panels.forEach(({ mesh, mat }) => {
         mesh.geometry.dispose()
         mat.map?.dispose()
         mat.dispose()
       })
-      renderer.dispose()
+      renderer?.dispose()
       sceneRef.current = null
     }
   }, [])
@@ -276,13 +297,18 @@ export default function JunniWorks() {
       invalidateOnRefresh: true,
       onUpdate: (self) => {
         progressRef.current = self.progress
+        updateDomItems(self.progress * (N - 1))
       },
     })
 
+    progressRef.current = trigger.progress
+    updateDomItems(trigger.progress * (N - 1))
+
     const unbindScroll = bindScrollTriggerUpdate(lenis)
-    ScrollTrigger.refresh()
+    const refreshId = requestAnimationFrame(() => ScrollTrigger.refresh())
 
     return () => {
+      cancelAnimationFrame(refreshId)
       unbindScroll()
       trigger.kill()
     }

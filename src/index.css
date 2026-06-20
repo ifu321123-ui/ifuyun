@@ -2990,3 +2990,81 @@
     }
   }
 }
+
+/* —— 触屏：Works 关闭 WebGL 时用纵向列表（防 iOS OOM 白屏），Hero/Gunze 滚动动效保留 —— */
+html.touch-static .junni-works[data-webgl="off"] .junni-works__webgl,
+html.touch-static .junni-works[data-webgl="off"] .junni-works__scrim {
+  display: none;
+}
+
+html.touch-static .junni-works[data-webgl="off"] .junni-works__inner {
+  position: relative;
+  height: auto;
+  min-height: auto;
+  overflow: visible;
+}
+
+html.touch-static .junni-works[data-webgl="off"] .junni-works__slider {
+  position: relative;
+  top: auto;
+  left: auto;
+  transform: none;
+  height: auto;
+  max-height: none;
+  pointer-events: auto;
+  padding: 0 clamp(1rem, 4vw, 2rem) clamp(2rem, 6vh, 3rem);
+}
+
+html.touch-static .junni-works[data-webgl="off"] .junni-works__list {
+  position: relative;
+  top: auto;
+  left: auto;
+  transform: none;
+  perspective: none;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2rem, 6vh, 3.5rem);
+  width: 100%;
+  max-width: 100%;
+}
+
+html.touch-static .junni-works[data-webgl="off"] .junni-works__item {
+  position: relative !important;
+  left: auto !important;
+  top: auto !important;
+  transform: none !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+html.touch-static .junni-works[data-webgl="off"] .junni-works__item-link {
+  pointer-events: auto;
+}
+
+html.touch-static .junni-works[data-webgl="off"] .junni-works__item-desc-char {
+  transform: none;
+  opacity: 1;
+}
+
+html.touch-static .junni-works[data-webgl="off"] .junni-works__pin {
+  position: relative;
+  min-height: auto;
+}
+
+html.touch-static .junni-works[data-webgl="off"] {
+  min-height: auto;
+}
+
+html.touch-static .junni-grid-perspective {
+  -webkit-perspective: 1200px;
+}
+
+html.touch-static .junni-hero-scene,
+html.touch-static .junni-hero-stage {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+html.touch-static .animate-fade-up {
+  animation: none;
+}
