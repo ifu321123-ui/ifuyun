@@ -5,7 +5,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 import App from "./App"
 import "./index.css"
 
-import { isTouchLikeDevice, markTouchStaticDocument } from "@/lib/scrollEnv"
+import { installScrollTriggerResizeSync, markTouchStaticDocument } from "@/lib/scrollEnv"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -15,26 +15,8 @@ if ("scrollRestoration" in history) {
   history.scrollRestoration = "manual"
 }
 
-if (typeof window !== "undefined" && !isTouchLikeDevice()) {
-  let resizeTimer = 0
-  window.addEventListener(
-    "resize",
-    () => {
-      window.clearTimeout(resizeTimer)
-      resizeTimer = window.setTimeout(() => ScrollTrigger.refresh(), 250)
-    },
-    { passive: true },
-  )
-} else if (typeof window !== "undefined") {
-  let resizeTimer = 0
-  window.addEventListener(
-    "resize",
-    () => {
-      window.clearTimeout(resizeTimer)
-      resizeTimer = window.setTimeout(() => ScrollTrigger.refresh(), 400)
-    },
-    { passive: true },
-  )
+if (typeof window !== "undefined") {
+  installScrollTriggerResizeSync(() => ScrollTrigger.refresh())
 }
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

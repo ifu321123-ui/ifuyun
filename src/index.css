@@ -3061,8 +3061,24 @@ html.touch-static .junni-grid-perspective {
 
 html.touch-static .junni-hero-scene,
 html.touch-static .junni-hero-stage {
-  min-height: 100vh;
-  min-height: 100dvh;
+  min-height: 100svh;
+}
+
+/* 触屏用 svh 锁定滚动区间，避免地址栏显隐时 dvh 变化导致 ScrollTrigger 进度跳变 */
+html.touch-static .junni-hero-stage {
+  height: calc(var(--junni-stage-vh, 2.6) * 100svh);
+}
+
+html.touch-static .junni-hero-scene {
+  height: 100svh;
+}
+
+html.touch-static .gunze-stage {
+  height: 320svh;
+}
+
+html.touch-static .gunze-scene {
+  height: 100svh;
 }
 
 html.touch-static .animate-fade-up {
