@@ -231,38 +231,7 @@ function WorkDetailPage({ work }: { work: WorkDetail }) {
           <TitleChars text={work.title} />
           <p className="jwd__subtitle">{work.subtitle}</p>
 
-          <div className="jwd__meta">
-            <Reveal className="jwd__meta-grid">
-              <span className="jwd__meta-label">Client</span>
-              <p className="jwd__meta-value">{work.client}</p>
-              <span className="jwd__meta-label">Scope</span>
-              <p className="jwd__meta-value">{work.scope}</p>
-              <span className="jwd__meta-label">Release</span>
-              <p className="jwd__meta-value">{work.release}</p>
-              {work.website ? (
-                <>
-                  <span className="jwd__meta-label">Website</span>
-                  <p className="jwd__meta-value jwd__meta-value--link">
-                    <a href={work.website} target="_blank" rel="noreferrer">
-                      {work.website}
-                    </a>
-                  </p>
-                </>
-              ) : null}
-            </Reveal>
-
-            <Reveal className="jwd__credits" delay={1}>
-              <p className="jwd__credits-title">Credit</p>
-              {work.credits.map((credit) => (
-                <div key={credit.role} className="jwd__credit-row">
-                  <span className="jwd__credit-role">{credit.role}</span>
-                  <p className="jwd__credit-name">{credit.name}</p>
-                </div>
-              ))}
-            </Reveal>
-          </div>
-
-          <Reveal className="jwd__intro" delay={2}>
+          <Reveal className="jwd__intro">
             <p>{work.intro}</p>
           </Reveal>
         </div>

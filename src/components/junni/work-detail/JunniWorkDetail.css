@@ -251,90 +251,9 @@
   color: var(--jwd-muted);
 }
 
-.jwd__meta {
-  display: grid;
-  gap: clamp(2rem, 5vw, 4rem);
-  margin-top: clamp(2.5rem, 6vw, 4.5rem);
-}
-
-@media (min-width: 768px) {
-  .jwd__meta {
-    grid-template-columns: 1fr 1fr;
-    align-items: start;
-  }
-}
-
-.jwd__meta-grid {
-  display: grid;
-  grid-template-columns: minmax(5rem, 7rem) 1fr;
-  gap: 0.85rem 1.5rem;
-  align-items: baseline;
-}
-
-.jwd__meta-label {
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--jwd-muted);
-}
-
-.jwd__meta-value {
-  margin: 0;
-  font-size: 0.95rem;
-  font-weight: 600;
-  line-height: 1.45;
-}
-
-.jwd__meta-value--link a {
-  display: inline-block;
-  padding: 0.1em 0.35em;
-  color: var(--jwd-ink);
-  text-decoration: none;
-  background: var(--jwd-green);
-  transition: opacity 0.2s;
-}
-
-.jwd__meta-value--link a:hover {
-  opacity: 0.75;
-}
-
-.jwd__credits {
-  display: grid;
-  gap: 0.75rem;
-}
-
-.jwd__credits-title {
-  margin: 0 0 0.35rem;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--jwd-muted);
-}
-
-.jwd__credit-row {
-  display: grid;
-  grid-template-columns: minmax(6rem, 8rem) 1fr;
-  gap: 1rem;
-  align-items: baseline;
-}
-
-.jwd__credit-role {
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--jwd-muted);
-}
-
-.jwd__credit-name {
-  margin: 0;
-  font-size: 0.95rem;
-  font-weight: 600;
-}
-
 .jwd__intro {
   max-width: 42rem;
-  margin: clamp(3rem, 8vw, 5rem) auto 0;
+  margin: clamp(2.5rem, 6vw, 4.5rem) auto 0;
   text-align: center;
   font-size: clamp(1rem, 2.2vw, 1.2rem);
   font-weight: 500;

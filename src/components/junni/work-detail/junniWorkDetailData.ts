@@ -1,7 +1,5 @@
 import { WORKS_PAGE_DATA, type WorksPageItem } from "../works-page/junniWorksPageData"
 
-export type WorkCredit = { role: string; name: string }
-
 export type WorkMedia =
   | { type: "image"; src: string; alt?: string; fit?: "full" }
   | { type: "video"; src: string; alt?: string; poster?: string }
@@ -19,21 +17,10 @@ export type WorkDetail = {
   subtitle: string
   heroImage: string
   heroVideo?: string
-  client: string
-  scope: string
-  release: string
   website?: string
-  credits: WorkCredit[]
   intro: string
   sections: WorkSection[]
 }
-
-const DEFAULT_CREDITS: WorkCredit[] = [
-  { role: "产品策划", name: "付云椒" },
-  { role: "UI / UX 设计", name: "付云椒" },
-  { role: "视觉设计", name: "付云椒" },
-  { role: "原型表达", name: "付云椒" },
-]
 
 export const WORK_DETAIL_BY_SLUG: Record<string, WorkDetail> = {
   shiyuan: {
@@ -42,10 +29,6 @@ export const WORK_DETAIL_BY_SLUG: Record<string, WorkDetail> = {
     subtitle: "中医药膳科普 · 助农电商平台",
     heroImage: "/works/shiyuan/01.png",
     heroVideo: "/works/shiyuan/interactive.mp4",
-    client: "蓝桥杯大赛参赛作品",
-    scope: "产品设计 / UI 设计 / IP 设计",
-    release: "2025",
-    credits: DEFAULT_CREDITS,
     intro:
       "《食援》是一款以「药食同源」「乡村振兴」「以食为援」为核心理念的 App。旨在让用户深入了解中医药膳文化，将药膳食材知识普及与乡村振兴助农融于一体的综合型平台，让用户「懂药膳、选好材」，同时助力农户增收。",
     sections: [
@@ -92,10 +75,6 @@ export const WORK_DETAIL_BY_SLUG: Record<string, WorkDetail> = {
     title: "蜀香",
     subtitle: "四川非遗酒文化数字化平台",
     heroImage: "/works/shuxiang/01.png",
-    client: "创新设计课程作品",
-    scope: "产品设计 / UI 设计 / VR 体验",
-    release: "2025",
-    credits: DEFAULT_CREDITS,
     intro:
       "蜀香是介绍四川非遗酒文化的数字化平台，融合旅游、文化、科普与社交。通过 VR 数字导览、线上购票、酒文化科普与圈子等功能，让用户更深刻地了解蜀地非遗酒文化。",
     sections: [
@@ -148,10 +127,6 @@ export const WORK_DETAIL_BY_SLUG: Record<string, WorkDetail> = {
     subtitle: "中国人的土地情感 · 农业记忆长卷",
     heroImage: "/works/yidirenjian/01.png",
     heroVideo: "/works/yidirenjian/yidirenjian.mp4",
-    client: "文化叙事设计作品",
-    scope: "网页设计 / 交互叙事 / 视觉设计",
-    release: "2025",
-    credits: DEFAULT_CREDITS,
     intro:
       "本网页以「中国人的土地情感」为叙事核心，构建一部跨越时空的农业记忆长卷。融合传统与现代视觉语言，借助互动体验与可视化技术，呈现农业发展轨迹，唤醒用户与泥土相连的情感记忆。",
     sections: [
@@ -191,16 +166,7 @@ export const WORK_DETAIL_BY_SLUG: Record<string, WorkDetail> = {
     title: "码绘工作室",
     subtitle: "工作室品牌门户 · Web 平台设计",
     heroImage: "/works/mahui/01.png",
-    client: "码绘技术工作室",
-    scope: "官网设计 / 品牌视觉 / 移动端适配",
-    release: "2025",
     website: "#",
-    credits: [
-      { role: "UI 组负责人", name: "付云椒" },
-      { role: "交互设计", name: "付云椒" },
-      { role: "视觉设计", name: "付云椒" },
-      { role: "前端协作", name: "码绘技术团队" },
-    ],
     intro:
       "码绘技术工作室官网是集工作室展示、技术培养、竞赛活动、产品发布与简历投递于一体的 Web 平台。以深蓝与黑白为主调，传递专业、创新、年轻的品牌气质，并同步完成移动端适配。",
     sections: [
@@ -219,14 +185,6 @@ export const WORK_DETAIL_BY_SLUG: Record<string, WorkDetail> = {
     title: "四川银行问卷后台管理系统",
     subtitle: "四川银行后台管理系统",
     heroImage: "/works/scbank/drumroll.png",
-    client: "四川银行（课程 / 竞赛项目）",
-    scope: "B 端后台 / 原型设计 / 交互设计",
-    release: "2024 — 2025",
-    credits: [
-      { role: "产品策划", name: "付云椒" },
-      { role: "交互设计", name: "付云椒" },
-      { role: "界面设计", name: "付云椒" },
-    ],
     intro:
       "面向银行内部运营场景的后台管理系统，整合客户意见收集、问卷调研、留言自动分发与处理进度追踪等能力。以舒适、高效、简约为情绪版设计导向，帮助提升服务效率与客户体验。",
     sections: [
@@ -261,10 +219,6 @@ export const WORK_DETAIL_BY_SLUG: Record<string, WorkDetail> = {
     title: "崖上的希望·云崖村扶贫纪实",
     subtitle: "悬崖村脱贫攻坚 · 数字叙事设计",
     heroImage: "/works/yunyacun/01.png",
-    client: "乡村振兴主题作品",
-    scope: "视觉叙事 / 网页设计 / 信息设计",
-    release: "2025",
-    credits: DEFAULT_CREDITS,
     intro:
       "作品聚焦四川大凉山悬崖村，见证「藤梯变钢梯」、从茅草屋到小康楼房、从贫瘠到特色农业旅游的云端巨变，以数字叙事传递脱贫攻坚的时代记忆。",
     sections: [
@@ -323,10 +277,6 @@ export const WORK_DETAIL_BY_SLUG: Record<string, WorkDetail> = {
     title: "膳小羊",
     subtitle: "中医药膳助农平台 IP · 文化传承与城乡联结",
     heroImage: "/works/shanxiaoyang/01.png",
-    client: "食援项目 IP 设计",
-    scope: "IP 设计 / 角色设定 / 视觉延展",
-    release: "2026",
-    credits: DEFAULT_CREDITS,
     intro:
       "膳小羊是食援平台的 IP 形象，以「羊」谐音「阳」传递传统养生智慧，担任中医药膳文化与乡村农户之间的善意联结者。造型借鉴汉代陶俑羊的圆润体态，以药草绿为主色调，温润谦和地承载药膳科普与助农好物甄选。",
     sections: [
