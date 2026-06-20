@@ -51,6 +51,8 @@
   html {
     /* 滚动由 Lenis 接管；保留 auto 以免与平滑滚动相互打架 */
     font-family: var(--font-sans);
+    overflow-x: clip;
+    -webkit-text-size-adjust: 100%;
   }
 
   /* —— Lenis 平滑滚动基础样式（官方推荐） —— */
@@ -1601,6 +1603,85 @@
   html.touch-static .junni-works__webgl,
   html.touch-static .junni-works__scrim {
     display: none;
+  }
+
+  /* 手机端：WORKS 改为纵向可浏览列表（替代 3D 圆筒 + ScrollTrigger） */
+  html.touch-static .junni-works__inner {
+    position: relative;
+    height: auto;
+    min-height: auto;
+    overflow: visible;
+    contain: none;
+  }
+
+  html.touch-static .junni-works__slider {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    height: auto;
+    max-height: none;
+    pointer-events: auto;
+    padding: 0 clamp(1rem, 4vw, 2rem) clamp(2rem, 6vh, 3rem);
+  }
+
+  html.touch-static .junni-works__list {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    perspective: none;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(2rem, 6vh, 3.5rem);
+    width: 100%;
+    max-width: 100%;
+  }
+
+  html.touch-static .junni-works__item {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    transform: none !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  html.touch-static .junni-works__item-link {
+    pointer-events: auto;
+  }
+
+  html.touch-static .junni-works__item-title {
+    color: var(--works-white);
+    text-shadow: 0 2px 30px rgba(0, 0, 0, 0.6), 0 0 2px rgba(0, 0, 0, 0.45);
+  }
+
+  html.touch-static .junni-works__item-desc {
+    opacity: 1;
+  }
+
+  html.touch-static .junni-works__item-desc-char {
+    transform: none;
+    opacity: 1;
+    transition: none;
+  }
+
+  html.touch-static .junni-works__shift {
+    display: none;
+  }
+
+  /* 子页切换动画在手机端关闭，避免「反复进入」感 */
+  html.touch-static .animate-fade-up {
+    animation: none;
+  }
+
+  html.touch-static .jwp__drumroll {
+    display: none !important;
+    min-height: 0 !important;
+  }
+
+  html.touch-static .jwp__toggle {
+    display: none !important;
   }
 
   .gunze-scene {
