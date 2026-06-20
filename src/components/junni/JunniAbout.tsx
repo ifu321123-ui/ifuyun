@@ -3,6 +3,7 @@ import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { useLenis } from "lenis/react"
 import { junniHero } from "./junniData"
+import { shouldUseScrollScrub } from "@/lib/scrollEnv"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -25,8 +26,13 @@ export default function JunniAbout() {
     const chars = charRefs.current
     if (!section || chars.length === 0) return
 
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    if (reducedMotion) {
+    const prefersReduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    if (prefersReduce) {
+      gsap.set(chars, { color: ABOUT_INK })
+      return
+    }
+
+    if (!shouldUseScrollScrub()) {
       gsap.set(chars, { color: ABOUT_INK })
       return
     }

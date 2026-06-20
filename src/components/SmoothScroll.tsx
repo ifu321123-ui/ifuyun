@@ -70,12 +70,19 @@ function useScrollToTopOnRoute(lenis?: Lenis | null) {
   const route = useRoute()
   const routeKey = route.page
   const prevRouteRef = useRef(routeKey)
+  const isFirstMountRef = useRef(true)
 
   const reset = useCallback(() => {
     scrollToTop(lenis)
   }, [lenis])
 
   useEffect(() => {
+    if (isFirstMountRef.current) {
+      isFirstMountRef.current = false
+      prevRouteRef.current = routeKey
+      return
+    }
+
     const prev = prevRouteRef.current
     prevRouteRef.current = routeKey
 

@@ -1571,6 +1571,38 @@
     background: var(--gunze-bg);
   }
 
+  html.touch-static .junni-hero-stage {
+    height: 100vh;
+    height: 100dvh;
+  }
+
+  html.touch-static .gunze-stage {
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  html.touch-static .gunze-stage[data-touch-static="true"] .gunze-scene,
+  html.touch-static .gunze-scene {
+    position: relative;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  html.touch-static .junni-works {
+    min-height: auto;
+  }
+
+  html.touch-static .junni-works__pin {
+    position: relative;
+    min-height: auto;
+  }
+
+  html.touch-static .junni-works__webgl,
+  html.touch-static .junni-works__scrim {
+    display: none;
+  }
+
   .gunze-scene {
     position: sticky;
     top: 0;
