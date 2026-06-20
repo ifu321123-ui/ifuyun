@@ -23,6 +23,8 @@ import {
 
 } from "./junniWorksPageData"
 
+import { bindScrollTriggerUpdate } from "@/lib/scrollSync"
+
 import "./JunniWorksPage.css"
 
 gsap.registerPlugin(ScrollTrigger)
@@ -254,12 +256,6 @@ export default function JunniWorksPage({ footerRef, onReadyChange }: JunniWorksP
     const section = drumrollSectionRef.current
     if (!section) return
 
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    if (reduce) {
-      setDrumrollPhase(0)
-      return
-    }
-
     const trigger = ScrollTrigger.create({
       trigger: section,
       start: "top top",
@@ -271,12 +267,11 @@ export default function JunniWorksPage({ footerRef, onReadyChange }: JunniWorksP
       },
     })
 
-    const onScroll = () => ScrollTrigger.update()
-    lenis?.on("scroll", onScroll)
+    const unbindScroll = bindScrollTriggerUpdate(lenis)
     ScrollTrigger.refresh()
 
     return () => {
-      lenis?.off("scroll", onScroll)
+      unbindScroll()
       trigger.kill()
     }
   }, [view, items.length, lenis, setDrumrollPhase])

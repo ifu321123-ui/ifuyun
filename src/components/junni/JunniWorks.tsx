@@ -23,6 +23,7 @@ import {
   splitDrumrollText,
   workDrumrollSrc,
 } from "./drumrollGeometry"
+import { bindScrollTriggerUpdate } from "@/lib/scrollSync"
 import { markHomeWorksReturn } from "@/hooks/useRoute"
 import { junniWorks } from "./junniData"
 import "./JunniWorks.css"
@@ -120,8 +121,6 @@ export default function JunniWorks() {
     const section = sectionRef.current
     const viewport = viewportRef.current
     if (!canvas || !section || !viewport) return
-
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
 
     const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true })
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
@@ -285,13 +284,6 @@ export default function JunniWorks() {
     const section = sectionRef.current
     if (!section) return
 
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    if (reduce) {
-      progressRef.current = 0
-      updateDomItems(0)
-      return
-    }
-
     const trigger = ScrollTrigger.create({
       trigger: section,
       start: "top top",
@@ -303,12 +295,11 @@ export default function JunniWorks() {
       },
     })
 
-    const onScroll = () => ScrollTrigger.update()
-    lenis?.on("scroll", onScroll)
+    const unbindScroll = bindScrollTriggerUpdate(lenis)
     ScrollTrigger.refresh()
 
     return () => {
-      lenis?.off("scroll", onScroll)
+      unbindScroll()
       trigger.kill()
     }
   }, [lenis])

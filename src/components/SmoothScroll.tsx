@@ -9,24 +9,12 @@ import {
   peekHomeWorksReturnScroll,
   useRoute,
 } from "@/hooks/useRoute"
+import { shouldUseLenis } from "@/lib/scrollEnv"
 
 gsap.registerPlugin(ScrollTrigger)
 
-/**
- * 是否开启平滑滚动。遵循系统无障碍偏好：
- * 当用户开启「减少动态效果」时，降级为浏览器原生滚动。
- */
-const prefersReducedMotion =
-  typeof window !== "undefined" &&
-  window.matchMedia("(prefers-reduced-motion: reduce)").matches
+const useLenisScroll = shouldUseLenis()
 
-/**
- * Lenis 阻尼参数 —— JUNNI 那种「高级感」的关键。
- * - lerp：线性插值系数，越小越「重」越顺滑（0.08~0.12 是高质感区间）。
- *   它是产生「阻尼/惯性」手感的核心，优先级高于 duration。
- * - wheelMultiplier / touchMultiplier：滚轮与触控的步进强度。
- * - easing：用于程序化 scrollTo（如锚点跳转）的缓动，expo-out 收尾干净利落。
- */
 const lenisOptions = {
   lerp: 0.09,
   duration: 1.2,
@@ -42,7 +30,6 @@ function scrollToTop(lenis?: Lenis | null) {
   window.scrollTo(0, 0)
 }
 
-/** 从作品集返回首页 WORKS：先 resize 更新 limit，再恢复 Lenis 滚动，避免与原生 scroll 脱节。 */
 function restoreHomeWorksScroll(lenis?: Lenis | null) {
   const y = peekHomeWorksReturnScroll()
   if (y == null) return () => {}
@@ -75,12 +62,29 @@ function useScrollToTopOnRoute(lenis?: Lenis | null) {
   const route = useRoute()
   const routeKey = route.page
   const prevRouteRef = useRef(routeKey)
+  const isFirstMountRef = useRef(true)
+  const lenisRef = useRef(lenis)
+  lenisRef.current = lenis
 
   const reset = useCallback(() => {
-    scrollToTop(lenis)
-  }, [lenis])
+    scrollToTop(lenisRef.current)
+  }, [])
 
   useEffect(() => {
+    const id = requestAnimationFrame(() => {
+      scrollToTop(lenisRef.current)
+      ScrollTrigger.refresh()
+    })
+    return () => cancelAnimationFrame(id)
+  }, [])
+
+  useEffect(() => {
+    if (isFirstMountRef.current) {
+      isFirstMountRef.current = false
+      prevRouteRef.current = routeKey
+      return
+    }
+
     const prev = prevRouteRef.current
     prevRouteRef.current = routeKey
 
@@ -89,13 +93,13 @@ function useScrollToTopOnRoute(lenis?: Lenis | null) {
     }
 
     if (routeKey === "home" && prev === "portfolio" && peekHomeWorksReturnScroll() != null) {
-      return restoreHomeWorksScroll(lenis)
+      return restoreHomeWorksScroll(lenisRef.current)
     }
 
     reset()
     const id = requestAnimationFrame(reset)
     return () => cancelAnimationFrame(id)
-  }, [routeKey, reset, lenis])
+  }, [routeKey, reset])
 
   useEffect(() => {
     const onReset = () => {
@@ -107,21 +111,19 @@ function useScrollToTopOnRoute(lenis?: Lenis | null) {
   }, [reset])
 }
 
-/** 路由（hash）切换或同页导航时，将滚动瞬间归零。 */
 function LenisScrollReset() {
   const lenis = useLenis()
   useScrollToTopOnRoute(lenis)
   return null
 }
 
-/** 减少动态效果时的归零兜底（不依赖 Lenis）。 */
 function NativeScrollReset() {
   useScrollToTopOnRoute()
   return null
 }
 
 export default function SmoothScroll({ children }: PropsWithChildren) {
-  if (prefersReducedMotion) {
+  if (!useLenisScroll) {
     return (
       <>
         <NativeScrollReset />

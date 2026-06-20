@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { useLenis } from "lenis/react"
+import { bindScrollTriggerUpdate } from "@/lib/scrollSync"
 import { junniHero } from "./junniData"
 
 gsap.registerPlugin(ScrollTrigger)
@@ -25,12 +26,6 @@ export default function JunniAbout() {
     const chars = charRefs.current
     if (!section || chars.length === 0) return
 
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    if (reducedMotion) {
-      gsap.set(chars, { color: ABOUT_INK })
-      return
-    }
-
     gsap.set(chars, { color: ABOUT_HIDDEN })
 
     const tween = gsap.to(chars, {
@@ -48,12 +43,11 @@ export default function JunniAbout() {
       },
     })
 
-    const onScroll = () => ScrollTrigger.update()
-    lenis?.on("scroll", onScroll)
+    const unbindScroll = bindScrollTriggerUpdate(lenis)
     ScrollTrigger.refresh()
 
     return () => {
-      lenis?.off("scroll", onScroll)
+      unbindScroll()
       tween.scrollTrigger?.kill()
       tween.kill()
     }

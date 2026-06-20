@@ -4,6 +4,7 @@ import { useLenis } from "lenis/react"
 import { Download } from "lucide-react"
 import { profile } from "@/data"
 import { navigate, useRoute, type PageId } from "@/hooks/useRoute"
+import { bindScrollTriggerUpdate } from "@/lib/scrollSync"
 import {
   JUNNI_MENU_ACTIONS,
   JUNNI_MENU_NAV,
@@ -127,13 +128,13 @@ export default function JunniMenu(_props: JunniMenuProps = {}) {
     const onResize = () => sample()
     window.addEventListener("resize", onResize)
     window.addEventListener("junni-menu-bg", sample)
-    lenis?.on("scroll", sample)
+    const unbindScroll = bindScrollTriggerUpdate(lenis, sample)
 
     return () => {
       cancelAnimationFrame(frame)
       window.removeEventListener("resize", onResize)
       window.removeEventListener("junni-menu-bg", sample)
-      lenis?.off("scroll", sample)
+      unbindScroll()
     }
   }, [page, lenis])
 

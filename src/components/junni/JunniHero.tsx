@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, type CSSProperties } from "react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { useLenis } from "lenis/react"
+import { bindScrollTriggerUpdate } from "@/lib/scrollSync"
 import {
   JUNNI_GRID_COLS,
   JUNNI_GRID_ROWS,
@@ -114,7 +115,6 @@ export default function JunniHero({ onInZoneChange }: JunniHeroProps) {
     const grid = gridRef.current
     if (!stage || !scene || !matrix || !grid) return
 
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
     const cards = cardRefs.current.filter(Boolean) as HTMLDivElement[]
     const flips = flipRefs.current.filter(Boolean) as HTMLDivElement[]
     const wells = cellRefs.current
@@ -152,16 +152,6 @@ export default function JunniHero({ onInZoneChange }: JunniHeroProps) {
       // 原站翻完后 kv_back 不会立刻消失，而是跟随 pin 释放自然滚出视窗。
       // 因此保留矩阵，避免背面文字在 manifesto 上来前突兀消失。
       matrix.style.display = ""
-    }
-
-    if (reducedMotion) {
-      // 降级：直接呈现绿底终态，并撤掉重型矩阵，背面文字常显。
-      matrix.style.display = "none"
-      scene.style.background = "#f17fb3"
-      scene.dataset.menuBg = "light"
-      window.dispatchEvent(new Event("junni-menu-bg"))
-      if (backOverlay) backOverlay.style.opacity = "1"
-      return
     }
 
     // 逐格 Hover 独立 360° 翻面：仅在首屏静止（progress<=FLIP_START）时激活。
@@ -210,11 +200,7 @@ export default function JunniHero({ onInZoneChange }: JunniHeroProps) {
       onInZoneChange?.(inZone)
     }
 
-    const onScroll = () => {
-      ScrollTrigger.update()
-      updateNavZone()
-    }
-    lenis?.on("scroll", onScroll)
+    const unbindScroll = bindScrollTriggerUpdate(lenis, updateNavZone)
 
     apply(0)
     updateNavZone()
@@ -222,7 +208,7 @@ export default function JunniHero({ onInZoneChange }: JunniHeroProps) {
 
     return () => {
       hoverCleanups.forEach((fn) => fn())
-      lenis?.off("scroll", onScroll)
+      unbindScroll()
       tween.scrollTrigger?.kill()
       tween.kill()
     }

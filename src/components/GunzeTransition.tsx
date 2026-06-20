@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { useLenis } from "lenis/react"
+import { bindScrollTriggerUpdate } from "@/lib/scrollSync"
 import { navigate } from "@/hooks/useRoute"
 import JunniService from "./junni/JunniService"
 import JunniWorks from "./junni/JunniWorks"
@@ -241,14 +242,13 @@ export default function GunzeTransition() {
       },
     })
 
-    const updateScrollTrigger = () => ScrollTrigger.update()
-    lenis?.on("scroll", updateScrollTrigger)
+    const unbindScroll = bindScrollTriggerUpdate(lenis)
 
     apply(0)
     ScrollTrigger.refresh()
 
     return () => {
-      lenis?.off("scroll", updateScrollTrigger)
+      unbindScroll()
       tween.scrollTrigger?.kill()
       tween.kill()
       for (const name of [
