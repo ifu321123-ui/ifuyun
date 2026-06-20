@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { shouldUseScrollScrub } from "@/lib/scrollEnv"
+import { shouldSkipDecorativeMotion } from "@/lib/scrollEnv"
 
 const COLS = 8
 const ROWS = 5
@@ -35,12 +35,7 @@ export default function IntroFlip() {
       return
     }
 
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches
-
-    // 手机端跳过全屏翻页入场，避免与原生滚动/地址栏变化叠加造成「反复进入」感
-    if (prefersReducedMotion || !shouldUseScrollScrub()) {
+    if (shouldSkipDecorativeMotion()) {
       markIntroPlayed()
       setDone(true)
       return

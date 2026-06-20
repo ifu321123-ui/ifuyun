@@ -115,7 +115,6 @@ export default function JunniHero({ onInZoneChange }: JunniHeroProps) {
     const grid = gridRef.current
     if (!stage || !scene || !matrix || !grid) return
 
-    const prefersReduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
     const touchStatic = !shouldUseScrollScrub()
     const cards = cardRefs.current.filter(Boolean) as HTMLDivElement[]
     const flips = flipRefs.current.filter(Boolean) as HTMLDivElement[]
@@ -154,16 +153,6 @@ export default function JunniHero({ onInZoneChange }: JunniHeroProps) {
       // 原站翻完后 kv_back 不会立刻消失，而是跟随 pin 释放自然滚出视窗。
       // 因此保留矩阵，避免背面文字在 manifesto 上来前突兀消失。
       matrix.style.display = ""
-    }
-
-    if (prefersReduce) {
-      // 降级：直接呈现绿底终态，并撤掉重型矩阵，背面文字常显。
-      matrix.style.display = "none"
-      scene.style.background = "#f17fb3"
-      scene.dataset.menuBg = "light"
-      window.dispatchEvent(new Event("junni-menu-bg"))
-      if (backOverlay) backOverlay.style.opacity = "1"
-      return
     }
 
     if (touchStatic) {

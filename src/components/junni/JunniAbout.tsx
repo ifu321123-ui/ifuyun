@@ -26,12 +26,6 @@ export default function JunniAbout() {
     const chars = charRefs.current
     if (!section || chars.length === 0) return
 
-    const prefersReduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    if (prefersReduce) {
-      gsap.set(chars, { color: ABOUT_INK })
-      return
-    }
-
     if (!shouldUseScrollScrub()) {
       gsap.set(chars, { color: ABOUT_INK })
       return

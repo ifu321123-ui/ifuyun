@@ -257,10 +257,7 @@ export default function JunniWorksPage({ footerRef, onReadyChange }: JunniWorksP
     const section = drumrollSectionRef.current
     if (!section) return
 
-    const reduce =
-      !shouldUseScrollScrub() ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    if (reduce) {
+    if (!shouldUseScrollScrub()) {
       setDrumrollPhase(0)
       return
     }

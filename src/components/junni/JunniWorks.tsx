@@ -122,11 +122,7 @@ export default function JunniWorks() {
     const viewport = viewportRef.current
     if (!canvas || !section || !viewport) return
 
-    const reduce =
-      !shouldUseScrollScrub() ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-
-    if (reduce) {
+    if (!shouldUseScrollScrub()) {
       updateDomItems(0)
       return
     }
@@ -293,10 +289,7 @@ export default function JunniWorks() {
     const section = sectionRef.current
     if (!section) return
 
-    const reduce =
-      !shouldUseScrollScrub() ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    if (reduce) {
+    if (!shouldUseScrollScrub()) {
       progressRef.current = 0
       updateDomItems(0)
       return

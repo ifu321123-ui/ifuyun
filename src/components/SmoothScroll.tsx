@@ -80,7 +80,11 @@ function useScrollToTopOnRoute(lenis?: Lenis | null) {
     if (isFirstMountRef.current) {
       isFirstMountRef.current = false
       prevRouteRef.current = routeKey
-      return
+      const id = requestAnimationFrame(() => {
+        scrollToTop(lenis)
+        ScrollTrigger.refresh()
+      })
+      return () => cancelAnimationFrame(id)
     }
 
     const prev = prevRouteRef.current

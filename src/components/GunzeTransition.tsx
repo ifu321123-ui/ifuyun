@@ -227,9 +227,7 @@ export default function GunzeTransition() {
       root.style.setProperty("--gunze-mv-y", `${map(p, 0, REVEAL_END, 0, -120).toFixed(2)}px`)
     }
 
-    const staticLayout =
-      !shouldUseScrollScrub() ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    const staticLayout = !shouldUseScrollScrub()
 
     if (staticLayout) {
       apply(0.72)
