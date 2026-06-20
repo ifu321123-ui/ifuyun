@@ -1,7 +1,5 @@
 /* junni.co.jp/recruit/ — 採用页样式（jrp = junni recruit page） */
 
-@import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&display=swap");
-
 .jrp {
   --jrp-dark: #1c1d21;
   --jrp-green: #f17fb3;
@@ -374,7 +372,7 @@
 }
 
 .jrp__positions-letter {
-  font-family: "Barlow Condensed", sans-serif;
+  font-family: "Arial Narrow", "PingFang SC", sans-serif;
   font-size: clamp(3rem, 8vw, 5rem);
   font-weight: 700;
   color: var(--jrp-white);
@@ -399,7 +397,7 @@
 
 .jrp__positions-label {
   margin-top: 0.64em;
-  font-family: "Barlow Condensed", sans-serif;
+  font-family: "Arial Narrow", "PingFang SC", sans-serif;
   font-size: clamp(12px, 2vw, 22px);
   text-align: center;
   opacity: 0;
@@ -840,7 +838,7 @@
   top: -0.13em;
   left: -0.32em;
   z-index: 1;
-  font-family: "Barlow Condensed", sans-serif;
+  font-family: "Arial Narrow", "PingFang SC", sans-serif;
   font-size: clamp(86px, 63px + 3vw, 110px);
   font-weight: 700;
   line-height: 0.7;

@@ -9,16 +9,11 @@ import {
   peekHomeWorksReturnScroll,
   useRoute,
 } from "@/hooks/useRoute"
+import { shouldUseLenis } from "@/lib/scrollEnv"
 
 gsap.registerPlugin(ScrollTrigger)
 
-/**
- * 是否开启平滑滚动。遵循系统无障碍偏好：
- * 当用户开启「减少动态效果」时，降级为浏览器原生滚动。
- */
-const prefersReducedMotion =
-  typeof window !== "undefined" &&
-  window.matchMedia("(prefers-reduced-motion: reduce)").matches
+const useLenisScroll = shouldUseLenis()
 
 /**
  * Lenis 阻尼参数 —— JUNNI 那种「高级感」的关键。
@@ -121,7 +116,7 @@ function NativeScrollReset() {
 }
 
 export default function SmoothScroll({ children }: PropsWithChildren) {
-  if (prefersReducedMotion) {
+  if (!useLenisScroll) {
     return (
       <>
         <NativeScrollReset />
