@@ -404,7 +404,7 @@ export default function JunniMenu(_props: JunniMenuProps = {}) {
                     style={{ opacity: 0, transform: "translateY(15px)" }}
                   >
                     <a
-                      className="junni-nav_action junni-nav_action--resume"
+                      className="junni-nav_action junni-nav_action--primary"
                       href={profile.portfolioUrl}
                       download={profile.portfolioDownloadName}
                       target="_blank"
