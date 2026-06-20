@@ -9,11 +9,16 @@ import {
   peekHomeWorksReturnScroll,
   useRoute,
 } from "@/hooks/useRoute"
-import { shouldUseLenis } from "@/lib/scrollEnv"
 
 gsap.registerPlugin(ScrollTrigger)
 
-const useLenisScroll = shouldUseLenis()
+/**
+ * 是否开启平滑滚动。遵循系统无障碍偏好：
+ * 当用户开启「减少动态效果」时，降级为浏览器原生滚动。
+ */
+const prefersReducedMotion =
+  typeof window !== "undefined" &&
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches
 
 /**
  * Lenis 阻尼参数 —— JUNNI 那种「高级感」的关键。
@@ -70,23 +75,12 @@ function useScrollToTopOnRoute(lenis?: Lenis | null) {
   const route = useRoute()
   const routeKey = route.page
   const prevRouteRef = useRef(routeKey)
-  const isFirstMountRef = useRef(true)
 
   const reset = useCallback(() => {
     scrollToTop(lenis)
   }, [lenis])
 
   useEffect(() => {
-    if (isFirstMountRef.current) {
-      isFirstMountRef.current = false
-      prevRouteRef.current = routeKey
-      const id = requestAnimationFrame(() => {
-        scrollToTop(lenis)
-        ScrollTrigger.refresh()
-      })
-      return () => cancelAnimationFrame(id)
-    }
-
     const prev = prevRouteRef.current
     prevRouteRef.current = routeKey
 
@@ -127,7 +121,7 @@ function NativeScrollReset() {
 }
 
 export default function SmoothScroll({ children }: PropsWithChildren) {
-  if (!useLenisScroll) {
+  if (prefersReducedMotion) {
     return (
       <>
         <NativeScrollReset />

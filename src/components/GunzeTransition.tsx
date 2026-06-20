@@ -3,7 +3,6 @@ import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { useLenis } from "lenis/react"
 import { navigate } from "@/hooks/useRoute"
-import { shouldUseScrollScrub } from "@/lib/scrollEnv"
 import JunniService from "./junni/JunniService"
 import JunniWorks from "./junni/JunniWorks"
 
@@ -225,34 +224,6 @@ export default function GunzeTransition() {
       root.style.setProperty("--gunze-message-y", "0vh")
       root.style.setProperty("--gunze-mv-alpha", (1 - map(p, 0.08, REVEAL_END, 0, 1)).toFixed(4))
       root.style.setProperty("--gunze-mv-y", `${map(p, 0, REVEAL_END, 0, -120).toFixed(2)}px`)
-    }
-
-    const staticLayout = !shouldUseScrollScrub()
-
-    if (staticLayout) {
-      apply(0.72)
-      stage.dataset.touchStatic = "true"
-      return () => {
-        delete stage.dataset.touchStatic
-        for (const name of [
-          "--gunze-q-height",
-          "--gunze-q-y",
-          "--gunze-body-opacity",
-          "--gunze-dot-left",
-          "--gunze-dot-top",
-          "--gunze-dot-rx",
-          "--gunze-dot-ry",
-          "--gunze-flood-alpha",
-          "--gunze-dot-alpha",
-          "--gunze-scene-dark-alpha",
-          "--gunze-message-alpha",
-          "--gunze-message-y",
-          "--gunze-mv-alpha",
-          "--gunze-mv-y",
-        ]) {
-          root.style.removeProperty(name)
-        }
-      }
     }
 
     const state = { progress: 0 }

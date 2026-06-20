@@ -1,50 +1,31 @@
 import { useEffect, useState } from "react"
-import { shouldSkipDecorativeMotion } from "@/lib/scrollEnv"
 
 const COLS = 8
 const ROWS = 5
 const TILE_COUNT = COLS * ROWS
 const INTRO_STORAGE_KEY = "ifu-intro-flip-played"
 
-let introPlayed = false
-
-function markIntroPlayed() {
-  introPlayed = true
-  try {
-    sessionStorage.setItem(INTRO_STORAGE_KEY, "1")
-  } catch {
-    /* 微信/隐私模式可能禁用 storage */
-  }
-}
-
-function hasIntroPlayed() {
-  if (introPlayed) return true
-  try {
-    return sessionStorage.getItem(INTRO_STORAGE_KEY) === "1"
-  } catch {
-    return introPlayed
-  }
-}
-
 export default function IntroFlip() {
-  const [done, setDone] = useState(true)
+  const [done, setDone] = useState(false)
 
   useEffect(() => {
-    if (hasIntroPlayed()) {
+    if (sessionStorage.getItem(INTRO_STORAGE_KEY)) {
       setDone(true)
       return
     }
 
-    if (shouldSkipDecorativeMotion()) {
-      markIntroPlayed()
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches
+
+    if (prefersReducedMotion) {
+      sessionStorage.setItem(INTRO_STORAGE_KEY, "1")
       setDone(true)
       return
     }
-
-    setDone(false)
 
     const timer = window.setTimeout(() => {
-      markIntroPlayed()
+      sessionStorage.setItem(INTRO_STORAGE_KEY, "1")
       setDone(true)
     }, 1800)
 

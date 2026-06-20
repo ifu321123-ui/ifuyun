@@ -9,7 +9,6 @@ import {
   JUNNI_STAGE_VH,
   junniHero,
 } from "./junniData"
-import { shouldUseScrollScrub } from "@/lib/scrollEnv"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -115,7 +114,7 @@ export default function JunniHero({ onInZoneChange }: JunniHeroProps) {
     const grid = gridRef.current
     if (!stage || !scene || !matrix || !grid) return
 
-    const touchStatic = !shouldUseScrollScrub()
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
     const cards = cardRefs.current.filter(Boolean) as HTMLDivElement[]
     const flips = flipRefs.current.filter(Boolean) as HTMLDivElement[]
     const wells = cellRefs.current
@@ -155,18 +154,13 @@ export default function JunniHero({ onInZoneChange }: JunniHeroProps) {
       matrix.style.display = ""
     }
 
-    if (touchStatic) {
-      apply(0)
-      scene.style.background = "#0a0a0a"
-      scene.dataset.menuBg = "dark"
+    if (reducedMotion) {
+      // 降级：直接呈现绿底终态，并撤掉重型矩阵，背面文字常显。
+      matrix.style.display = "none"
+      scene.style.background = "#f17fb3"
+      scene.dataset.menuBg = "light"
       window.dispatchEvent(new Event("junni-menu-bg"))
-      if (backOverlay) backOverlay.style.opacity = "0"
-      const root = stage.closest(".junni-root") as HTMLElement | null
-      onInZoneChange?.(true)
-      if (root) {
-        const rect = root.getBoundingClientRect()
-        onInZoneChange?.(rect.bottom > window.innerHeight * 0.6)
-      }
+      if (backOverlay) backOverlay.style.opacity = "1"
       return
     }
 

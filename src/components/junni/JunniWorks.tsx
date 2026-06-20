@@ -24,7 +24,6 @@ import {
   workDrumrollSrc,
 } from "./drumrollGeometry"
 import { markHomeWorksReturn } from "@/hooks/useRoute"
-import { shouldUseScrollScrub } from "@/lib/scrollEnv"
 import { junniWorks } from "./junniData"
 import "./JunniWorks.css"
 
@@ -122,10 +121,7 @@ export default function JunniWorks() {
     const viewport = viewportRef.current
     if (!canvas || !section || !viewport) return
 
-    if (!shouldUseScrollScrub()) {
-      updateDomItems(0)
-      return
-    }
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
 
     const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true })
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
@@ -289,7 +285,8 @@ export default function JunniWorks() {
     const section = sectionRef.current
     if (!section) return
 
-    if (!shouldUseScrollScrub()) {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    if (reduce) {
       progressRef.current = 0
       updateDomItems(0)
       return

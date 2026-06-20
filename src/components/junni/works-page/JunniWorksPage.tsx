@@ -23,8 +23,6 @@ import {
 
 } from "./junniWorksPageData"
 
-import { shouldUseScrollScrub } from "@/lib/scrollEnv"
-
 import "./JunniWorksPage.css"
 
 gsap.registerPlugin(ScrollTrigger)
@@ -57,7 +55,6 @@ const PORTFOLIO_VIEW_KEY = "jwp-view-mode"
 
 function readPortfolioView(): ViewMode {
   if (typeof window === "undefined") return "list"
-  if (!shouldUseScrollScrub()) return "list"
   return sessionStorage.getItem(PORTFOLIO_VIEW_KEY) === "drumroll" ? "drumroll" : "list"
 }
 
@@ -257,7 +254,8 @@ export default function JunniWorksPage({ footerRef, onReadyChange }: JunniWorksP
     const section = drumrollSectionRef.current
     if (!section) return
 
-    if (!shouldUseScrollScrub()) {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    if (reduce) {
       setDrumrollPhase(0)
       return
     }
@@ -321,10 +319,6 @@ export default function JunniWorksPage({ footerRef, onReadyChange }: JunniWorksP
   }, [page, setDrumrollPhase])
 
   useEffect(() => {
-    if (!shouldUseScrollScrub()) {
-      setView("list")
-      return
-    }
     sessionStorage.setItem(PORTFOLIO_VIEW_KEY, view)
   }, [view])
 
@@ -617,9 +611,7 @@ export default function JunniWorksPage({ footerRef, onReadyChange }: JunniWorksP
 
 
 
-      {toggleMounted && shouldUseScrollScrub()
-        ? createPortal(toggleNode, document.body)
-        : null}
+      {toggleMounted ? createPortal(toggleNode, document.body) : null}
 
     </div>
 
