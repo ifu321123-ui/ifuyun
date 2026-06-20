@@ -306,7 +306,7 @@
 }
 
 @media (max-width: 768px) {
-  .junni-works {
+  html:not(.touch-static) .junni-works {
     min-height: 280vh;
     min-height: 280dvh;
   }

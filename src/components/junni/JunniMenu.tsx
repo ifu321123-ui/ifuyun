@@ -105,7 +105,6 @@ export default function JunniMenu(_props: JunniMenuProps = {}) {
       return
     }
 
-    let frame = 0
     let current = false
 
     const sample = () => {
@@ -116,26 +115,20 @@ export default function JunniMenu(_props: JunniMenuProps = {}) {
       }
     }
 
-    const tick = () => {
-      sample()
-      frame = requestAnimationFrame(tick)
-    }
-
     sample()
-    frame = requestAnimationFrame(tick)
 
     const onResize = () => sample()
-    window.addEventListener("resize", onResize)
+    const onScroll = () => sample()
+    window.addEventListener("resize", onResize, { passive: true })
+    window.addEventListener("scroll", onScroll, { passive: true })
     window.addEventListener("junni-menu-bg", sample)
-    lenis?.on("scroll", sample)
 
     return () => {
-      cancelAnimationFrame(frame)
       window.removeEventListener("resize", onResize)
+      window.removeEventListener("scroll", onScroll)
       window.removeEventListener("junni-menu-bg", sample)
-      lenis?.off("scroll", sample)
     }
-  }, [page, lenis])
+  }, [page])
 
   const closeMenu = useCallback(() => {
     const panel = panelRef.current
