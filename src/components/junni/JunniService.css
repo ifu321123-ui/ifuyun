@@ -3,7 +3,7 @@
   --svc-bg: #f7f7f7;
   --svc-ink: #111111;
   --svc-dark: #1c1d21;
-  --svc-green: #dcff46;
+  --svc-green: #f17fb3;
   --svc-line: rgba(17, 17, 17, 0.14);
   --svc-ease: cubic-bezier(0.16, 1, 0.3, 1);
   /* 行内统一度量：左右内边距 / 编号列宽 / 列间距，供面板正文与名称对齐复用 */

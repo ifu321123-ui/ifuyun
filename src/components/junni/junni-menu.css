@@ -1,7 +1,7 @@
 /* —— junni.co.jp 全局 MENU 导航（结构/参数对齐原站 about.BCtYlxuM.css） —— */
 
 .junni-menu {
-  --junni-menu-accent: #dcff46;
+  --junni-menu-accent: #f17fb3;
   --junni-menu-ink: #111;
   --junni-menu-text: #f7f7f7;
   --junni-menu-btn-size: 5em;
@@ -418,7 +418,7 @@
 
   .junni-nav_action--primary:hover {
     transform: scale(1.02);
-    box-shadow: 0 0.35rem 1rem rgb(220 255 70 / 28%);
+    box-shadow: 0 0.35rem 1rem rgb(241 127 179 / 28%);
   }
 
   .junni-nav_action--resume:hover {

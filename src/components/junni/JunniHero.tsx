@@ -142,7 +142,7 @@ export default function JunniHero({ onInZoneChange }: JunniHeroProps) {
 
       // 接近翻完时把 sticky 底色由黑切绿：此刻多数格子已是绿背，
       // 网格细缝随之由黑转绿、与 home_about 无缝衔接，且消除黑底上的绿色缝隙。
-      scene.style.background = p >= FLIP_END ? "#cbea41" : "#0a0a0a"
+      scene.style.background = p >= FLIP_END ? "#f17fb3" : "#0a0a0a"
       scene.dataset.menuBg = p >= FLIP_END ? "light" : "dark"
       window.dispatchEvent(new Event("junni-menu-bg"))
 
@@ -157,7 +157,7 @@ export default function JunniHero({ onInZoneChange }: JunniHeroProps) {
     if (reducedMotion) {
       // 降级：直接呈现绿底终态，并撤掉重型矩阵，背面文字常显。
       matrix.style.display = "none"
-      scene.style.background = "#cbea41"
+      scene.style.background = "#f17fb3"
       scene.dataset.menuBg = "light"
       window.dispatchEvent(new Event("junni-menu-bg"))
       if (backOverlay) backOverlay.style.opacity = "1"

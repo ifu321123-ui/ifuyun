@@ -7,7 +7,7 @@ import { junniHero } from "./junniData"
 gsap.registerPlugin(ScrollTrigger)
 
 const ABOUT_INK = "#111111"
-const ABOUT_HIDDEN = "#cbea41"
+const ABOUT_HIDDEN = "#f17fb3"
 
 /**
  * home_about：荧光绿底 + 黑字大段日文文案 + ABOUT JUNNI 按钮。

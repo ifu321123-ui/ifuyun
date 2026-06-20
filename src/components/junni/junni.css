@@ -3,7 +3,7 @@
 .junni-root {
   --junni-black: #0a0a0a; /* 格缝/底层暗色阶，比卡片更深，渲染出网格线 */
   --junni-panel: #1c1d21; /* 卡片正面暗色阶 */
-  --junni-green: #cbea41;
+  --junni-green: #f17fb3;
   --junni-ink: #0a0a0a;
   --junni-white: #f5f5f5;
   --junni-gap: 2.76px; /* 原站单元缝隙，配合圆角呈“巧克力网格” */

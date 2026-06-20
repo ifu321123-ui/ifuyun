@@ -8,9 +8,9 @@
   --font-averia: "Averia Serif Libre", "Noto Serif SC", "Songti SC", serif;
   --font-serif: "Playfair Display", "Averia Serif Libre", "Noto Serif SC", "Songti SC", serif;
 
-  --notebook-red: #cbea41;
-  /* 红→主题绿换肤：把红色皮革/红色线稿插画整体旋到黄绿色相 */
-  --notebook-hue: 65deg;
+  --notebook-red: #f17fb3;
+  /* 红→主题粉换肤：把红色皮革/红色线稿插画整体旋到粉色调 */
+  --notebook-hue: 298deg;
   --notebook-cream: #f2e3cf;
   --notebook-paper: #f5f0e6;
 
@@ -29,13 +29,13 @@
   --color-border: oklch(1 0 0 / 10%);
   --color-border-strong: oklch(1 0 0 / 18%);
 
-  /* 强调色：砖红（按钮/激活态/点缀），文字用奶油色 */
-  --color-accent: oklch(0.63 0.18 28);
+  /* 强调色：粉（按钮/激活态/点缀），文字用奶油色 */
+  --color-accent: oklch(0.73 0.17 350);
   --color-accent-foreground: oklch(0.97 0.02 86);
-  --color-accent-muted: oklch(0.63 0.18 28 / 14%);
+  --color-accent-muted: oklch(0.73 0.17 350 / 14%);
 
-  /* 点缀色统一为砖红 */
-  --color-brand: oklch(0.63 0.18 28);
+  /* 点缀色统一为粉 */
+  --color-brand: oklch(0.73 0.17 350);
 
   --radius: 1rem;
 
@@ -1472,7 +1472,7 @@
 @layer components {
   :root {
     --gunze-blue: #1700ff;
-    --gunze-green: #dcff46;
+    --gunze-green: #f17fb3;
     --gunze-bg: #ffffff;
     --gunze-ink: #0b0713;
     --gunze-yellow: #f2ff00;
@@ -1543,7 +1543,7 @@
 
   .business-intro__word {
     margin: clamp(0.4rem, 1.4vw, 1.2rem) 0 0;
-    color: #cbea41;
+    color: #f17fb3;
     font-size: clamp(3.4rem, 14.5vw, 14rem);
     font-weight: 950;
     line-height: 0.86;
@@ -1864,7 +1864,7 @@
   .gunze-message-fill {
     position: absolute;
     inset: 0;
-    background: #cbea41;
+    background: #f17fb3;
     opacity: var(--gunze-flood-alpha);
     will-change: opacity;
   }
@@ -1877,8 +1877,8 @@
        rx/ry 半轴、圆心 cx/cy 全部由 JS 写入 CSS 变量；末端 1.2px 软边做抗锯齿。 */
     background: radial-gradient(
       var(--gunze-dot-rx, 74px) var(--gunze-dot-ry, 52px) at var(--gunze-dot-left, 50%) var(--gunze-dot-top, 50%),
-      #cbea41 0,
-      #cbea41 calc(100% - 1.2px),
+      #f17fb3 0,
+      #f17fb3 calc(100% - 1.2px),
       transparent 100%
     );
     will-change: background;
@@ -2588,7 +2588,7 @@
 
   .gunze-btn:hover {
     transform: translateY(-3px);
-    box-shadow: 0 1rem 2rem rgb(220 255 70 / 28%);
+    box-shadow: 0 1rem 2rem rgb(241 127 179 / 28%);
   }
 
   .profile-switcher {
