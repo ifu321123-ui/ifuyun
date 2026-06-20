@@ -243,31 +243,15 @@ export default function JunniWorks() {
     resize()
     window.addEventListener("resize", resize)
 
-    if (reduce) {
-      renderFrame()
-    } else {
-      const io = new IntersectionObserver(
-        (entries) => entries.forEach((e) => (e.isIntersecting ? start() : stop())),
-        { threshold: 0 },
-      )
-      io.observe(section)
-      return () => {
-        disposed = true
-        io.disconnect()
-        stop()
-        window.removeEventListener("resize", resize)
-        refs.panels.forEach(({ mesh, mat }) => {
-          mesh.geometry.dispose()
-          mat.map?.dispose()
-          mat.dispose()
-        })
-        renderer.dispose()
-        sceneRef.current = null
-      }
-    }
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => (e.isIntersecting ? start() : stop())),
+      { threshold: 0 },
+    )
+    io.observe(section)
 
     return () => {
       disposed = true
+      io.disconnect()
       stop()
       window.removeEventListener("resize", resize)
       refs.panels.forEach(({ mesh, mat }) => {
