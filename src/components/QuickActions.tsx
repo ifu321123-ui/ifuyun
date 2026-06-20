@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react"
 import { ArrowRight, Download } from "lucide-react"
 import { profile } from "@/data"
-import { navigate } from "@/hooks/useRoute"
 import { cn } from "@/lib/utils"
 
 export default function QuickActions() {
@@ -24,17 +23,20 @@ export default function QuickActions() {
       )}
       aria-hidden={!visible}
     >
-      <button
-        onClick={() => navigate("portfolio")}
+      <a
+        href={profile.portfolioUrl}
+        download={profile.portfolioDownloadName}
+        target="_blank"
+        rel="noreferrer"
         className="group inline-flex items-center justify-center gap-2 rounded-full bg-accent px-4 py-3 text-sm font-semibold text-accent-foreground shadow-lg transition-transform hover:scale-[1.03] sm:px-5"
-        aria-label="查看项目作品"
+        aria-label="下载作品集"
       >
         <ArrowRight className="size-4 sm:order-2 sm:transition-transform sm:group-hover:translate-x-1" />
-        <span className="hidden sm:inline">查看项目作品</span>
-      </button>
+        <span className="hidden sm:inline">下载作品集</span>
+      </a>
       <a
         href={profile.resumeUrl}
-        download
+        download={profile.resumeDownloadName}
         target="_blank"
         rel="noreferrer"
         className="inline-flex items-center justify-center gap-2 rounded-full border border-border-strong bg-background/90 px-4 py-3 text-sm font-semibold text-foreground shadow-lg backdrop-blur-sm transition-colors hover:bg-muted sm:px-5"

@@ -14,6 +14,8 @@ export const profile = {
   github: "https://github.com/ifu321123-ui",
   resumeUrl: "/resume.pdf",
   portfolioUrl: "/portfolio.pdf",
+  resumeDownloadName: "付云椒-简历.pdf",
+  portfolioDownloadName: "付云椒-作品集.pdf",
   currentStatus: "成都锦城学院 · 数字媒体技术",
   previous: ["成都四方伟业（UI 实习生）", "码绘技术工作室 UI 组负责人"],
   brandClosing:

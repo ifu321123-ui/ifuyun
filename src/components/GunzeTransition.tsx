@@ -93,22 +93,22 @@ function CeoSection() {
               </div>
             </div>
             <figcaption>
-              AI 复合型产品经理 · UX 设计
+              产品经理 · UX 设计
               <br />
               付云椒
             </figcaption>
           </figure>
 
           <div className="gunze-ceo__copy">
-            <p className="gunze-ceo__catch">体验为先 = 价值落地</p>
+            <p className="gunze-ceo__catch">见问题而定，向价值而行</p>
             <p>
-              工具总在变，好的体验却不会过时。
+              若要为这一路留一句寓意——
               <br />
-              我始终相信，产品要从真实问题出发，
+              产品思维，是在纷繁里拎出主线，在假设里找到证据。
               <br />
-              用设计把复杂变清晰，用 AI 把验证变更快。
+              把该做的题定义清楚，把不必做的路主动关掉。
               <br />
-              也想继续把这三件事，织进每一次创作里。
+              每一次取舍，都指向同一件事：让价值更早、更准地抵达。
             </p>
             <button type="button" className="gunze-btn" onClick={() => navigate("contact")}>
               联系我

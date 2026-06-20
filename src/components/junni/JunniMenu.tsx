@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import gsap from "gsap"
 import { useLenis } from "lenis/react"
-import { ArrowRight, Download } from "lucide-react"
+import { Download } from "lucide-react"
 import { profile } from "@/data"
 import { navigate, useRoute, type PageId } from "@/hooks/useRoute"
 import {
@@ -403,18 +403,21 @@ export default function JunniMenu(_props: JunniMenuProps = {}) {
                     ref={actionsRef}
                     style={{ opacity: 0, transform: "translateY(15px)" }}
                   >
-                    <button
-                      type="button"
-                      className="junni-nav_action junni-nav_action--primary"
-                      onClick={() => onNavClick(JUNNI_MENU_ACTIONS.portfolio.page)}
+                    <a
+                      className="junni-nav_action junni-nav_action--resume"
+                      href={profile.portfolioUrl}
+                      download={profile.portfolioDownloadName}
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={closeMenu}
                     >
+                      <Download className="junni-nav_action-icon" aria-hidden />
                       <span>{JUNNI_MENU_ACTIONS.portfolio.label}</span>
-                      <ArrowRight className="junni-nav_action-icon" aria-hidden />
-                    </button>
+                    </a>
                     <a
                       className="junni-nav_action junni-nav_action--resume"
                       href={profile.resumeUrl}
-                      download
+                      download={profile.resumeDownloadName}
                       target="_blank"
                       rel="noreferrer"
                       onClick={closeMenu}

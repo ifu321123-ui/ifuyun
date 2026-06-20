@@ -64,7 +64,7 @@ function StickyBeliefNote({
         <div className="notebook-sticky-actions">
           <a
             href={profile.resumeUrl}
-            download
+            download={profile.resumeDownloadName}
             target="_blank"
             rel="noreferrer"
             className="notebook-sticky-btn notebook-sticky-btn--primary"
@@ -74,7 +74,7 @@ function StickyBeliefNote({
           </a>
           <a
             href={profile.portfolioUrl}
-            download
+            download={profile.portfolioDownloadName}
             target="_blank"
             rel="noreferrer"
             className="notebook-sticky-btn notebook-sticky-btn--outline"
