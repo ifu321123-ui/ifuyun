@@ -1,0 +1,8 @@
+# Cloudflare Pages — https://dash.cloudflare.com
+# Git 连接仓库后，构建命令 npm run build，输出目录 dist
+name = "ifuyun"
+pages_build_output_dir = "./dist"
+compatibility_date = "2024-08-01"
+
+[env.production]
+name = "ifuyun"
